@@ -25,7 +25,7 @@ export default function CommandPalette() {
   return (
     <>
       <Command.Dialog open={open} onOpenChange={setOpen}>
-        <Command.Input placeholder="Search..." />
+        <Command.Input placeholder="⌘/Ctrl + K" />
         <Command.List>
           <Command.Empty>No results found.</Command.Empty>
 

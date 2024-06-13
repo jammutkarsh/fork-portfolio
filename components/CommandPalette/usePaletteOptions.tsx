@@ -5,14 +5,13 @@ import { allBlogs } from 'contentlayer/generated';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
 import { ReactNode } from 'react';
+import { BsMoonFill, BsSunFill } from 'react-icons/bs';
 import {
-  HiOutlineDocumentAdd,
   HiOutlineDocumentDuplicate,
   HiOutlineHome,
   HiOutlinePencil,
   HiOutlineUser,
 } from 'react-icons/hi';
-import { TbBolt, TbBoltOff } from 'react-icons/tb';
 
 type PaletteOption = {
   id: string;
@@ -30,7 +29,7 @@ export default function usePaletteOptions() {
     {
       id: 'Toggle Theme',
       name: 'Toggle Theme',
-      icon: theme === 'dark' ? <TbBolt /> : <TbBoltOff />,
+      icon: theme === 'dark' ? <BsSunFill /> : <BsMoonFill />,
       onSelect: () => setTheme(theme === 'dark' ? 'light' : 'dark'),
     },
     {
@@ -45,7 +44,6 @@ export default function usePaletteOptions() {
     { id: '/', name: 'Home', icon: <HiOutlineHome />, onSelect: (v) => router.push(v) },
     { id: '/blog', name: 'Blog', icon: <HiOutlinePencil />, onSelect: (v) => router.push(v) },
     { id: '/about', name: 'About', icon: <HiOutlineUser />, onSelect: (v) => router.push(v) },
-    { id: '/uses', name: 'Uses', icon: <HiOutlineDocumentAdd />, onSelect: (v) => router.push(v) },
   ];
 
   const blogOptions: PaletteOption[] = sortedPosts.map((post) => ({
