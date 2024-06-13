@@ -3,10 +3,11 @@ import MainLayout from '@/layouts/MainLayout';
 import { allCoreContent } from '@/lib/utils/contentlayer';
 import kebabCase from '@/lib/utils/kebabCase';
 import { allBlogs } from 'contentlayer/generated';
+import siteMetadata from 'content/siteMetadata';
 
 export const metadata = {
-  title: 'Blog - Dale Larroder',
-  description: 'My Tags - Dale Larroder',
+  title: 'Blog - ' + siteMetadata.title,
+  description: 'My Tags - ' + siteMetadata.title,
 };
 
 export default function Tag({ params }: { params: { tag: string } }) {

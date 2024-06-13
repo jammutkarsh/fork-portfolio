@@ -3,10 +3,11 @@ import MainLayout from '@/layouts/MainLayout';
 import { sortedBlogPost } from '@/lib/utils/contentlayer';
 import { POSTS_PER_PAGE } from '@/types/default';
 import { allBlogs } from 'contentlayer/generated';
+import siteMetadata from 'content/siteMetadata';
 
 export const metadata = {
-  title: 'Blog - Dale Larroder',
-  description: 'My Blogs - Dale Larroder',
+  title: 'Blog - ' + siteMetadata.title,
+  description: 'My Blogs - ' + siteMetadata.title,
 };
 
 export default function Blog() {

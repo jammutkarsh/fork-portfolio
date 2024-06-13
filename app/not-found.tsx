@@ -1,12 +1,11 @@
 import Link from '@/components/Link';
 import SectionContainer from '@/components/SectionContainer';
+import siteMetadata from 'content/siteMetadata';
 
-// TODO: Comment out when https://github.com/vercel/next.js/issues/50566 is fixed.
-
-// export const metadata = {
-//   title: '404 - Dale Larroder',
-//   description: 'Not Found - Dale Larroder',
-// };
+export const metadata = {
+  title: '404 - ' + siteMetadata.title,
+  description: 'Not Found - ' + siteMetadata.title,
+};
 
 export default function FourZeroFour() {
   return (

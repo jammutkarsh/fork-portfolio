@@ -1,9 +1,10 @@
 import Projects from '@/components/Projects/Projects';
 import MainLayout from '@/layouts/MainLayout';
+import siteMetadata from 'content/siteMetadata';
 
 export const metadata = {
-  title: 'Projects - Dale Larroder',
-  description: 'My Projects - Dale Larroder',
+  title: siteMetadata.title,
+  description: 'My Projects - ' + siteMetadata.title,
 };
 
 export default function Page() {
