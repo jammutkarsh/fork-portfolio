@@ -1,0 +1,244 @@
+---
+title: 'Test Driven Leetcode'
+date: '2023-12-23'
+tags: ['Leetcode', 'Data Structures & Algorithm']
+draft: false
+author: 'Utkarsh Chourasia'
+summary: 'This article will show you how you take the test driven development approach to solve leetcode problems.'
+---
+
+## Overview
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+# Intro
+
+You might have heard about [Test Driven Development(**TDD**)](https://en.wikipedia.org/wiki/Test-driven_development). It's a practice where you write the test(case) for the function(ality) first, before implementing it.
+
+Some say it's stupid, while others say it's a good practice. [If you 100.00% sure about what the output is going to be, then TDD is the way to go.'](https://youtu.be/nVrf6FgL13Q) is something I have concluded from all those opinions.
+
+When solving a Leetcode question, you are in that **100.00% sure** spot. Leetcode, provides you the input and the output, you just need to figure out the path. Sounds familiar? Yes, it's the same as TDD for Leetcode. But today, we are going to learn how to write **Test Driven Leetcode (TDL)**
+
+## Reasons why you should read further
+
+There are many obvious(_conscious_) & subtle(_unconscious_) benefits of this, but I will list the ones which I think are the most important:
+
+1. Depending upon the language, you might not need a `func main()` to test your code locally.\*
+2. Brings 5 out of 11 **Leetcode premium** feature to your IDE.
+   1. [Debugging](https://leetcode.com/subscribe/#:~:text=your%20source%20code.-,Debugger,-Tired%20ofSystem)
+   2. [Unlimited Playgrounds](https://leetcode.com/subscribe/#:~:text=Unlimited%20Playgrounds)
+   3. [Cloud Storage](https://leetcode.com/subscribe/#:~:text=select%20items/content.-,Cloud%20Storage,-Code%20and%20layouts) _using GitHub/GitLab_
+   4. [Autocomplete](https://leetcode.com/subscribe/#:~:text=from%20Google%20alone.-,Autocomplete,-Not%20interested%20in)
+   5. [Lightning Judge](https://leetcode.com/subscribe/#:~:text=our%20code%20editor.-,Lightning%20Judge,-Tired%20of%20waiting)
+3. As a _Junior Developer_, you might be able to impress an interviewer!\*\*
+4. With coverage report of your solution, you can either add more test cases in your code or remove the parts of code that are not covered.\*\*\*
+
+<small>
+
+_\*In languages like C/C++, it's a little trivial to write a unit test in those cases you need to write the func main()._
+
+_\*\*This actually happened to me in an interview. The person asked me 'solve a these questions where ever you are comfortable', so I solved them in my IDE using TDL. Towards the end of our call, he mentioned that 'He has never seen someone solve algorithms question using a Unit Test approach'._
+
+_\*\*\*When someone asks you, 'what happen if I remove this line of code?' the coverage report will be there to save you._
+
+</small>
+
+## Example(s)
+
+I will be using [Leetcode 509. Fibonacci Number](https://leetcode.com/problems/fibonacci-number/) as an example and solving the question in Go and C++(one of the most popular languages used to solve Leetcode)
+
+For languages like Python we have [unittest](https://docs.python.org/3/library/unittest.html) and for Java, we have [JUnit](https://junit.org/junit5/). The syntax might differ, but you will have the idea of what needs to be done.
+
+### Example in Go
+
+**Code File:** `509.go`
+
+```go
+package fib
+
+var recursionArray map[int]int
+
+func fib(n int) int {
+ if n <= 1 {
+  return n
+ }
+ if recursionArray == nil {
+  recursionArray = make(map[int]int)
+ }
+ if _, ok := recursionArray[n]; ok {
+  return recursionArray[n]
+ }
+ recursionArray[n] = fib(n-1) + fib(n-2)
+ return recursionArray[n]
+}
+```
+
+**Test File:** `509_test.go`
+
+```go
+package fib
+
+import "testing"
+
+// Auto-Generated test using Go VSCode Extention saving some time.
+func TestFib(t *testing.T) {
+ type args struct {
+  n int
+ }
+ tests := []struct {
+  name string
+  args args
+  want int
+ }{
+  {"Test Case 1", args{0}, 0},
+  {"Test Case 2", args{1}, 1},
+  {"Test Case 3", args{4}, 3},
+  {"Test Case 4", args{7}, 13},
+ }
+ for _, tt := range tests {
+  t.Run(tt.name, func(t *testing.T) {
+   if got := fib(tt.args.n); got != tt.want {
+    t.Errorf("Fib() = %v, want %v", got, tt.want)
+   }
+  })
+ }
+}
+```
+
+**Testing:**
+
+```bash
+$ go test . # For a passing test
+ok      gitlab.com/jammutkarsh/dsa-in-go/509    0.253s
+
+$ go test . # For a failing test
+--- FAIL: TestFib (0.00s)
+    --- FAIL: TestFib/Fib(0) (0.00s)
+        509_test.go:23: Fib() = 0, want 1
+FAIL
+FAIL    gitlab.com/jammutkarsh/dsa-in-go/509    0.354s
+FAIL
+```
+
+### In C++
+
+**Code and Test file:** `509.cpp`
+
+```cpp
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <iterator>
+#include <list>
+#include <map>            // map and multimaps
+#include <numeric>        // some numeric algorithm
+#include <set>            // set and multisets
+#include <unordered_map>  // unordered map and unordered multimap
+#include <unordered_set>  // unordered set and unordered multisets
+#include <vector>
+
+using namespace std;
+
+// Sometimes needed to convert a vector to a string for printing
+string VectorToString(vector<int> input) {
+    string str = "[";
+    for (int i = 0; i < input.size(); i++) {
+        str += to_string(input[i]);
+        if (i != input.size() - 1) {
+            str += ", ";
+        }
+    }
+    str += "]";
+    return str;
+}
+
+class Args {
+   private:
+    struct Parameters {int target;};
+    struct Result {int result;};
+
+   public:
+    string TestCase;
+    Parameters Input;
+    Result Output;
+    Args(string name, Parameters input, Result output) {
+        TestCase = name;
+        Input = input;
+        Output = output;
+    }
+};
+
+int Recursivefib(int n) {
+    if (n <= 1) return n;
+    return Recursivefib(n - 1) + Recursivefib(n - 2);
+}
+
+int fib(int n) {
+    if (n <= 1) return n;
+    int last = 0, sLast = 1;
+    int fib = 0;
+    while (n--) {
+        fib = last + sLast;
+        sLast = last;
+        last = fib;
+    }
+    return fib;
+}
+
+int main() {
+    bool allPassing = false;
+    vector<Args> args;
+    args.push_back(Args("Test Case 1", {0}, {0}));
+    args.push_back(Args("Test Case 2", {1}, {1}));
+    args.push_back(Args("Test Case 3", {2}, {1}));
+    args.push_back(Args("Test Case 4", {3}, {2}));
+
+    for (int i = 0; i < args.size(); i++) {
+        auto result = fib(args[i].Input.target);
+        if (result != args[i].Output.result) {
+            cout << "FAIL: " << args[i].TestCase << endl;
+            cout << "EXPECTED: " << args[i].Output.result << endl;
+            cout << "GOT: " << result << endl;
+            allPassing = true;
+        }
+    }
+
+    if (!allPassing) {
+        cout << "ok!" << endl;
+        return 1;
+    }
+    return 0;
+}
+
+```
+
+**Testing:**
+
+```bash
+$ gpp 509.cpp # For a passing test
+ok!
+
+$ gpp 509.cpp # For a failing test
+FAIL: Test Case 4
+EXPECTED: 2
+GOT: 1
+```
+
+> `gpp` is a custom script that complies, runs, and deletes the c++ executable.
+
+## Cons
+
+### Boilerplate Code
+
+This might seem a little exhausting initially, writing up all the boilerplate code, then adding tests to it. While the platform provides everything.
+
+For this, I maintain a `template.lang` file that has all the boiler code I am ever going to need. Then I simply need to import the function signature, and let GitHub Copilot write test cases for me.
+
+### Advanced Topics
+
+There are times when we would have to write some complex inputs and outputs, and it could easily become challenging. Well, in that case, I would simply code the solution on the platform.
+
+## Conclusion
+
+Frankly, this is an overkill for most (basic) Leetcode questions, but I still find this technique valuable as a junior developer who has just started.
+Also, there are topics, where the code seems simple to write, but hard to understand. In those scenarios this method could be very helpful and that's what makes it worth trying.
