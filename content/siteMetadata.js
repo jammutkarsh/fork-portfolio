@@ -13,10 +13,7 @@ const siteMetadata = {
   email: 'dlarroder@gmail.com',
   github: 'https://github.com/dlarroder',
   twitter: 'https://twitter.com/dalelarroder',
-  facebook: 'https://facebook.com/dlarroder',
   linkedin: 'https://www.linkedin.com/in/dale-larroder/',
-  spotify: 'https://open.spotify.com/user/12162121994?si=e685b3546f414967',
-  steam: 'https://steamcommunity.com/id/dlarroder/',
   locale: 'en-US',
   comment: {
     provider: 'giscus',
