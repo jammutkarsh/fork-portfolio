@@ -28,6 +28,13 @@ module.exports = {
         aspects: ['invalidHref', 'preferButton'],
       },
     ],
+    'sort-imports': [
+      'error',
+      {
+        ignoreCase: true,
+        ignoreDeclarationSort: true,
+      },
+    ],
     'react/prop-types': 0,
     'no-unused-vars': 0,
     'react/no-unescaped-entities': 'off',
