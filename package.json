@@ -5,10 +5,8 @@
   "scripts": {
     "dev": "contentlayer dev & next dev",
     "build": "next build",
-    "postbuild": "yarn rss",
-    "rss": "cross-env NODE_OPTIONS='--experimental-json-modules' node ./scripts/generate-rss.mjs",
     "serve": "next start",
-    "lint": "next lint --fix --dir pages --dir components --dir lib --dir layouts --dir scripts",
+    "lint": "next lint --fix --dir app --dir components --dir lib --dir layouts --dir scripts --dir content",
     "prepare": "husky install"
   },
   "engines": {

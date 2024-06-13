@@ -3,7 +3,6 @@
 - **Framework**: [Next.js](https://nextjs.org/)
 - **Deployment**: [Vercel](https://vercel.com)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Analytics**: [Logrocket](https://logrocket.com/)
 - **Content**: [MDX](https://mdxjs.com/) with [Contentlayer](https://www.contentlayer.dev/)
 
 ## Running Locally
@@ -69,10 +68,10 @@ Don't forget to give the project a star! Thanks again!
 
 This is the second version of my website.
 
-Prevoius v1 version:
+Previous v1 version:
 
-- https://v1.dalelarroder.com/
+- <https://v1.dalelarroder.com/>
 
-## Licence
+## License
 
 [MIT](https://github.com/dlarroder/dalelarroder/blob/master/LICENSE) © [Dale Larroder](https://www.dalelarroder.com)
