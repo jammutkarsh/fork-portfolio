@@ -8,7 +8,7 @@ const siteMetadata = {
   siteUrl: 'https://dalelarroder.com',
   siteRepo: 'https://github.com/dlarroder/dalelarroder-blog',
   siteLogo: '/static/images/logo.png',
-  image: '/static/images/avatar.webp',
+  image: '/static/images/avatar.jpg',
   socialBanner: '/static/images/twitter-card.png',
   email: 'dlarroder@gmail.com',
   github: 'https://github.com/dlarroder',
