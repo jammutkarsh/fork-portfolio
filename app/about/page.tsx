@@ -1,8 +1,8 @@
 import { MDXLayoutRenderer } from '@/components/MDXComponents';
+import siteMetadata from '@/content/siteMetadata';
 import AuthorLayout from '@/layouts/MDX/AuthorLayout';
 import MainLayout from '@/layouts/MainLayout';
 import { allAuthors } from 'contentlayer/generated';
-import siteMetadata from 'content/siteMetadata';
 
 export const metadata = {
   title: 'About - ' + siteMetadata.title,

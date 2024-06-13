@@ -1,4 +1,4 @@
-import siteMetadata from 'content/siteMetadata';
+import siteMetadata from '@/content/siteMetadata';
 import { allBlogs } from 'contentlayer/generated';
 import { MetadataRoute } from 'next';
 

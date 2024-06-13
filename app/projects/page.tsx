@@ -1,6 +1,6 @@
 import Projects from '@/components/Projects/Projects';
+import siteMetadata from '@/content/siteMetadata';
 import MainLayout from '@/layouts/MainLayout';
-import siteMetadata from 'content/siteMetadata';
 
 export const metadata = {
   title: siteMetadata.title,

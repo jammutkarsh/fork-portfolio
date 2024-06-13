@@ -1,7 +1,8 @@
 import PageTitle from '@/components/PageTitle';
+import PostComments from '@/components/PostComments';
 import PostNavigation from '@/components/PostNavigation';
+import siteMetadata from '@/content/siteMetadata';
 import { CoreContent } from '@/lib/utils/contentlayer';
-import siteMetadata from 'content/siteMetadata';
 import type { Blog } from 'contentlayer/generated';
 import { ReactNode } from 'react';
 
@@ -48,7 +49,7 @@ export default function PostLayout({ content, children, next, prev }: Props) {
           <div className="prose max-w-none pt-8 pb-8 dark:prose-dark">
             {children}
             <PostNavigation prev={prev} next={next} />
-            {/* <PostComments /> */}
+            <PostComments />
           </div>
         </div>
       </div>

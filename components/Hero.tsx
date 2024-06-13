@@ -1,8 +1,8 @@
 'use client';
 
+import siteMetadata from '@/content/siteMetadata';
 import Link from 'next/link';
 import { ReactElement, useRef } from 'react';
-import siteMetadata from 'content/siteMetadata';
 
 export default function Hero(): ReactElement {
   const ref = useRef<HTMLHeadingElement>(null);

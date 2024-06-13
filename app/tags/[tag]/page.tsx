@@ -1,9 +1,9 @@
+import siteMetadata from '@/content/siteMetadata';
 import ListLayout from '@/layouts/MDX/ListLayout';
 import MainLayout from '@/layouts/MainLayout';
 import { allCoreContent } from '@/lib/utils/contentlayer';
 import kebabCase from '@/lib/utils/kebabCase';
 import { allBlogs } from 'contentlayer/generated';
-import siteMetadata from 'content/siteMetadata';
 
 export const metadata = {
   title: 'Blog - ' + siteMetadata.title,

@@ -1,6 +1,6 @@
 'use client';
 
-import siteMetadata from 'content/siteMetadata';
+import siteMetadata from '@/content/siteMetadata';
 import { useTheme } from 'next-themes';
 import { useEffect } from 'react';
 

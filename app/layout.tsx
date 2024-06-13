@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import LenisProvider from '@/components/Providers/LenisProvider';
 import ThemeProvider from '@/components/Providers/ThemeProvider';
-import siteMetadata from 'content/siteMetadata';
+import siteMetadata from '@/content/siteMetadata';
 
 export const metadata = {
   title: siteMetadata.title,

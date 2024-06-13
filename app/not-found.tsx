@@ -1,6 +1,6 @@
 import Link from '@/components/Link';
 import SectionContainer from '@/components/SectionContainer';
-import siteMetadata from 'content/siteMetadata';
+import siteMetadata from '@/content/siteMetadata';
 
 export const metadata = {
   title: '404 - ' + siteMetadata.title,
