@@ -1,19 +1,20 @@
 const siteMetadata = {
-  title: 'Dale Larroder',
-  author: 'Dale Larroder',
+  title: 'Utkarsh Chourasia',
+  author: 'Utkarsh Chourasia',
   headerTitle: 'dalelarroder',
-  description: 'Software Developer at Aphex',
+  description: 'Software Developer at TCS',
+  bio: 'Server Side Engineer',
   language: 'en-us',
-  theme: 'dark', // system, dark or light
-  siteUrl: 'https://dalelarroder.com',
-  siteRepo: 'https://github.com/dlarroder/dalelarroder-blog',
+  theme: 'system', // system, dark or light
+  siteUrl: 'https://utkarshchourasia.in',
+  siteRepo: 'https://github.com/jammutkarsh/fork-portfolio',
   siteLogo: '/static/images/logo.png',
   image: '/static/images/avatar.jpg',
   socialBanner: '/static/images/twitter-card.png',
-  email: 'dlarroder@gmail.com',
-  github: 'https://github.com/dlarroder',
-  twitter: 'https://twitter.com/dalelarroder',
-  linkedin: 'https://www.linkedin.com/in/dale-larroder/',
+  email: 'mail@utkarshchourasia.in',
+  github: 'https://github.com/jammutkarsh',
+  twitter: 'https://twitter.com/jammutkarsh',
+  linkedin: 'https://www.linkedin.com/in/jammutkarsh',
   locale: 'en-US',
   comment: {
     provider: 'giscus',
@@ -25,11 +26,11 @@ const siteMetadata = {
       mapping: 'pathname',
       reactions: '1',
       metadata: '0',
-      theme: 'light',
+      theme: 'dark',
       darkTheme: 'transparent_dark',
       themeURL: '',
     },
   },
 };
 
-module.exports = siteMetadata;
+export default siteMetadata;
