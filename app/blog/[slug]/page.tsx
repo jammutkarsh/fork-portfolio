@@ -1,11 +1,11 @@
 import { MDXLayoutRenderer } from '@/components/MDXComponents';
-import PageTitle from '@/components/PageTitle';
 import ScrollProgressBar from '@/components/ScrollProgressBar';
 import PostLayout from '@/layouts/MDX/PostLayout';
 import MainLayout from '@/layouts/MainLayout';
 import { coreContent, formatBlogLink, sortedBlogPost } from '@/lib/utils/contentlayer';
 import { allBlogs } from 'contentlayer/generated';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 export async function generateMetadata({
   params,
@@ -47,14 +47,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
             <MDXLayoutRenderer toc={post.toc} content={post} authorDetails={author} />
           </PostLayout>
         ) : (
-          <div className="mt-24 text-center">
-            <PageTitle>
-              Under Construction{' '}
-              <span role="img" aria-label="roadwork sign">
-                🚧
-              </span>
-            </PageTitle>
-          </div>
+          notFound()
         )}
       </MainLayout>
     </>
