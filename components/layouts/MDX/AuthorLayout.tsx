@@ -20,7 +20,8 @@ export default function AuthorLayout({ children, content }: Props) {
             height={150}
             width={150}
             src={avatar || ''}
-            className="rounded-full  mr-5 mt-5"
+            priority={false}
+            className="rounded-full object-scale-down mr-5 mt-5"
           />
         </div>
         <div className="text-center sm:text-left">

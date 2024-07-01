@@ -5,6 +5,17 @@ import { allCoreContent } from '@/lib/utils/contentlayer';
 import kebabCase from '@/lib/utils/kebabCase';
 import { allBlogs } from 'contentlayer/generated';
 
+// Function to generate static paths
+export async function generateStaticParams() {
+  const tags = allBlogs.flatMap((post) => post.tags || []).map((tag) => kebabCase(tag));
+  const uniqueTags = Array.from(new Set(tags));
+
+  return uniqueTags.map((tag) => ({
+    params: { tag },
+  }));
+}
+
+// Metadata for the page
 export const metadata = {
   title: 'Blog - ' + siteMetadata.title,
   description: 'My Tags - ' + siteMetadata.title,
