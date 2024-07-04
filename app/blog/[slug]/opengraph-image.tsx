@@ -1,9 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 import { allBlogs } from 'contentlayer/generated';
 
-// Route segment config
-export const runtime = 'edge';
-
 // Image metadata
 export const alt = 'Blog Post';
 export const size = {
@@ -12,6 +9,8 @@ export const size = {
 };
 
 export const contentType = 'image/png';
+
+export const dynamic = 'force-static';
 
 export default async function Image({ params }: { params: { slug: string } }) {
   const post = allBlogs.find((p) => p.slug === params.slug);
@@ -32,15 +31,18 @@ export default async function Image({ params }: { params: { slug: string } }) {
         {/*Second half*/}
         <div tw="flex h-[45%] w-full pt-[3.5%] pb-[3.5%]">
           <div tw="flex w-[20%] h-full pl-[3.5%] pr-0">
-            <img
-              width="180"
-              height="180"
-              src={`https://github.com/${username}.png`}
-              style={{
-                borderRadius: 300,
-                border: '5px solid #AABBF1',
-              }}
-            />
+            <picture>
+              <img
+                alt="GitHub Profile Avatar"
+                width="180"
+                height="180"
+                src={`https://github.com/${username}.png`}
+                style={{
+                  borderRadius: 300,
+                  border: '5px solid #AABBF1',
+                }}
+              />
+            </picture>
           </div>
           <div tw="flex w-[80%] h-full pl-0 pr-[3.5%] text-[36px] font-bold">{description}</div>
         </div>

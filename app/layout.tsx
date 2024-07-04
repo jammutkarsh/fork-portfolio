@@ -11,7 +11,7 @@ import siteMetadata from '@/content/siteMetadata';
 export const metadata = {
   title: siteMetadata.title,
   description: siteMetadata.bio,
-  metadataBase: new URL(siteMetadata.siteUrl),
+  // metadataBase: new URL(siteMetadata.siteUrl),
 };
 
 interface RootLayoutProps {
