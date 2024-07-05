@@ -1,5 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 import { allBlogs } from 'contentlayer/generated';
+import { Fira_Sans } from 'next/font/google';
 
 // Image metadata
 export const alt = 'Blog Post';
@@ -12,46 +13,81 @@ export const contentType = 'image/png';
 
 export const dynamic = 'force-static';
 
+const firaSans = Fira_Sans({
+  weight: '400',
+  style: 'normal',
+  subsets: ['latin'],
+});
+
 export default async function Image({ params }: { params: { slug: string } }) {
   const post = allBlogs.find((p) => p.slug === params.slug);
 
-  const username = 'jammutkarsh';
-  const title = post?.title || 'Default Title';
-  const description = post?.summary || 'Default Description';
-  const urlPath = `🔗 https://utkarshchourasia.in/${post?._raw.flattenedPath}`;
-  const readingTime = `⏳ ${post?.readingTime.text || '5 min read'}`;
+  const title = post?.title || 'Tech Blogs of Utkarsh Chourasia';
+  const publishDate = formatISODate(post?.date);
+  const readingTime = `${post?.readingTime.text || '5 min read'}`;
+  const SlugbackgroundImage =
+    'https://raw.githubusercontent.com/jammutkarsh/fork-portfolio/utkarshchourasia-in/public/images/blogSlugBackgroundImage.png';
+
+  let fontSize = 96; // Base font size
+  if (title.length > 100) {
+    fontSize = 64;
+  }
+
   return await new ImageResponse(
     (
-      <div tw="flex flex-col h-full w-full items-center justify-center">
-        <div tw="flex flex-col h-[45%] w-full pl-[3.5%] pt-[3.5%] pr-[3.5%]">
-          <div tw="flex text-left text-5xl font-black">Blog Post</div>
-          <div tw="flex text-left text-[42px]">{title}</div>
-        </div>
-
-        {/*Second half*/}
-        <div tw="flex h-[45%] w-full pt-[3.5%] pb-[3.5%]">
-          <div tw="flex w-[20%] h-full pl-[3.5%] pr-0">
-            <picture>
-              <img
-                alt="GitHub Profile Avatar"
-                width="180"
-                height="180"
-                src={`https://github.com/${username}.png`}
-                style={{
-                  borderRadius: 300,
-                  border: '5px solid #AABBF1',
-                }}
-              />
-            </picture>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          backgroundImage: `url(${SlugbackgroundImage})`,
+          backgroundSize: '100% 100%',
+        }}
+      >
+        <div
+          className={firaSans.className}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            color: '#000000',
+          }}
+        >
+          {/* <----------------------- DATE | TIME -----------------------> */}
+          <div
+            style={{
+              display: 'flex',
+              fontSize: '32px',
+              padding: '50px 0 30px 0',
+            }}
+          >
+            <span>
+              {publishDate} | {readingTime}
+            </span>
           </div>
-          <div tw="flex w-[80%] h-full pl-0 pr-[3.5%] text-[36px] font-bold">{description}</div>
-        </div>
-        {/* LowerURL */}
-        <div tw="flex flex-row items-center justify-between h-[10%] w-full">
-          <div tw="flex text-left text-[18px] font-bold pl-[3.5%]">{urlPath}</div>
-          <div tw="flex text-right text-[18px] font-bold pr-[3.5%]">{readingTime}</div>
+          {/* <----------------------- TITLE -----------------------> */}
+          <div
+            style={{
+              display: 'flex',
+              fontSize: `${fontSize}px`,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              padding: '30px 40px 200px 40px',
+            }}
+          >
+            <span style={{ textAlign: 'center' }}>{title}</span>
+          </div>
         </div>
       </div>
     )
   );
+}
+
+function formatISODate(ISOString: string | undefined | number | Date) {
+  const date = ISOString === undefined ? new Date() : new Date(ISOString);
+  const day = date.getDate();
+  const month = date.toLocaleString('en-US', { month: 'short' });
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
 }
