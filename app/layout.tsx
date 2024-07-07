@@ -7,11 +7,30 @@ import Header from '@/components/Header';
 import LenisProvider from '@/components/Providers/LenisProvider';
 import ThemeProvider from '@/components/Providers/ThemeProvider';
 import siteMetadata from '@/content/siteMetadata';
+import { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: siteMetadata.title,
   description: siteMetadata.bio,
-  // metadataBase: new URL(siteMetadata.siteUrl),
+  creator: siteMetadata.author,
+  metadataBase: new URL(siteMetadata.siteUrl),
+  openGraph: {
+    title: siteMetadata.title,
+    siteName: siteMetadata.title,
+    description: siteMetadata.bio,
+    type: 'website',
+    url: new URL(siteMetadata.siteUrl),
+    images: [
+      {
+        url: new URL(`${siteMetadata.siteUrl}/opengraph-image.png`),
+        secureUrl: new URL(`${siteMetadata.siteUrl}/opengraph-image.png`),
+        type: 'image/png',
+        alt: "Home page of Utkarsh Chourasia's portfolio website",
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
 };
 
 interface RootLayoutProps {

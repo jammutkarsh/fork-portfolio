@@ -1,5 +1,6 @@
 import { MDXLayoutRenderer } from '@/components/MDXComponents';
 import ScrollProgressBar from '@/components/ScrollProgressBar';
+import siteMetadata from '@/content/siteMetadata';
 import PostLayout from '@/layouts/MDX/PostLayout';
 import MainLayout from '@/layouts/MainLayout';
 import { coreContent, formatBlogLink, sortedBlogPost } from '@/lib/utils/contentlayer';
@@ -14,7 +15,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const slug = params.slug;
   const post = allBlogs.find((p) => p.slug === slug);
-
+  const siteURL = `${siteMetadata.siteUrl}/blog/${slug}`;
   if (!post) {
     return {};
   }
@@ -22,6 +23,26 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.summary,
+    creator: siteMetadata.author,
+    keywords: post.tags,
+    metadataBase: new URL(siteURL),
+    openGraph: {
+      title: post.title,
+      siteName: post.title,
+      description: post.summary,
+      type: 'article',
+      url: new URL(siteURL),
+      images: [
+        {
+          url: `${siteURL}/opengraph-image`,
+          secureUrl: `${siteURL}/opengraph-image`,
+          type: 'image/png',
+          alt: `A Blog about ${post.summary} by ${post.author}`,
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
   };
 }
 
