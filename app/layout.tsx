@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import LenisProvider from '@/components/Providers/LenisProvider';
 import ThemeProvider from '@/components/Providers/ThemeProvider';
 import siteMetadata from '@/content/siteMetadata';
+import { GoogleTagManager } from '@next/third-parties/google';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <meta name="theme-color" content="#000000" />
       </head>
       <body className="bg-white text-black antialiased dark:bg-black dark:text-white">
+        <GoogleTagManager gtmId="G-65F69D270G" />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Header />
           <LenisProvider>
