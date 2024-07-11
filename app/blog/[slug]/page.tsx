@@ -34,8 +34,8 @@ export async function generateMetadata({
       url: new URL(siteURL),
       images: [
         {
-          url: `${siteURL}/opengraph-image`,
-          secureUrl: `${siteURL}/opengraph-image`,
+          url: '/opengraph-image.png',
+          secureUrl: '/opengraph-image.png',
           type: 'image/png',
           alt: `A Blog about ${post.summary} by ${post.author}`,
           width: 1200,
