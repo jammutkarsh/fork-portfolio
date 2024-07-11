@@ -7,7 +7,7 @@ import { allBlogs } from 'contentlayer/generated';
 import { Metadata } from 'next';
 
 const siteTitle = 'Blog - ' + siteMetadata.title;
-const siteDescription = 'My Blogs - ' + siteMetadata.title;
+const siteDescription = 'Blogs - ' + siteMetadata.title;
 const siteURL = `${siteMetadata.siteUrl}/blog`;
 
 export const metadata: Metadata = {

@@ -1,3 +1,21 @@
+let deploymentURL = 'https://localhost:3000';
+
+function getBranch(url: string) {
+  // fork-portfolio-git-prod-env-urls-jammutkarshs-projects.vercel.app
+  const startIndex = url.search('git-');
+  const endIndex = url.search('-jammutkarshs-projects.vercel.app');
+  return url.substring(startIndex + 4, endIndex);
+}
+
+if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'production') {
+  if (getBranch(process.env.VERCEL_BRANCH_URL || '') === 'utkarshchourasia-in') {
+    deploymentURL = 'https://utkarshchourasia.in';
+  } else {
+    deploymentURL =
+      `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` || 'https://utkarshchourasia.in';
+  }
+}
+
 const siteMetadata = {
   title: 'Utkarsh Chourasia',
   author: 'Utkarsh Chourasia',
@@ -6,7 +24,7 @@ const siteMetadata = {
   bio: 'Server Side Engineer',
   language: 'en-us',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://utkarshchourasia.in',
+  siteUrl: deploymentURL,
   siteRepo: 'https://github.com/jammutkarsh/fork-portfolio',
   siteLogo: '/static/images/logo.png',
   image: '/static/images/avatar.jpg',
