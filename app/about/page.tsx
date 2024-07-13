@@ -5,12 +5,12 @@ import MainLayout from '@/layouts/MainLayout';
 import { allAuthors } from 'contentlayer/generated';
 import { Metadata } from 'next';
 
-const siteTitle = 'About - ' + siteMetadata.title;
-const siteDescription = 'About me - ' + siteMetadata.title;
+const siteTitle = `About | ${siteMetadata.title}`;
+const siteDescription = `About | ${siteMetadata.title}`;
 const siteURL = `${siteMetadata.siteUrl}/about`;
 
 export const metadata: Metadata = {
-  title: siteTitle,
+  title: 'About',
   description: siteDescription,
   creator: siteMetadata.author,
   metadataBase: new URL(siteURL),

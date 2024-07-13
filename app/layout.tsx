@@ -11,7 +11,10 @@ import { GoogleTagManager } from '@next/third-parties/google';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: siteMetadata.title,
+  title: {
+    default: siteMetadata.title,
+    template: `%s | ${siteMetadata.title}`,
+  },
   description: siteMetadata.bio,
   creator: siteMetadata.author,
   metadataBase: new URL(siteMetadata.siteUrl),

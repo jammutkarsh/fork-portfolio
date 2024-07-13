@@ -6,12 +6,12 @@ import { POSTS_PER_PAGE } from '@/types/default';
 import { allBlogs } from 'contentlayer/generated';
 import { Metadata } from 'next';
 
-const siteTitle = 'Blog - ' + siteMetadata.title;
-const siteDescription = 'Blogs - ' + siteMetadata.title;
+const siteTitle = `Blog | ${siteMetadata.title}`;
+const siteDescription = `Blog | ${siteMetadata.title}`;
 const siteURL = `${siteMetadata.siteUrl}/blog`;
 
 export const metadata: Metadata = {
-  title: siteTitle,
+  title: 'Blog',
   description: siteDescription,
   creator: siteMetadata.author,
   metadataBase: new URL(siteURL),

@@ -21,7 +21,9 @@ export async function generateMetadata({
   }
 
   return {
-    title: post.title,
+    title: {
+      absolute: post.title,
+    },
     description: post.summary,
     creator: siteMetadata.author,
     keywords: post.tags,
