@@ -43,7 +43,7 @@ Reading state information... Done
 E: Unable to locate package vim
 ```
 
-You ran apt install vim, but it threw an error:
+You ran `apt install vim`, but it threw an error:
 `E: Unable to locate package vim.`
 Why? Because the system doesn’t yet know anything about a package named vim.
 
@@ -62,9 +62,9 @@ We’ll look at how this file works soon.
 
 Running `apt update` will download the _latest index_.
 
-![apt update is downloading 15 indexes.](/images/how-apt-update-works/apt-update.png)
+![apt update is downloading 18 indexes.](/images/how-apt-update-works/apt-update.png)
 
-As you can see above, `apt update` is downloading **15 index files**.
+As you can see above, `apt update` is downloading **18 index files**.
 
 But wait — how does the machine know where to fetch these indexes from?
 This is a fresh container, and **we didn’t specify any repository URL**. So where is `apt` getting this information?
@@ -77,12 +77,14 @@ Just like (living) organisms have DNA that carries genetic information for devel
 
 If you compare this file with the output from `apt update`, you’ll notice many matching keywords and URLs (see the _colored rows_ in both screenshots). That’s because `apt` reads this list to know **where** to fetch package indexes and actual `.deb` files from.
 
+Here's the breakdown of the deb format:
+
 ![Deb format breakdown](/images/how-apt-update-works/deb-format-breakdown.png)
 
 - **Archive Type** (e.g. `deb` or `deb-src`)
 
   - `deb` refers to pre-compiled binary packages — the `.deb` files that get directly installed.
-  - `deb-src` refers to source packages. These can be downloaded and compiled locally if needed, but are also used by Ubuntu to build binary `.deb` packages.
+  - `deb-src` refers to source packages. These can be downloaded and compiled locally if needed.
 
 - **Repository URI**
   This is the web address (e.g. `http://archive.ubuntu.com/ubuntu/`) pointing to the server hosting the package indexes and `.deb` files.
@@ -94,8 +96,8 @@ If you compare this file with the output from `apt update`, you’ll notice many
 
 - **Repository Components**
   These define the "category" of software:
-  - `main`: Officially supported, open-source packages maintained by Ubuntu.
-  - `restricted`: Proprietary drivers or software maintained by Ubuntu but not open-source.
+  - `main`: Officially supported, open-source packages maintained by the distribution organization, in our case its Ubuntu.
+  - `restricted`: Proprietary drivers or software maintained by distribution organization but not open-source.
   - Other components include `universe` (community-maintained) and `multiverse` (non-free, legally restricted software).
 
 > This format — `<Archive Type> <URI> <release> <components>` — is the minimum required to fetch package indexes and install software via `apt`.
@@ -124,8 +126,9 @@ Putting it all together, `apt` builds URLs like: `https://archive.ubuntu.com/ubu
 - `Packages.gz`
 - `Packages.xz`
 
+We can manually download the index file using `wget`:
+
 ```bash
-# Lets confirm what we learned.
 cd /tmp/
 wget -q https://archive.ubuntu.com/ubuntu/dists/focal/main/binary-amd64/Packages.gz
 gzip -d Packages.gz
@@ -141,7 +144,6 @@ This directory contains metadata files downloaded from each source listed in `/e
 To prove this, let's run the following commands:
 
 ```bash
-# Lets confirm what we learned.
 docker run --rm -it ubuntu:20.04 # starting a new container in host
 cd /var/lib/apt/lists/ # location of index
 ls # 0 Files and Folders
@@ -158,9 +160,16 @@ archive.ubuntu.com_ubuntu_dists_focal_restricted_binary-amd64_Packages.lz4
 # ... and many more files
 ```
 
-`apt` uses these index files to look up for package information.
+Here, you might notice `.lz4` files locally, even though the server delivers `.gz` or `.xz` files. Why is that?
+
+This is because `apt` decompresses those files and may re-compress them into `.lz4` format locally, as `lz4` offers much faster decompression, improving performance during package management tasks.
+This conversion is a worthwhile trade-off because `apt update` is typically run periodically, not frequently, so the faster decompression during package management provides a more responsive user experience overall.
+
+_You can read [this blog](https://manishrjain.com/compression-algo-moving-data) where the author compares just how fast `lz4` is._
+
+Finally, `apt` uses these index files to look up for package information.
 This is how `apt` knows that `vim` is available.
 
 ---
 
-_So, apt update has populated our system with package info. But how does that translate into actually getting vim (or any other package) onto your machine? In Part 2, we'll follow the journey from package index to installed application, revealing the steps apt takes to make it all happen._
+_So, apt update has populated our system with package info. But how does that translate into actually downloading vim (or any other package) onto your machine? In Part 2, we'll follow the journey from package index to installed application, revealing the steps apt takes to make it all happen._
