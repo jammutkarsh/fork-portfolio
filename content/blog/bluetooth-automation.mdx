@@ -1,0 +1,130 @@
+---
+title: 'Mac Auto-Disconnect Bluetooth Devices'
+date: '2025-10-18'
+tags: ['Automation']
+draft: false
+author: 'Utkarsh Chourasia'
+summary: 'Automatically disconnect specific Bluetooth devices when your Mac goes to sleep'
+---
+
+[LinkedIn Post](https://www.linkedin.com/posts/jammutkarsh_i-recently-automated-something-small-but-activity-7385353686434213888-J457)
+
+## Installation
+
+```bash
+brew install sleepwatcher blueutil
+```
+
+## Setup
+
+1. **Create the disconnect script** at `~/.disconnect_bt.sh`:
+
+```bash
+#!/bin/bash
+
+# Array of MAC addresses to disconnect
+MACS=(
+    "AA:BB:CC:DD:EE:FF"
+    "11:22:33:44:55:66"
+)
+
+# Path to blueutil (for Intel Mac)
+BLUEUTIL="/usr/local/bin/blueutil" # or find using `which blueutil`
+
+# Log file (optional, for debugging)
+LOG_FILE="$HOME/.disconnect_bt.log"
+
+echo "$(date): Starting disconnection process" >> "$LOG_FILE"
+
+# Check if any MAC addresses are configured
+if [ ${#MACS[@]} -eq 0 ]; then
+    echo "$(date): No MAC addresses configured." >> "$LOG_FILE"
+    exit 1
+fi
+
+# Loop through each MAC address and disconnect
+for MAC in "${MACS[@]}"; do
+    echo "$(date): Attempting to disconnect $MAC" >> "$LOG_FILE"
+
+    # Disconnect
+    $BLUEUTIL --disconnect "$MAC" >> "$LOG_FILE" 2>&1
+
+    if [ $? -eq 0 ]; then
+        echo "$(date): Successfully disconnected $MAC" >> "$LOG_FILE"
+    else
+        echo "$(date): Failed to disconnect $MAC" >> "$LOG_FILE"
+    fi
+done
+
+echo "$(date): Disconnection process completed" >> "$LOG_FILE"
+```
+
+2. **Make it executable**:
+
+```bash
+chmod +x ~/.disconnect_bt.sh
+```
+
+3. **Update MAC addresses** in the `MACS` array with your device addresses
+
+4. **Create LaunchAgent** at `~/Library/LaunchAgents/com.utc.sleepwatcher.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
+     "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>de.utc.sleepwatcher</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/sbin/sleepwatcher</string>
+        <string>-s</string>
+        <string>/Users/YOUR_USERNAME/.disconnect_bt.sh</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>
+```
+
+**Note**: Replace `YOUR_USERNAME` with your actual macOS username. Run `cd ~ && pwd | pbcopy`
+
+5. **Load the LaunchAgent**:
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.utc.sleepwatcher.plist
+```
+
+## Find Your Device MAC Address
+
+```bash
+blueutil --paired
+```
+
+## Check Logs
+
+```bash
+tail -f ~/.disconnect_bt.log
+```
+
+## Troubleshooting
+
+**Unload/reload LaunchAgent**:
+
+```bash
+launchctl unload ~/Library/LaunchAgents/com.utc.sleepwatcher.plist
+launchctl load ~/Library/LaunchAgents/com.utc.sleepwatcher.plist
+```
+
+**Check if sleepwatcher is running**:
+
+```bash
+ps aux | grep sleepwatcher
+```
