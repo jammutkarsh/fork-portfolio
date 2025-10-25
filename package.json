@@ -10,13 +10,13 @@
     "prepare": "husky install"
   },
   "engines": {
-    "node": ">=20"
+    "node": "22"
   },
   "dependencies": {
     "@dlarroder/playground": "1.10.0",
     "@fontsource/mukta": "5.0.18",
     "@next/third-parties": "^16.0.0",
-    "@vercel/og": "^0.6.2",
+    "@vercel/og": "^0.8.5",
     "classnames": "2.3.2",
     "cmdk": "^1.1.1",
     "contentlayer2": "^0.5.8",
