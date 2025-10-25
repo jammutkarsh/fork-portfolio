@@ -1,6 +1,5 @@
 import { ImageResponse } from 'next/og';
 import { allBlogs } from 'contentlayer/generated';
-import { Fira_Sans } from 'next/font/google';
 
 // Image metadata
 export const alt = 'Blog Post';
@@ -12,12 +11,6 @@ export const size = {
 export const contentType = 'image/png';
 
 export const dynamic = 'force-static';
-
-const firaSans = Fira_Sans({
-  weight: '400',
-  style: 'normal',
-  subsets: ['latin'],
-});
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

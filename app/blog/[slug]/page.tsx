@@ -6,7 +6,6 @@ import MainLayout from '@/layouts/MainLayout';
 import { coreContent, formatBlogLink, sortedBlogPost } from '@/lib/utils/contentlayer';
 import { allBlogs } from 'contentlayer/generated';
 import { Metadata } from 'next';
-import { use } from 'react';
 
 type BlogPostProps = {
   params: Promise<{ slug: string }>;
@@ -50,8 +49,8 @@ export async function generateMetadata({
   };
 }
 
-export default function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params);
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const sortedPosts = sortedBlogPost(allBlogs);
 
   const post = sortedPosts.find((p) => p.slug === slug);
