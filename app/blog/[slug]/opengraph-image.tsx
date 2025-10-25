@@ -19,8 +19,9 @@ const firaSans = Fira_Sans({
   subsets: ['latin'],
 });
 
-export default async function Image({ params }: { params: { slug: string } }) {
-  const post = allBlogs.find((p) => p.slug === params.slug);
+export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = allBlogs.find((p) => p.slug === slug);
 
   const title = post?.title || 'Tech Blogs of Utkarsh Chourasia';
   const publishDate = formatISODate(post?.date);
