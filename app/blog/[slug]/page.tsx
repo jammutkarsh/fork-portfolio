@@ -6,14 +6,16 @@ import MainLayout from '@/layouts/MainLayout';
 import { coreContent, formatBlogLink, sortedBlogPost } from '@/lib/utils/contentlayer';
 import { allBlogs } from 'contentlayer/generated';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { use } from 'react';
+
+type BlogPostProps = {
+  params: Promise<{ slug: string }>;
+};
 
 export async function generateMetadata({
   params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
-  const slug = params.slug;
+}: BlogPostProps): Promise<Metadata> {
+  const { slug } = await params;
   const post = allBlogs.find((p) => p.slug === slug);
   const siteURL = `${siteMetadata.siteUrl}/blog/${slug}`;
   if (!post) {
@@ -48,8 +50,8 @@ export async function generateMetadata({
   };
 }
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
-  const slug = params.slug;
+export default function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
   const sortedPosts = sortedBlogPost(allBlogs);
 
   const post = sortedPosts.find((p) => p.slug === slug);
@@ -65,13 +67,9 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
     <>
       <ScrollProgressBar />
       <MainLayout>
-        {post && 'draft' in post && post.draft !== true ? (
-          <PostLayout content={post} prev={formatBlogLink(prev)} next={formatBlogLink(next)}>
-            <MDXLayoutRenderer toc={post.toc} content={post} authorDetails={author} />
-          </PostLayout>
-        ) : (
-          notFound()
-        )}
+        <PostLayout content={post} prev={formatBlogLink(prev)} next={formatBlogLink(next)}>
+          <MDXLayoutRenderer toc={post.toc} content={post} authorDetails={author} />
+        </PostLayout>
       </MainLayout>
     </>
   );

@@ -1,4 +1,4 @@
-const { withContentlayer } = require('next-contentlayer');
+const { withContentlayer } = require('next-contentlayer2');
 
 /**
  * @type {import('next/dist/next-server/server/config').NextConfig}
@@ -6,8 +6,5 @@ const { withContentlayer } = require('next-contentlayer');
 module.exports = withContentlayer({
   reactStrictMode: true,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  eslint: {
-    dirs: ['app', 'components', 'lib', 'layouts', 'scripts'],
-  },
-  swcMinify: true,
+  turbopack: {},
 });
