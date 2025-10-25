@@ -1,7 +1,6 @@
 'use client';
 
 import { LinkButton } from '@dlarroder/playground';
-import Link from 'next/link';
 import { AnchorHTMLAttributes, DetailedHTMLProps } from 'react';
 
 const CustomLink = ({
@@ -12,11 +11,7 @@ const CustomLink = ({
   const isAnchorLink = href && href.startsWith('#');
 
   if (isInternalLink) {
-    return (
-      <Link href={href} legacyBehavior>
-        <LinkButton {...rest} />
-      </Link>
-    );
+    return <LinkButton href={href} {...rest} />;
   }
 
   if (isAnchorLink) {

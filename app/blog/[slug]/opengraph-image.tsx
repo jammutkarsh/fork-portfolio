@@ -1,6 +1,5 @@
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/og';
 import { allBlogs } from 'contentlayer/generated';
-import { Fira_Sans } from 'next/font/google';
 
 // Image metadata
 export const alt = 'Blog Post';
@@ -13,14 +12,9 @@ export const contentType = 'image/png';
 
 export const dynamic = 'force-static';
 
-const firaSans = Fira_Sans({
-  weight: '400',
-  style: 'normal',
-  subsets: ['latin'],
-});
-
-export default async function Image({ params }: { params: { slug: string } }) {
-  const post = allBlogs.find((p) => p.slug === params.slug);
+export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = allBlogs.find((p) => p.slug === slug);
 
   const title = post?.title || 'Tech Blogs of Utkarsh Chourasia';
   const publishDate = formatISODate(post?.date);
@@ -33,7 +27,7 @@ export default async function Image({ params }: { params: { slug: string } }) {
     fontSize = 64;
   }
 
-  return await new ImageResponse(
+  return new ImageResponse(
     (
       <div
         style={{
@@ -46,12 +40,12 @@ export default async function Image({ params }: { params: { slug: string } }) {
         }}
       >
         <div
-          className={firaSans.className}
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             color: '#000000',
+            fontFamily: 'sans-serif',
           }}
         >
           {/* <----------------------- DATE | TIME -----------------------> */}
@@ -80,7 +74,10 @@ export default async function Image({ params }: { params: { slug: string } }) {
           </div>
         </div>
       </div>
-    )
+    ),
+    {
+      ...size,
+    }
   );
 }
 

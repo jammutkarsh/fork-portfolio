@@ -11,7 +11,7 @@ export async function generateStaticParams() {
   const uniqueTags = Array.from(new Set(tags));
 
   return uniqueTags.map((tag) => ({
-    params: { tag },
+    tag,
   }));
 }
 
@@ -21,8 +21,8 @@ export const metadata = {
   description: 'My Tags - ' + siteMetadata.title,
 };
 
-export default function Tag({ params }: { params: { tag: string } }) {
-  const { tag } = params;
+export default async function Tag({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag } = await params;
   const posts = allCoreContent(
     allBlogs.filter(
       (post) => post.draft !== true && post.tags?.map((t) => kebabCase(t)).includes(tag)

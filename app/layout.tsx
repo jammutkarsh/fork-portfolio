@@ -4,7 +4,6 @@ import '@fontsource/mukta';
 
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
-import LenisProvider from '@/components/Providers/LenisProvider';
 import ThemeProvider from '@/components/Providers/ThemeProvider';
 import siteMetadata from '@/content/siteMetadata';
 import { GoogleTagManager } from '@next/third-parties/google';
@@ -55,9 +54,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <GoogleTagManager gtmId="G-65F69D270G" />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Header />
-          <LenisProvider>
-            <main>{children}</main>
-          </LenisProvider>
+          <main>{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

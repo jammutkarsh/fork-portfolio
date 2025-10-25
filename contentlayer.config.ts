@@ -1,7 +1,6 @@
-import { ComputedFields, defineDocumentType, makeSource } from 'contentlayer/source-files';
+import { ComputedFields, defineDocumentType, makeSource } from 'contentlayer2/source-files';
 import readingTime from 'reading-time';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-import rehypePrismPlus from 'rehype-prism-plus';
 import rehypeSlug from 'rehype-slug';
 import remarkCodeTitles from './lib/remark-code-title';
 import { extractTocHeadings } from './lib/remark-toc-headings';
@@ -59,6 +58,6 @@ export default makeSource({
   mdx: {
     cwd: process.cwd(),
     remarkPlugins: [remarkCodeTitles],
-    rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings, [rehypePrismPlus, { ignoreMissing: true }]],
+    rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
   },
 });
