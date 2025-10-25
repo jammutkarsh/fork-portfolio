@@ -63,6 +63,10 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
   const nextContent = sortedPosts[postIndex - 1] || null;
   const next = nextContent ? coreContent(nextContent) : null;
 
+  if (!post) {
+    return <div>Post not found</div>;
+  }
+
   return (
     <>
       <ScrollProgressBar />

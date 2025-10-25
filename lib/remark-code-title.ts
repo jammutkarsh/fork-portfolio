@@ -27,7 +27,9 @@ export default function remarkCodeTitles() {
         data: { _xdmExplicitJsx: true },
       };
 
-      parent.children.splice(index, 0, titleNode);
+      if (typeof index === 'number') {
+        parent.children.splice(index, 0, titleNode);
+      }
       node.lang = language;
     });
 }

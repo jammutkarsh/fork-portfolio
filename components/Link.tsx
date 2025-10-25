@@ -12,11 +12,7 @@ const CustomLink = ({
   const isAnchorLink = href && href.startsWith('#');
 
   if (isInternalLink) {
-    return (
-      <Link href={href} legacyBehavior>
-        <LinkButton {...rest} />
-      </Link>
-    );
+    return <LinkButton href={href} {...rest} />;
   }
 
   if (isAnchorLink) {
