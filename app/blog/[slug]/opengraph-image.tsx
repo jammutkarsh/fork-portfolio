@@ -1,4 +1,4 @@
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/og';
 import { allBlogs } from 'contentlayer/generated';
 import { Fira_Sans } from 'next/font/google';
 
@@ -34,7 +34,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     fontSize = 64;
   }
 
-  return await new ImageResponse(
+  return new ImageResponse(
     (
       <div
         style={{
@@ -47,12 +47,12 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         }}
       >
         <div
-          className={firaSans.className}
           style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             color: '#000000',
+            fontFamily: 'sans-serif',
           }}
         >
           {/* <----------------------- DATE | TIME -----------------------> */}
@@ -81,7 +81,10 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           </div>
         </div>
       </div>
-    )
+    ),
+    {
+      ...size,
+    }
   );
 }
 
