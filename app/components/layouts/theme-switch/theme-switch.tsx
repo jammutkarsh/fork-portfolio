@@ -2,9 +2,10 @@
 
 import { motion } from 'motion/react';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { type MouseEvent, useEffect, useState } from 'react';
 import { MoonIcon } from '../icons/moon-icon';
 import { SunMediumIcon } from '../icons/sun-icon';
+import { switchTheme } from './switch-theme';
 
 const ThemeSwitch = ({
 	className = 'flex items-center',
@@ -17,22 +18,13 @@ const ThemeSwitch = ({
 	// When mounted on client, now we can show the UI
 	useEffect(() => setMounted(true), []);
 
-	const toggleTheme = () => {
+	const toggleTheme = (event: MouseEvent<HTMLButtonElement>) => {
 		const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
-
-		// Use ViewTransition API if supported, otherwise fallback to immediate switch
-		if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-			const root = document.documentElement;
-			root.classList.add('theme-switching');
-			const transition = document.startViewTransition(() => {
-				setTheme(newTheme);
-			});
-			transition.finished.finally(() => {
-				root.classList.remove('theme-switching');
-			});
-		} else {
-			setTheme(newTheme);
-		}
+		const rect = event.currentTarget.getBoundingClientRect();
+		switchTheme(() => setTheme(newTheme), {
+			x: rect.left + rect.width / 2,
+			y: rect.top + rect.height / 2,
+		});
 	};
 
 	return (

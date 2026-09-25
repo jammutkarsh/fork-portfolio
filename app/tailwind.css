@@ -85,28 +85,14 @@ input:-webkit-autofill:focus {
 	}
 }
 
-/* Theme toggle: circular reveal from the top-right (only while switching). */
+/*
+  Theme toggle: the circular reveal is animated from JS (switch-theme.ts) from
+  the clicked point; here we only switch off the default crossfade.
+*/
 html.theme-switching::view-transition-old(root),
 html.theme-switching::view-transition-new(root) {
 	animation: none;
 	mix-blend-mode: normal;
-}
-
-html.theme-switching::view-transition-old(root) {
-	z-index: -1;
-}
-
-html.theme-switching::view-transition-new(root) {
-	animation: circle-top-right 0.5s ease-out both;
-}
-
-@keyframes circle-top-right {
-	from {
-		clip-path: circle(0% at top right);
-	}
-	to {
-		clip-path: circle(150% at top right);
-	}
 }
 
 @media (prefers-reduced-motion: reduce) {
