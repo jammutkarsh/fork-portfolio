@@ -6,7 +6,7 @@
 - **Content**: [MDX](https://mdxjs.com/) via [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote)
 - **Lint/Format**: [Biome](https://biomejs.dev/)
 
-Based on [dlarroder/dalelarroder](https://github.com/dlarroder/dalelarroder).
+Based on [dlarroder/dalelarroder](https://github.com/dlarroder/dalelarroder). See [SYNCING.md](./SYNCING.md) for pulling in upstream updates.
 
 ## Running Locally
 
