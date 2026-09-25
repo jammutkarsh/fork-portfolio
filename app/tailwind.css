@@ -30,6 +30,48 @@
 	--color-primary-700: #9f0e7f;
 	--color-primary-800: #800972;
 	--color-primary-900: #6a0568;
+
+	--animate-first: moveVertical 30s ease infinite;
+	--animate-second: moveInCircle 20s reverse infinite;
+	--animate-third: moveInCircle 40s linear infinite;
+	--animate-fourth: moveHorizontal 40s ease infinite;
+	--animate-fifth: moveInCircle 20s ease infinite;
+
+	@keyframes moveHorizontal {
+		0% {
+			transform: translateX(-50%) translateY(-10%);
+		}
+		50% {
+			transform: translateX(50%) translateY(10%);
+		}
+		100% {
+			transform: translateX(-50%) translateY(-10%);
+		}
+	}
+
+	@keyframes moveInCircle {
+		0% {
+			transform: rotate(0deg);
+		}
+		50% {
+			transform: rotate(180deg);
+		}
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes moveVertical {
+		0% {
+			transform: translateY(-50%);
+		}
+		50% {
+			transform: translateY(50%);
+		}
+		100% {
+			transform: translateY(-50%);
+		}
+	}
 }
 
 html::-webkit-scrollbar {
@@ -48,58 +90,68 @@ input:-webkit-autofill:focus {
 	@apply bg-linear-to-r from-primary-500 to-primary-500 bg-no-repeat no-underline bg-position-[0_100%] bg-size-[100%_0.2em] focus:bg-size-[100%_100%] hover:text-white hover:bg-size-[100%_100%] motion-safe:transition-[background-size,color] motion-safe:duration-300 dark:from-primary-500 dark:to-primary-500;
 }
 
-/*
-  View transitions.
-  Page navigations: quick crossfade of the page content, while the navbar's
-  active indicator (view-transition-name: nav-indicator) glides between links.
-*/
-::view-transition-old(root),
-::view-transition-new(root) {
-	animation-duration: 180ms;
+.horizontal-underline {
+	border-bottom-width: 0;
+	background-image:
+		linear-gradient(transparent, transparent),
+		linear-gradient(var(--color-primary-500), var(--color-primary-500));
+	background-size: 0 3px;
+	background-position: 0 100%;
+	background-repeat: no-repeat;
+	transition: background-size 0.2s ease-out;
 }
 
-::view-transition-group(.nav-indicator) {
-	animation-duration: 350ms;
-	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+.horizontal-underline:hover {
+	background-size: 100% 3px;
+	background-position: 0 100%;
 }
 
-/* Old page leaves fast, new page arrives after it, so text never overlaps. */
-::view-transition-old(.page) {
-	animation: 120ms ease-out both page-fade-out;
+.horizontal-underline-active {
+	background-size: 100% 3px;
+	background-position: 0 100%;
 }
 
-::view-transition-new(.page) {
-	animation: 220ms ease-out 100ms both page-fade-in;
+[data-radix-tooltip-content] {
+	transform-origin: var(--radix-tooltip-content-transform-origin);
 }
 
-@keyframes page-fade-out {
-	to {
-		opacity: 0;
-	}
+#nprogress .bar {
+	background: var(--color-primary-500);
+	height: 4px;
 }
 
-@keyframes page-fade-in {
-	from {
-		opacity: 0;
-		transform: translateY(6px);
-	}
+.intro-text {
+	transition: opacity 0.4s;
 }
 
-/*
-  Theme toggle: the circular reveal is animated from JS (switch-theme.ts) from
-  the clicked point; here we only switch off the default crossfade.
-*/
-html.theme-switching::view-transition-old(root),
-html.theme-switching::view-transition-new(root) {
+/* ViewTransition API Animations for Theme Toggle */
+html {
+	view-transition-name: theme;
+}
+
+::view-transition-old(theme),
+::view-transition-new(theme) {
 	animation: none;
 	mix-blend-mode: normal;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	::view-transition-group(*),
-	::view-transition-old(*),
-	::view-transition-new(*) {
-		/* biome-ignore lint/complexity/noImportantStyles: must beat the per-class durations above */
-		animation: none !important;
+/* Circle animation from top-right */
+::view-transition-new(theme) {
+	clip-path: circle(0% at top right);
+	animation: circle-top-right 0.5s ease-out;
+	animation-fill-mode: both;
+	transform-origin: top right;
+}
+
+::view-transition-old(theme) {
+	z-index: -1;
+}
+
+@keyframes circle-top-right {
+	from {
+		clip-path: circle(0% at top right);
+	}
+	to {
+		clip-path: circle(150% at top right);
 	}
 }

@@ -11,6 +11,7 @@ import SiteFooter from './components/layouts/site-footer';
 import SiteNav from './components/layouts/site-nav';
 import { mukta } from './fonts';
 import './tailwind.css';
+import './site.css';
 
 export const metadata: Metadata = {
 	title: {

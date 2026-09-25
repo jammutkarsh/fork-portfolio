@@ -1,0 +1,66 @@
+/*
+  Fork-specific styles, kept out of app/tailwind.css so that file stays
+  identical to upstream (dlarroder/dalelarroder) and syncs cleanly.
+  Imported after tailwind.css in app/layout.tsx.
+*/
+
+/*
+  Upstream renames the root view transition to "theme" and animates it as a
+  circle from the top-right. Restore the default name so that animation no
+  longer runs; the theme reveal is done from JS (switch-theme.ts) instead.
+*/
+html {
+	view-transition-name: root;
+}
+
+/*
+  Page navigations: quick crossfade of the page content, while the navbar's
+  active indicator (view-transition-name: nav-indicator) glides between links.
+*/
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 180ms;
+}
+
+::view-transition-group(.nav-indicator) {
+	animation-duration: 350ms;
+	animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Old page leaves fast, new page arrives after it, so text never overlaps. */
+::view-transition-old(.page) {
+	animation: 120ms ease-out both page-fade-out;
+}
+
+::view-transition-new(.page) {
+	animation: 220ms ease-out 100ms both page-fade-in;
+}
+
+@keyframes page-fade-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes page-fade-in {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+}
+
+/* Theme toggle: switch off the default crossfade; the reveal runs from JS. */
+html.theme-switching::view-transition-old(root),
+html.theme-switching::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		/* biome-ignore lint/complexity/noImportantStyles: must beat the per-class durations above */
+		animation: none !important;
+	}
+}
