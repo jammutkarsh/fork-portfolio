@@ -31,7 +31,6 @@ const siteMetadata = {
 	siteRepo: 'https://github.com/jammutkarsh/fork-portfolio',
 	siteLogo: '/static/favicons/favicon.png',
 	image: '/images/avatar.jpg',
-	socialBanner: '/images/opengraph-image.png',
 	email: 'mail@utkarshchourasia.in',
 	github: 'https://github.com/jammutkarsh',
 	twitter: 'https://twitter.com/jammutkarsh',
