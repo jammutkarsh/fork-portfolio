@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import Link from 'next/link';
 import { merryWeather } from '../../fonts';
+import siteMetadata from '../../site-metadata';
 import { AtSignIcon } from '../layouts/icons/at-sign-icon';
 import { GithubIcon } from '../layouts/icons/github-icon';
 import { LinkedinIcon } from '../layouts/icons/linkedin-icon';
@@ -29,22 +30,16 @@ export default function Hero() {
 						</h1>
 						<section className='relative z-10'>
 							<p className='text-base text-justify'>
-								I&apos;m Dale Larroder — a Software Engineer and forever a
-								student of the craft. I love building things for the web and am
-								always on the lookout for new challenges and opportunities to
-								learn. I&apos;m passionate about creating beautiful and
-								functional user experiences. Right now, I&apos;m building cool
-								things at{' '}
-								<a
-									href='https://www.aphex.co/'
+								I&apos;m {siteMetadata.author} — a {siteMetadata.bio} who likes
+								Linux, Go, self-hosting and open source. I build stuff in the
+								backend and write about the things I learn along the way.{' '}
+								<Link
+									href='/about'
 									className='underline-magical'
-									target='_blank'
-									rel='noreferrer'
 									data-skip-splash-cursor
 								>
-									Aphex
-								</a>
-								.
+									Read more about me &rarr;
+								</Link>
 							</p>
 						</section>
 						<section className='relative z-10 flex space-x-4 items-center text-sm'>
@@ -52,7 +47,7 @@ export default function Hero() {
 								<p>More about me: </p>
 								<div className='flex -ml-2'>
 									<Link
-										href='https://www.linkedin.com/in/dale-larroder/'
+										href={siteMetadata.linkedin}
 										target='_blank'
 										rel='noreferrer'
 										aria-label='linkedin'
@@ -61,7 +56,7 @@ export default function Hero() {
 										<LinkedinIcon className='h-9 w-9' />
 									</Link>
 									<Link
-										href='https://github.com/dlarroder'
+										href={siteMetadata.github}
 										target='_blank'
 										rel='noreferrer'
 										aria-label='github'
@@ -70,7 +65,7 @@ export default function Hero() {
 										<GithubIcon className='h-9 w-9' />
 									</Link>
 									<Link
-										href='https://x.com/dalelarroder'
+										href={siteMetadata.twitter}
 										target='_blank'
 										rel='noreferrer'
 										aria-label='twitter'
@@ -79,7 +74,7 @@ export default function Hero() {
 										<XIcon className='h-9 w-9' />
 									</Link>
 									<Link
-										href='mailto:hi@dalelarroder.com'
+										href={`mailto:${siteMetadata.email}`}
 										aria-label='email'
 										rel='noreferrer'
 										data-skip-splash-cursor
@@ -94,9 +89,9 @@ export default function Hero() {
 								data-skip-splash-cursor
 							>
 								<Link href='/projects'>/projects</Link>
-								<Link href='/thoughts'>/thoughts</Link>
+								<Link href='/blog'>/blog</Link>
+								<Link href='/about'>/about</Link>
 								<Link href='/uses'>/uses</Link>
-								<Link href='/stats'>/stats</Link>
 							</div>
 						</section>
 					</div>

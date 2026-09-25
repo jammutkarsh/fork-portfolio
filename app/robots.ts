@@ -1,3 +1,4 @@
+import siteMetadata from 'app/site-metadata';
 import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
@@ -6,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
 			userAgent: '*',
 			allow: '/',
 		},
-		sitemap: `https://dalelarroder.com/sitemap.xml`,
-		host: `https://dalelarroder.com`,
+		sitemap: `${siteMetadata.siteUrl}/sitemap.xml`,
+		host: siteMetadata.siteUrl,
 	};
 }

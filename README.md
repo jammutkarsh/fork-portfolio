@@ -1,62 +1,42 @@
-# dalelarroder.com ⚡️
+# utkarshchourasia.in ⚡️
 
 - **Framework**: [Next.js](https://nextjs.org/)
 - **Deployment**: [Vercel](https://vercel.com)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Analytics**: [Logrocket](https://logrocket.com/)
-- **Content**: [MDX](https://mdxjs.com/)
+- **Content**: [MDX](https://mdxjs.com/) via [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote)
+- **Lint/Format**: [Biome](https://biomejs.dev/)
+
+Based on [dlarroder/dalelarroder](https://github.com/dlarroder/dalelarroder).
 
 ## Running Locally
 
-### Installation
-
-1. Clone this repo
+1. Clone this repo and install dependencies
 
 ```bash
-git clone git@github.com:dlarroder/dalelarroder.git
+git clone https://github.com/jammutkarsh/fork-portfolio
+cd fork-portfolio
+npm install
 ```
 
-2. Change directory
-
-```sh
-cd dalelarroder
-```
-
-3. Install dependencies
-
-```bash
-bun install
-```
-
-1. Create a `.env.local` file following the `.env.example`
+2. Create a `.env.local` file following the `.env.example` and fill in the Giscus values
 
 ```bash
 cp .env.example .env.local
 ```
 
-5. Add your environment variables to `.env.local`
-
-```txt
-SPOTIFY_REFRESH_TOKEN=<Your env>
-SPOTIFY_CLIENT_SECRET=<Your env>
-SPOTIFY_CLIENT_ID=<Your env>
-// ...
-```
-
-6. Run the development server
+3. Run the development server
 
 ```bash
-bun run dev
+npm run dev
 ```
 
-## Previous Version
+## Writing content
 
-This is the second version of my website.
-
-Prevoius v1 version:
-
-- https://v1.dalelarroder.com/
+- Blog posts: `content/blog/*.mdx` (frontmatter: `title`, `date`, `tags`, `draft`, `summary`)
+- About page: `content/about.mdx`
+- Uses page: `app/uses/content.mdx`
+- Projects: `app/projects/constants.ts` (preview images go in `public/static/images/project/`)
 
 ## Licence
 
-[MIT](https://github.com/dlarroder/dalelarroder/blob/master/LICENSE) © [Dale Larroder](https://www.dalelarroder.com)
+[MIT](./LICENSE)
