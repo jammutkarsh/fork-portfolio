@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { kebabCase } from '../../blog/kebab-case';
-import { getAllTags, getPosts } from '../../blog/utils';
+import { getAllTags, getPosts, getTagNames, toSummary } from '../../blog/utils';
 import { BlogPosts } from '../../components/blog-posts';
 import Header from '../../components/header';
 import siteMetadata from '../../site-metadata';
@@ -12,7 +12,7 @@ export function generateStaticParams() {
 }
 
 function tagTitle(tag: string) {
-	return tag[0].toUpperCase() + tag.slice(1);
+	return getTagNames(getPosts())[tag] ?? tag;
 }
 
 export async function generateMetadata(props: {
@@ -36,7 +36,7 @@ export default async function TagPage(props: {
 	return (
 		<>
 			<Header title={tagTitle(tag)} />
-			<BlogPosts posts={posts} />
+			<BlogPosts posts={posts.map(toSummary)} />
 		</>
 	);
 }

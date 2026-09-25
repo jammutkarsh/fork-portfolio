@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getAllTags, getPosts } from '../blog/utils';
+import { getAllTags, getPosts, getTagNames } from '../blog/utils';
 import Header from '../components/header';
 import siteMetadata from '../site-metadata';
 
@@ -9,7 +9,9 @@ export const metadata = {
 };
 
 export default function TagsPage() {
-	const tags = getAllTags(getPosts());
+	const posts = getPosts();
+	const tags = getAllTags(posts);
+	const names = getTagNames(posts);
 	const sortedTags = Object.keys(tags).sort((a, b) => tags[b] - tags[a]);
 
 	return (
@@ -23,7 +25,7 @@ export default function TagsPage() {
 						href={`/tags/${tag}`}
 						className='rounded-md bg-primary-500 px-3 py-1 text-sm uppercase text-white motion-safe:transition-colors motion-safe:duration-300 hover:bg-primary-400'
 					>
-						{tag} ({tags[tag]})
+						{names[tag]} ({tags[tag]})
 					</Link>
 				))}
 			</div>

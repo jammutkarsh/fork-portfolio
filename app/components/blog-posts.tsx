@@ -3,10 +3,10 @@
 import { format } from 'date-fns';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
-import type { BlogPost } from '../blog/utils';
+import type { PostSummary } from '../blog/utils';
 import Tag from './tag';
 
-export function BlogPosts({ posts }: { posts: BlogPost[] }) {
+export function BlogPosts({ posts }: { posts: PostSummary[] }) {
 	const prefersReducedMotion = useReducedMotion();
 
 	return (

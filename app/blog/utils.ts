@@ -19,6 +19,16 @@ export interface BlogPost {
 	readingTime: string;
 }
 
+/** A post without its MDX body — safe to pass to client components. */
+export type PostSummary = Omit<BlogPost, 'content'>;
+
+export function toSummary({
+	content: _content,
+	...summary
+}: BlogPost): PostSummary {
+	return summary;
+}
+
 type Metadata = {
 	title: string;
 	publishedAt: string;
@@ -176,7 +186,18 @@ export const getPostFromSlug = cache(async (slug: string) => {
 	};
 });
 
-export function getAllTags(posts: BlogPost[]): Record<string, number> {
+/** Maps each tag slug to its display name as written in frontmatter. */
+export function getTagNames(posts: PostSummary[]): Record<string, string> {
+	const names: Record<string, string> = {};
+	for (const post of posts) {
+		for (const tag of post.metadata.tags) {
+			names[kebabCase(tag)] ??= tag;
+		}
+	}
+	return names;
+}
+
+export function getAllTags(posts: PostSummary[]): Record<string, number> {
 	const tags: Record<string, number> = {};
 	for (const post of posts) {
 		for (const tag of post.metadata.tags) {

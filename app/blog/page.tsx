@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { BlogPosts } from '../components/blog-posts';
+import { BlogExplorer } from '../components/blog-explorer';
 import Header from '../components/header';
 import PageContainer from '../components/layouts/page-container';
 import siteMetadata from '../site-metadata';
-import { getPosts } from './utils';
+import { getAllTags, getPosts, getTagNames, toSummary } from './utils';
 
 export const metadata: Metadata = {
 	title: 'Blog',
@@ -22,7 +22,11 @@ export default function BlogPage() {
 	return (
 		<PageContainer>
 			<Header title='Blog' />
-			<BlogPosts posts={posts} />
+			<BlogExplorer
+				posts={posts.map(toSummary)}
+				tags={getAllTags(posts)}
+				tagNames={getTagNames(posts)}
+			/>
 		</PageContainer>
 	);
 }
