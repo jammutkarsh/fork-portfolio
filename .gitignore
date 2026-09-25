@@ -39,4 +39,4 @@ yarn-error.log*
 
 # Contentlayer
 .contentlayer
-.vscode/ltex.dictionary.en-US.txt
+.env*.local

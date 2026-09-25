@@ -1,18 +1,17 @@
-import siteMetadata from '@/content/siteMetadata';
-import { allBlogs } from 'contentlayer/generated';
-import { MetadataRoute } from 'next';
+import { getPosts } from './thoughts/utils';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = siteMetadata.siteUrl;
-  const blogRoutes = allBlogs.map((post) => ({
-    url: `${siteUrl}/${post.slug}`,
-    lastModified: post.lastmod || post.date,
-  }));
+export const baseUrl = 'https://dalelarroder.com';
 
-  const routes = ['', 'blog', 'about'].map((route) => ({
-    url: `${siteUrl}/${route}`,
-    lastModified: new Date().toISOString().split('T')[0],
-  }));
+export default async function sitemap() {
+	const blogs = getPosts().map((post) => ({
+		url: `${baseUrl}/thoughts/${post.slug}`,
+		lastModified: post.metadata.publishedAt,
+	}));
 
-  return [...routes, ...blogRoutes];
+	const routes = ['', 'thoughts', 'projects', 'stats', 'uses'].map((route) => ({
+		url: route === '' ? `${baseUrl}/` : `${baseUrl}/${route}`,
+		lastModified: new Date().toISOString().split('T')[0],
+	}));
+
+	return [...routes, ...blogs];
 }

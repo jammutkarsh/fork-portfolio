@@ -1,14 +1,5 @@
-import Hero from '@/components/Hero';
-import SectionContainer from '@/components/SectionContainer';
-import { Suspense } from 'react';
+import Hero from './components/hero/hero';
 
-export default function Page() {
-  return (
-    <>
-      <Hero />
-      <SectionContainer>
-        <Suspense fallback="loading.."></Suspense>
-      </SectionContainer>
-    </>
-  );
+export default function Home() {
+	return <Hero />;
 }

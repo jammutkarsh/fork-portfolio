@@ -1,9 +1,10 @@
-# utkarshchourasia.in ⚡️
+# dalelarroder.com ⚡️
 
 - **Framework**: [Next.js](https://nextjs.org/)
 - **Deployment**: [Vercel](https://vercel.com)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Content**: [MDX](https://mdxjs.com/) with [Contentlayer](https://www.contentlayer.dev/)
+- **Analytics**: [Logrocket](https://logrocket.com/)
+- **Content**: [MDX](https://mdxjs.com/)
 
 ## Running Locally
 
@@ -12,19 +13,19 @@
 1. Clone this repo
 
 ```bash
-git clone https://github.com/jammutkarsh/fork-portfolio
+git clone git@github.com:dlarroder/dalelarroder.git
 ```
 
 2. Change directory
 
 ```sh
-cd fork-portfolio
+cd dalelarroder
 ```
 
-3. Install yarn packages
+3. Install dependencies
 
 ```bash
-npm i --force
+bun install
 ```
 
 1. Create a `.env.local` file following the `.env.example`
@@ -36,25 +37,26 @@ cp .env.example .env.local
 5. Add your environment variables to `.env.local`
 
 ```txt
-NEXT_PUBLIC_GISCUS_REPO=
-NEXT_PUBLIC_GISCUS_REPOSITORY_ID=
-NEXT_PUBLIC_GISCUS_CATEGORY=
-NEXT_PUBLIC_GISCUS_CATEGORY_ID=
+SPOTIFY_REFRESH_TOKEN=<Your env>
+SPOTIFY_CLIENT_SECRET=<Your env>
+SPOTIFY_CLIENT_ID=<Your env>
 // ...
 ```
 
 6. Run the development server
 
 ```bash
-npm run dev
+bun run dev
 ```
 
-## Contributing
+## Previous Version
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+This is the second version of my website.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Prevoius v1 version:
 
-## License
+- https://v1.dalelarroder.com/
 
-[MIT](https://github.com/jammutkarsh/fork-portfolio/blob/utkarshchourasia-in/LICENSE) © [Utkarsh Chourasia](https://utkarshchourasia.in)
+## Licence
+
+[MIT](https://github.com/dlarroder/dalelarroder/blob/master/LICENSE) © [Dale Larroder](https://www.dalelarroder.com)
