@@ -24,8 +24,8 @@ interface OgImageOptions {
 	tags?: string[];
 }
 
-const read = (...segments: string[]) =>
-	fs.readFile(path.join(process.cwd(), ...segments));
+const fontsDir = path.join(process.cwd(), 'assets', 'fonts');
+const avatarPath = path.join(process.cwd(), 'public', 'images', 'avatar.jpg');
 
 function truncate(text: string, max: number) {
 	return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
@@ -41,10 +41,10 @@ export async function renderOgImage({
 }: OgImageOptions) {
 	const [merriweather, muktaRegular, muktaSemiBold, avatar] = await Promise.all(
 		[
-			read('assets/fonts/Merriweather-700.ttf'),
-			read('assets/fonts/Mukta-400.ttf'),
-			read('assets/fonts/Mukta-600.ttf'),
-			read('public', siteMetadata.image),
+			fs.readFile(path.join(fontsDir, 'Merriweather-700.ttf')),
+			fs.readFile(path.join(fontsDir, 'Mukta-400.ttf')),
+			fs.readFile(path.join(fontsDir, 'Mukta-600.ttf')),
+			fs.readFile(avatarPath),
 		],
 	);
 	const avatarSrc = `data:image/jpeg;base64,${avatar.toString('base64')}`;
