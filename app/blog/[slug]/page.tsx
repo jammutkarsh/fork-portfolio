@@ -70,7 +70,7 @@ export default async function Blog(props: {
 					</div>
 				)}
 			</section>
-			<article className='md:max-w-5xl'>{content}</article>
+			<article className='min-w-0 break-words md:max-w-5xl'>{content}</article>
 			<PostComments />
 		</>
 	);
