@@ -7,7 +7,7 @@ import { MoonIcon } from '../icons/moon-icon';
 import { SunMediumIcon } from '../icons/sun-icon';
 
 const ThemeSwitch = ({
-	className = 'absolute top-4 right-4 z-11',
+	className = 'flex items-center',
 }: {
 	className?: string;
 }) => {
@@ -22,8 +22,13 @@ const ThemeSwitch = ({
 
 		// Use ViewTransition API if supported, otherwise fallback to immediate switch
 		if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-			document.startViewTransition(() => {
+			const root = document.documentElement;
+			root.classList.add('theme-switching');
+			const transition = document.startViewTransition(() => {
 				setTheme(newTheme);
+			});
+			transition.finished.finally(() => {
+				root.classList.remove('theme-switching');
 			});
 		} else {
 			setTheme(newTheme);

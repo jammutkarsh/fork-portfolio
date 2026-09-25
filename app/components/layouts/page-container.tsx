@@ -1,17 +1,17 @@
 import type React from 'react';
-import SiteNav from './site-nav';
 
 export default function PageContainer({
 	children,
+	className,
 }: {
 	children: React.ReactNode;
+	className?: string;
 }) {
 	return (
-		<div className='flex w-full flex-col items-center justify-center'>
-			<SiteNav />
-			<main className='flex min-h-[calc(100svh-4rem)] w-full max-w-5xl flex-col gap-4 border-gray-200 dark:border-gray-300/20 p-8 pt-12 md:p-18 md:pt-14 border-x'>
-				{children}
-			</main>
-		</div>
+		<main
+			className={`mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 border-x border-gray-200 p-8 pt-12 dark:border-gray-300/20 md:p-18 md:pt-14 ${className ?? ''}`}
+		>
+			{children}
+		</main>
 	);
 }

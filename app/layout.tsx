@@ -4,7 +4,11 @@ import LenisProvider from 'app/components/providers/LenisProvider';
 import ThemeProvider from 'app/components/providers/ThemeProvider';
 import siteMetadata from 'app/site-metadata';
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
+import { type ReactNode, ViewTransition } from 'react';
+import { getPosts } from './blog/utils';
+import CommandMenu from './components/command-menu';
+import SiteFooter from './components/layouts/site-footer';
+import SiteNav from './components/layouts/site-nav';
 import { mukta } from './fonts';
 import './tailwind.css';
 
@@ -30,6 +34,12 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
+	const commandMenuPosts = getPosts().map((post) => ({
+		slug: post.slug,
+		title: post.metadata.title,
+		tags: post.metadata.tags,
+	}));
+
 	return (
 		<html lang='en' suppressHydrationWarning className={mukta.className}>
 			<head>
@@ -60,7 +70,17 @@ export default function RootLayout({ children }: RootLayoutProps) {
 					defaultTheme='dark'
 					themes={['dark', 'light']}
 				>
-					<LenisProvider>{children}</LenisProvider>
+					<LenisProvider>
+						<div className='flex min-h-svh flex-col'>
+							<SiteNav />
+							{/* Page content crossfades on navigation; nav/footer stay put. */}
+							<ViewTransition default='page'>
+								<div className='flex flex-1 flex-col'>{children}</div>
+							</ViewTransition>
+							<SiteFooter />
+						</div>
+						<CommandMenu posts={commandMenuPosts} />
+					</LenisProvider>
 					{process.env.NODE_ENV === 'production' && <Analytics />}
 				</ThemeProvider>
 			</body>
