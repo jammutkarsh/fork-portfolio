@@ -6,7 +6,13 @@ import Link from 'next/link';
 import type { PostSummary } from '../blog/utils';
 import Tag from './tag';
 
-export function BlogPosts({ posts }: { posts: PostSummary[] }) {
+export function BlogPosts({
+	posts,
+	onTagSelect,
+}: {
+	posts: PostSummary[];
+	onTagSelect?: (slug: string) => void;
+}) {
 	const prefersReducedMotion = useReducedMotion();
 
 	return (
@@ -48,7 +54,7 @@ export function BlogPosts({ posts }: { posts: PostSummary[] }) {
 					{post.metadata.tags.length > 0 && (
 						<div className='flex flex-wrap gap-2 pb-5 -mt-2'>
 							{post.metadata.tags.map((tag) => (
-								<Tag key={tag} text={tag} />
+								<Tag key={tag} text={tag} onSelect={onTagSelect} />
 							))}
 						</div>
 					)}

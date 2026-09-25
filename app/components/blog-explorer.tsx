@@ -17,6 +17,25 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 	const [activeTag, setActiveTag] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 
+	// Start from `?tag=` (links from post pages) and keep the URL in sync.
+	useEffect(() => {
+		const tag = new URLSearchParams(window.location.search).get('tag');
+		if (tag && tags[tag]) {
+			setActiveTag(tag);
+		}
+	}, [tags]);
+
+	const selectTag = (tag: string | null) => {
+		setActiveTag(tag);
+		const url = new URL(window.location.href);
+		if (tag) {
+			url.searchParams.set('tag', tag);
+		} else {
+			url.searchParams.delete('tag');
+		}
+		window.history.replaceState(null, '', url);
+	};
+
 	// Press "/" anywhere to jump to the search box.
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -86,14 +105,14 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 
 			<fieldset className='flex flex-wrap gap-2'>
 				<legend className='sr-only'>Filter by tag</legend>
-				<TagChip active={activeTag === null} onClick={() => setActiveTag(null)}>
+				<TagChip active={activeTag === null} onClick={() => selectTag(null)}>
 					All ({posts.length})
 				</TagChip>
 				{sortedTags.map((tag) => (
 					<TagChip
 						key={tag}
 						active={activeTag === tag}
-						onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+						onClick={() => selectTag(activeTag === tag ? null : tag)}
 					>
 						{tagNames[tag] ?? tag} ({tags[tag]})
 					</TagChip>
@@ -101,7 +120,11 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 			</fieldset>
 
 			{filteredPosts.length > 0 ? (
-				<BlogPosts key={`${activeTag}-${query}`} posts={filteredPosts} />
+				<BlogPosts
+					key={`${activeTag}-${query}`}
+					posts={filteredPosts}
+					onTagSelect={selectTag}
+				/>
 			) : (
 				<p className='py-10 text-center text-gray-500 dark:text-gray-400'>
 					No posts found.

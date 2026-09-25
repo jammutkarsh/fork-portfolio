@@ -1,4 +1,4 @@
-import { getAllTags, getPosts } from './blog/utils';
+import { getPosts } from './blog/utils';
 import siteMetadata from './site-metadata';
 
 export default async function sitemap() {
@@ -10,17 +10,10 @@ export default async function sitemap() {
 		lastModified: post.metadata.publishedAt,
 	}));
 
-	const tags = Object.keys(getAllTags(posts)).map((tag) => ({
-		url: `${baseUrl}/tags/${tag}`,
+	const routes = ['', 'blog', 'projects', 'about', 'uses'].map((route) => ({
+		url: route === '' ? `${baseUrl}/` : `${baseUrl}/${route}`,
 		lastModified: new Date().toISOString().split('T')[0],
 	}));
 
-	const routes = ['', 'blog', 'projects', 'about', 'uses', 'tags'].map(
-		(route) => ({
-			url: route === '' ? `${baseUrl}/` : `${baseUrl}/${route}`,
-			lastModified: new Date().toISOString().split('T')[0],
-		}),
-	);
-
-	return [...routes, ...blogs, ...tags];
+	return [...routes, ...blogs];
 }

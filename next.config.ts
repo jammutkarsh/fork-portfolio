@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
 	experimental: {
 		turbopackFileSystemCacheForDev: true,
 	},
+	// Tag pages were folded into the blog's tag filter.
+	async redirects() {
+		return [
+			{ source: '/tags', destination: '/blog', permanent: true },
+			{ source: '/tags/:tag', destination: '/blog?tag=:tag', permanent: true },
+		];
+	},
 };
 
 export default nextConfig;

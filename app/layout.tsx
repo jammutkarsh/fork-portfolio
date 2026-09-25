@@ -37,7 +37,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
 	const commandMenuPosts = getPosts().map((post) => ({
 		slug: post.slug,
 		title: post.metadata.title,
-		tags: post.metadata.tags,
 	}));
 
 	return (
