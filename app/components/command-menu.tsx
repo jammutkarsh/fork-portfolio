@@ -1,6 +1,7 @@
 'use client';
 
 import { Command } from 'cmdk';
+import { useLenis } from 'lenis/react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
@@ -44,6 +45,17 @@ export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
 	const { resolvedTheme, setTheme } = useTheme();
+	const lenis = useLenis();
+
+	// Lenis smooth-scroll hijacks wheel events page-wide; pause it while the
+	// menu is open so the page behind stays put.
+	useEffect(() => {
+		if (open) {
+			lenis?.stop();
+		} else {
+			lenis?.start();
+		}
+	}, [open, lenis]);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -78,7 +90,10 @@ export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
 				placeholder='Type a command or search…'
 				className='w-full border-b border-gray-200 bg-transparent px-4 py-3 text-base outline-none placeholder:text-gray-500 dark:border-gray-800'
 			/>
-			<Command.List className='max-h-[min(19rem,60vh)] overflow-y-auto overscroll-contain p-2'>
+			<Command.List
+				data-lenis-prevent
+				className='max-h-[min(19rem,60vh)] overflow-y-auto overscroll-contain p-2'
+			>
 				<Command.Empty className='py-6 text-center text-sm text-gray-500'>
 					No results found.
 				</Command.Empty>
