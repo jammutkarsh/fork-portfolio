@@ -6,7 +6,11 @@ import { useEffect, useState } from 'react';
 import { MoonIcon } from '../icons/moon-icon';
 import { SunMediumIcon } from '../icons/sun-icon';
 
-const ThemeSwitch = () => {
+const ThemeSwitch = ({
+	className = 'absolute top-4 right-4 z-11',
+}: {
+	className?: string;
+}) => {
 	const [mounted, setMounted] = useState(false);
 	const { theme, setTheme, resolvedTheme } = useTheme();
 
@@ -27,7 +31,7 @@ const ThemeSwitch = () => {
 	};
 
 	return (
-		<div className='absolute top-4 right-4 z-11'>
+		<div className={className}>
 			<motion.button
 				aria-label='Toggle Dark Mode'
 				type='button'

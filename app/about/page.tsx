@@ -35,9 +35,9 @@ export default function AboutPage() {
 					className='rounded-full object-cover'
 				/>
 				<div className='text-center sm:text-left'>
-					<h1 className='text-xl font-bold md:text-3xl lg:text-4xl'>
+					<h2 className='text-xl font-bold md:text-3xl lg:text-4xl'>
 						{data.name ?? siteMetadata.author}
-					</h1>
+					</h2>
 					<p className='text-sm text-gray-600 dark:text-gray-400 md:text-base'>
 						{data.occupation}
 					</p>
