@@ -1,56 +1,32 @@
-import siteMetadata from '@/content/siteMetadata';
-import ListLayout from '@/layouts/MDX/ListLayout';
-import MainLayout from '@/layouts/MainLayout';
-import { sortedBlogPost } from '@/lib/utils/contentlayer';
-import { POSTS_PER_PAGE } from '@/types/default';
-import { allBlogs } from 'contentlayer/generated';
-import { Metadata } from 'next';
-
-const siteTitle = `Blog | ${siteMetadata.title}`;
-const siteDescription = `Blog | ${siteMetadata.title}`;
-const siteURL = `${siteMetadata.siteUrl}/blog`;
+import type { Metadata } from 'next';
+import { BlogExplorer } from '../components/blog-explorer';
+import Header from '../components/header';
+import PageContainer from '../components/layouts/page-container';
+import siteMetadata from '../site-metadata';
+import { getAllTags, getPosts, getTagNames, toSummary } from './utils';
 
 export const metadata: Metadata = {
-  title: 'Blog',
-  description: siteDescription,
-  creator: siteMetadata.author,
-  metadataBase: new URL(siteURL),
-  openGraph: {
-    title: siteTitle,
-    siteName: siteTitle,
-    description: siteDescription,
-    type: 'website',
-    url: new URL(siteURL),
-    images: [
-      {
-        url: new URL(`${siteURL}/opengraph-image`),
-        secureUrl: new URL(`${siteURL}/opengraph-image`),
-        type: 'image/png',
-        alt: "Blog page of Utkarsh Chourasia's portfolio website",
-        width: 1200,
-        height: 630,
-      },
-    ],
-  },
+	title: 'Blog',
+	description: `Blog | ${siteMetadata.title}`,
+	openGraph: {
+		title: `Blog | ${siteMetadata.title}`,
+		description: `Blog | ${siteMetadata.title}`,
+		type: 'website',
+		url: '/blog',
+	},
 };
 
-export default function Blog() {
-  const activePosts = allBlogs.filter((p) => p.draft === false);
-  const posts = sortedBlogPost(activePosts);
-  const initialDisplayPosts = posts.slice(0, POSTS_PER_PAGE);
-  const pagination = {
-    currentPage: 1,
-    totalPages: Math.ceil(posts.length / POSTS_PER_PAGE),
-  };
+export default function BlogPage() {
+	const posts = getPosts();
 
-  return (
-    <MainLayout>
-      <ListLayout
-        posts={posts}
-        initialDisplayPosts={initialDisplayPosts}
-        pagination={pagination}
-        title="Blog"
-      />
-    </MainLayout>
-  );
+	return (
+		<PageContainer>
+			<Header title='Blog' />
+			<BlogExplorer
+				posts={posts.map(toSummary)}
+				tags={getAllTags(posts)}
+				tagNames={getTagNames(posts)}
+			/>
+		</PageContainer>
+	);
 }

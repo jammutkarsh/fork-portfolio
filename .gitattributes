@@ -201,3 +201,17 @@ Procfile          text
 
 # Ignore files (like .npmignore or .gitignore)
 *.*ignore         text
+
+## UPSTREAM SYNC (see SYNCING.md)
+#
+# Files that are entirely this fork's own content. When syncing with
+# dlarroder/dalelarroder, keep our version whenever both sides changed them.
+# Needs `git config merge.ours.driver true` (scripts/sync-upstream.sh sets it).
+README.md                   merge=ours
+LICENSE                     merge=ours
+.env.example                merge=ours
+app/projects/constants.ts   merge=ours
+app/uses/content.mdx        merge=ours
+app/robots.ts               merge=ours
+app/sitemap.ts              merge=ours
+app/components/header.tsx   merge=ours

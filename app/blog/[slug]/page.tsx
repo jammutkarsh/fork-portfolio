@@ -1,79 +1,77 @@
-import { MDXLayoutRenderer } from '@/components/MDXComponents';
-import ScrollProgressBar from '@/components/ScrollProgressBar';
-import siteMetadata from '@/content/siteMetadata';
-import PostLayout from '@/layouts/MDX/PostLayout';
-import MainLayout from '@/layouts/MainLayout';
-import { coreContent, formatBlogLink, sortedBlogPost } from '@/lib/utils/contentlayer';
-import { allBlogs } from 'contentlayer/generated';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import PostComments from '../../components/comments/post-comments';
+import BackNavigation from '../../components/layouts/back-navigation';
+import Tag from '../../components/tag';
+import siteMetadata from '../../site-metadata';
+import { formatDate, getPostFromSlug, getPosts } from '../utils';
+import PageTitle from './page-title';
 
-type BlogPostProps = {
-  params: Promise<{ slug: string }>;
-};
+export const dynamicParams = false;
 
-export async function generateMetadata({
-  params,
-}: BlogPostProps): Promise<Metadata> {
-  const { slug } = await params;
-  const post = allBlogs.find((p) => p.slug === slug);
-  const siteURL = `${siteMetadata.siteUrl}/blog/${slug}`;
-  if (!post) {
-    return {};
-  }
-
-  return {
-    title: {
-      absolute: post.title,
-    },
-    description: post.summary,
-    creator: siteMetadata.author,
-    keywords: post.tags,
-    metadataBase: new URL(siteURL),
-    openGraph: {
-      title: post.title,
-      siteName: post.title,
-      description: post.summary,
-      type: 'article',
-      url: new URL(siteURL),
-      images: [
-        {
-          url: new URL(`${siteURL}/opengraph-image`),
-          secureUrl: new URL(`${siteURL}/opengraph-image`),
-          type: 'image/png',
-          alt: `A Blog about ${post.summary} by ${post.author}`,
-          width: 1200,
-          height: 630,
-        },
-      ],
-    },
-  };
+export function generateStaticParams() {
+	return getPosts().map((post) => ({ slug: post.slug }));
 }
 
-export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const sortedPosts = sortedBlogPost(allBlogs);
+export async function generateMetadata(props: {
+	params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+	const params = await props.params;
+	const { metadata } = await getPostFromSlug(params.slug);
 
-  const post = sortedPosts.find((p) => p.slug === slug);
-  const author = post?.author || ['default'];
+	const url = `/blog/${params.slug}`;
 
-  const postIndex = sortedPosts.findIndex((p) => p.slug === slug);
-  const prevContent = sortedPosts[postIndex + 1] || null;
-  const prev = prevContent ? coreContent(prevContent) : null;
-  const nextContent = sortedPosts[postIndex - 1] || null;
-  const next = nextContent ? coreContent(nextContent) : null;
+	return {
+		title: metadata.title,
+		description: metadata.summary,
+		openGraph: {
+			title: metadata.title,
+			description: metadata.summary,
+			type: 'article',
+			url: url,
+			publishedTime: metadata.publishedAt,
+			authors: [metadata.author ?? siteMetadata.author],
+			tags: metadata.tags,
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: metadata.title,
+			description: metadata.summary,
+		},
+		alternates: {
+			canonical: url,
+		},
+	};
+}
 
-  if (!post) {
-    return <div>Post not found</div>;
-  }
+export default async function Blog(props: {
+	params: Promise<{ slug: string }>;
+}) {
+	const params = await props.params;
 
-  return (
-    <>
-      <ScrollProgressBar />
-      <MainLayout>
-        <PostLayout content={post} prev={formatBlogLink(prev)} next={formatBlogLink(next)}>
-          <MDXLayoutRenderer toc={post.toc} content={post} authorDetails={author} />
-        </PostLayout>
-      </MainLayout>
-    </>
-  );
+	const { metadata, content, readingTime } = await getPostFromSlug(params.slug);
+
+	return (
+		<>
+			<section>
+				<BackNavigation />
+				<PageTitle>{metadata.title}</PageTitle>
+				<div className='flex flex-wrap gap-2 items-center mt-2 text-sm text-neutral-600 dark:text-neutral-400'>
+					<time dateTime={metadata.publishedAt}>
+						{formatDate(metadata.publishedAt)}
+					</time>
+					<span aria-hidden>·</span>
+					<span>{readingTime}</span>
+				</div>
+				{metadata.tags.length > 0 && (
+					<div className='flex flex-wrap gap-2 mt-3'>
+						{metadata.tags.map((tag) => (
+							<Tag key={tag} text={tag} />
+						))}
+					</div>
+				)}
+			</section>
+			<article className='min-w-0 break-words md:max-w-5xl'>{content}</article>
+			<PostComments />
+		</>
+	);
 }

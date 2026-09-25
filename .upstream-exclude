@@ -1,0 +1,39 @@
+# Upstream (dlarroder/dalelarroder) paths this fork has removed.
+# scripts/sync-upstream.sh deletes anything matching these after merging
+# upstream, so new or changed upstream files here never come back.
+# One git pathspec per line; `:(exclude)<path>` keeps a path. See SYNCING.md.
+
+# Upstream author's posts and images (this fork's posts live in content/blog)
+app/thoughts/
+app/blog/posts/
+:(glob)public/static/images/**
+:(exclude)public/static/images/project/placeholder.png
+public/static/favicons/favicon.ico
+app/opengraph-image.png
+public/static/og-image.png
+
+# Features this fork doesn't use
+app/api/
+app/stats/
+app/components/spotify/
+app/components/wakatime/
+app/components/github-contributions/
+app/components/work/
+app/components/tiles/
+app/components/hero/
+app/components/splash-cursor.tsx
+app/components/intro.tsx
+app/components/contact.tsx
+app/components/background-gradient-animation.tsx
+app/components/animated-number.tsx
+app/components/stat-item.tsx
+app/components/skeleton.tsx
+app/components/providers/ScrollProvider.tsx
+app/components/analytics/log-rocket.tsx
+app/components/layouts/section-container.tsx
+app/components/layouts/icons/arrow-down-icon.tsx
+app/blog/[slug]/table-of-contents.tsx
+
+# Upstream uses bun; this fork uses npm (package-lock.json)
+bun.lock
+bun.lockb

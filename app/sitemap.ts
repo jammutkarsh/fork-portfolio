@@ -1,18 +1,19 @@
-import siteMetadata from '@/content/siteMetadata';
-import { allBlogs } from 'contentlayer/generated';
-import { MetadataRoute } from 'next';
+import { getPosts } from './blog/utils';
+import siteMetadata from './site-metadata';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = siteMetadata.siteUrl;
-  const blogRoutes = allBlogs.map((post) => ({
-    url: `${siteUrl}/${post.slug}`,
-    lastModified: post.lastmod || post.date,
-  }));
+export default async function sitemap() {
+	const baseUrl = siteMetadata.siteUrl;
+	const posts = getPosts();
 
-  const routes = ['', 'blog', 'about'].map((route) => ({
-    url: `${siteUrl}/${route}`,
-    lastModified: new Date().toISOString().split('T')[0],
-  }));
+	const blogs = posts.map((post) => ({
+		url: `${baseUrl}/blog/${post.slug}`,
+		lastModified: post.metadata.publishedAt,
+	}));
 
-  return [...routes, ...blogRoutes];
+	const routes = ['', 'blog', 'projects', 'about', 'uses'].map((route) => ({
+		url: route === '' ? `${baseUrl}/` : `${baseUrl}/${route}`,
+		lastModified: new Date().toISOString().split('T')[0],
+	}));
+
+	return [...routes, ...blogs];
 }
