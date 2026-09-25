@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Header from '../components/header';
+import PageContainer from '../components/layouts/page-container';
 import { CustomMDX } from '../components/mdx';
 import siteMetadata from '../site-metadata';
 
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
 	return (
-		<>
+		<PageContainer>
 			<Header title='About' />
 			<div className='flex flex-col-reverse items-center gap-5 sm:flex-row'>
 				<Image
@@ -46,6 +47,6 @@ export default function AboutPage() {
 			<div className='text-justify'>
 				<CustomMDX source={content} />
 			</div>
-		</>
+		</PageContainer>
 	);
 }

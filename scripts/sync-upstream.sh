@@ -48,7 +48,14 @@ done < .upstream-exclude
 if ((${#pathspecs[@]})); then
 	# Put these paths back exactly as they are on our branch: upstream additions
 	# are removed, upstream edits are dropped, our own files there are kept.
-	git restore --source=HEAD --staged --worktree --ignore-unmatch -- "${pathspecs[@]}"
+	git ls-files -- "${pathspecs[@]}" | sort -u | while IFS= read -r path; do
+		if git cat-file -e "HEAD:$path" 2>/dev/null; then
+			git checkout HEAD -- "$path"
+		else
+			git rm -q -f -- "$path"
+			echo "  dropped upstream file: $path"
+		fi
+	done
 fi
 
 # 3. Regenerate the lockfile instead of hand-merging it.
