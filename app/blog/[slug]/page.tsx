@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
+import PostComments from '../../components/comments/post-comments';
 import BackNavigation from '../../components/layouts/back-navigation';
+import Tag from '../../components/tag';
+import siteMetadata from '../../site-metadata';
 import { formatDate, getPostFromSlug, getPosts } from '../utils';
 import PageTitle from './page-title';
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
 	return getPosts().map((post) => ({ slug: post.slug }));
@@ -13,8 +18,7 @@ export async function generateMetadata(props: {
 	const params = await props.params;
 	const { metadata } = await getPostFromSlug(params.slug);
 
-	const url = `https://dalelarroder.com/thoughts/${params.slug}`;
-	const ogImage = metadata.image || '/static/og-image.png';
+	const url = `/blog/${params.slug}`;
 
 	return {
 		title: metadata.title,
@@ -25,21 +29,13 @@ export async function generateMetadata(props: {
 			type: 'article',
 			url: url,
 			publishedTime: metadata.publishedAt,
-			authors: ['Dale Larroder'],
-			images: [
-				{
-					url: ogImage,
-					width: 1200,
-					height: 630,
-					alt: metadata.title,
-				},
-			],
+			authors: [metadata.author ?? siteMetadata.author],
+			tags: metadata.tags,
 		},
 		twitter: {
 			card: 'summary_large_image',
 			title: metadata.title,
 			description: metadata.summary,
-			images: [ogImage],
 		},
 		alternates: {
 			canonical: url,
@@ -52,20 +48,30 @@ export default async function Blog(props: {
 }) {
 	const params = await props.params;
 
-	const { metadata, content } = await getPostFromSlug(params.slug);
+	const { metadata, content, readingTime } = await getPostFromSlug(params.slug);
 
 	return (
 		<>
 			<section>
 				<BackNavigation />
 				<PageTitle>{metadata.title}</PageTitle>
-				<div className='flex justify-between items-center mt-2 text-sm'>
-					<p className='text-sm text-neutral-600 dark:text-neutral-400'>
+				<div className='flex flex-wrap gap-2 items-center mt-2 text-sm text-neutral-600 dark:text-neutral-400'>
+					<time dateTime={metadata.publishedAt}>
 						{formatDate(metadata.publishedAt)}
-					</p>
+					</time>
+					<span aria-hidden>·</span>
+					<span>{readingTime}</span>
 				</div>
+				{metadata.tags.length > 0 && (
+					<div className='flex flex-wrap gap-2 mt-3'>
+						{metadata.tags.map((tag) => (
+							<Tag key={tag} text={tag} />
+						))}
+					</div>
+				)}
 			</section>
 			<article className='md:max-w-5xl'>{content}</article>
+			<PostComments />
 		</>
 	);
 }

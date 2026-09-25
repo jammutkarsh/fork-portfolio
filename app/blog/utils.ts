@@ -3,13 +3,20 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import { cache } from 'react';
+import readingTime from 'reading-time';
 import rehypePrettyCode from 'rehype-pretty-code';
 import { components } from '../components/mdx';
+import { extractHeadings } from './[slug]/extract-headings';
+import TOCInline, { type TOCInlineProps } from './[slug]/toc-inline';
+import { kebabCase } from './kebab-case';
+
+export const POSTS_DIR = path.join(process.cwd(), 'content/blog');
 
 export interface BlogPost {
 	metadata: Metadata;
 	slug: string;
 	content: string;
+	readingTime: string;
 }
 
 type Metadata = {
@@ -17,6 +24,8 @@ type Metadata = {
 	publishedAt: string;
 	summary: string;
 	draft: boolean;
+	tags: string[];
+	author?: string;
 	image?: string;
 };
 
@@ -34,9 +43,11 @@ function matterDataToMetadata(data: Record<string, unknown>): Metadata {
 	const image = data.image;
 	return {
 		title: String(data.title ?? ''),
-		publishedAt: String(data.publishedAt ?? ''),
+		publishedAt: String(data.publishedAt ?? data.date ?? ''),
 		summary: String(data.summary ?? ''),
 		draft: normalizeDraft(data.draft),
+		tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+		...(typeof data.author === 'string' ? { author: data.author } : {}),
 		...(typeof image === 'string' && image.length > 0 ? { image } : {}),
 	};
 }
@@ -69,12 +80,13 @@ function getMDXData(dir: string): BlogPost[] {
 			metadata,
 			slug,
 			content,
+			readingTime: readingTime(content).text,
 		};
 	});
 }
 
 export function getPosts(): BlogPost[] {
-	const posts = getMDXData(path.join(process.cwd(), 'app/thoughts/posts'));
+	const posts = getMDXData(POSTS_DIR);
 
 	return posts
 		.filter((post) => !post.metadata.draft)
@@ -124,16 +136,19 @@ export function formatDate(date: string, includeRelative = false) {
 
 export const getPostFromSlug = cache(async (slug: string) => {
 	const raw = await fs.promises.readFile(
-		path.join(process.cwd(), 'app/thoughts/posts', `${slug}.mdx`),
+		path.join(POSTS_DIR, `${slug}.mdx`),
 		'utf-8',
 	);
 
 	const { metadata, content: mdxBody } = parseMdxSource(raw);
+	const toc = extractHeadings(mdxBody);
 
 	const { content } = await compileMDX({
 		source: mdxBody,
 		options: {
 			parseFrontmatter: false,
+			// Posts are first-party content; allow JSX expression props like toHeading={2}.
+			blockJS: false,
 			mdxOptions: {
 				remarkPlugins: [],
 				rehypePlugins: [
@@ -147,11 +162,27 @@ export const getPostFromSlug = cache(async (slug: string) => {
 				format: 'mdx',
 			},
 		},
-		components: components,
+		components: {
+			...components,
+			TOCInline: (props: Omit<TOCInlineProps, 'toc'>) =>
+				TOCInline({ ...props, toc }),
+		},
 	});
 
 	return {
 		metadata,
 		content,
+		readingTime: readingTime(mdxBody).text,
 	};
 });
+
+export function getAllTags(posts: BlogPost[]): Record<string, number> {
+	const tags: Record<string, number> = {};
+	for (const post of posts) {
+		for (const tag of post.metadata.tags) {
+			const key = kebabCase(tag);
+			tags[key] = (tags[key] ?? 0) + 1;
+		}
+	}
+	return tags;
+}

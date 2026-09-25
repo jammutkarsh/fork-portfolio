@@ -3,9 +3,10 @@
 import { format } from 'date-fns';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
-import type { BlogPost } from '../thoughts/utils';
+import type { BlogPost } from '../blog/utils';
+import Tag from './tag';
 
-export function Thoughts({ posts }: { posts: BlogPost[] }) {
+export function BlogPosts({ posts }: { posts: BlogPost[] }) {
 	const prefersReducedMotion = useReducedMotion();
 
 	return (
@@ -26,7 +27,7 @@ export function Thoughts({ posts }: { posts: BlogPost[] }) {
 					}}
 				>
 					<Link
-						href={`/thoughts/${post.slug}`}
+						href={`/blog/${post.slug}`}
 						aria-label={`Read "${post.metadata.title}"`}
 					>
 						<article className='space-y-2 py-5 border-b border-gray-300/20'>
@@ -44,6 +45,13 @@ export function Thoughts({ posts }: { posts: BlogPost[] }) {
 							</p>
 						</article>
 					</Link>
+					{post.metadata.tags.length > 0 && (
+						<div className='flex flex-wrap gap-2 pb-5 -mt-2'>
+							{post.metadata.tags.map((tag) => (
+								<Tag key={tag} text={tag} />
+							))}
+						</div>
+					)}
 				</motion.li>
 			))}
 		</ul>

@@ -1,3 +1,4 @@
+import { getTextContent, slugify } from 'app/blog/[slug]/extract-headings';
 import Link from 'next/link';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import type { ComponentPropsWithoutRef } from 'react';
@@ -9,15 +10,6 @@ type ListItemProps = ComponentPropsWithoutRef<'li'>;
 type AnchorProps = ComponentPropsWithoutRef<'a'>;
 type BlockquoteProps = ComponentPropsWithoutRef<'blockquote'>;
 
-function slugify(text: string): string {
-	return text
-		.toLowerCase()
-		.trim()
-		.replace(/[^\w\s-]/g, '')
-		.replace(/[\s_-]+/g, '-')
-		.replace(/^-+|-+$/g, '');
-}
-
 export const components = {
 	h1: ({ children, ...props }: HeadingProps) => (
 		<h1
@@ -28,7 +20,7 @@ export const components = {
 		</h1>
 	),
 	h2: ({ children, ...props }: HeadingProps) => {
-		const id = typeof children === 'string' ? slugify(children) : undefined;
+		const id = slugify(getTextContent(children));
 		return (
 			<h2
 				id={id}
@@ -40,7 +32,7 @@ export const components = {
 		);
 	},
 	h3: ({ children, ...props }: HeadingProps) => {
-		const id = typeof children === 'string' ? slugify(children) : undefined;
+		const id = slugify(getTextContent(children));
 		return (
 			<h3
 				id={id}
