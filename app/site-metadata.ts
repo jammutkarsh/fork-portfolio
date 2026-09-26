@@ -30,7 +30,7 @@ const siteMetadata = {
 	siteUrl: getDeploymentURL(),
 	siteRepo: 'https://github.com/jammutkarsh/fork-portfolio',
 	siteLogo: '/static/favicons/favicon.png',
-	image: '/images/avatar.jpg',
+	image: '/images/avatar.png',
 	email: 'mail@utkarshchourasia.in',
 	github: 'https://github.com/jammutkarsh',
 	twitter: 'https://twitter.com/jammutkarsh',

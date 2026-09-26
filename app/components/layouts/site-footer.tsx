@@ -14,7 +14,7 @@ const socials = [
 
 export default function SiteFooter() {
 	return (
-		<footer className='w-full border-t border-gray-200 dark:border-gray-300/20'>
+		<footer className='w-full'>
 			<div className='mx-auto flex w-full max-w-5xl flex-col-reverse items-center justify-between gap-3 border-x border-gray-200 px-5 py-6 text-sm text-gray-600 dark:border-gray-300/20 dark:text-gray-400 sm:flex-row sm:px-8 md:px-18'>
 				<p>
 					© {new Date().getFullYear()} {siteMetadata.author}. All rights
