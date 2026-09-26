@@ -27,21 +27,18 @@ import type { PhaseMeta } from './get-story';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-// The phase title rolls like a drum: in from below going forward, from
-// above going back.
-const drum = {
-	enter: (dir: number) => ({
-		y: `${dir * 100}%`,
-		rotateX: dir * -70,
-		opacity: 0,
-	}),
-	center: { y: '0%', rotateX: 0, opacity: 1 },
-	exit: (dir: number) => ({
-		y: `${dir * -100}%`,
-		rotateX: dir * 70,
-		opacity: 0,
-	}),
-};
+// The name on the intro and the phase titles share one size.
+const heading =
+	'text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl';
+
+// The title and the paragraph change the same way: the old one fades out,
+// then the new one fades in.
+const swap = (dir: number) => ({
+	initial: { opacity: 0, y: dir * 14, filter: 'blur(6px)' },
+	animate: { opacity: 1, y: 0, filter: 'blur(0px)' },
+	exit: { opacity: 0, y: dir * -8, filter: 'blur(4px)' },
+	transition: { duration: 0.4, ease },
+});
 
 /**
  * The home page as a slide deck: one frame stays in place while scrolling
@@ -50,8 +47,8 @@ const drum = {
  *
  * Leaving the intro (driven by the scroll position, so it plays both ways)
  * the photo gives way to the desk, the site's two vertical frame lines slide
- * off screen and the frame widens. On the phases, the paragraph swaps in
- * place, the title rolls over in the top-left, the desk changes with the
+ * off screen and the frame widens. On the phases, the title in the top-left
+ * and the paragraph swap in place, and the desk changes with the
  * phase and the goals line along the bottom grows by one.
  */
 export default function StoryDeck({
@@ -190,22 +187,14 @@ export default function StoryDeck({
 					{/* Phase title, top left */}
 					<div
 						aria-hidden='true'
-						className='relative h-10 shrink-0 overflow-hidden perspective-[800px] md:h-12'
+						className='min-h-19 shrink-0 sm:min-h-12 lg:min-h-15'
 					>
-						<AnimatePresence initial={false} custom={dir}>
+						<AnimatePresence mode='wait' initial={false}>
 							{opened && (
 								<motion.h2
 									key={phase.id}
-									custom={dir}
-									variants={drum}
-									initial='enter'
-									animate='center'
-									exit='exit'
-									transition={{ duration: 0.55, ease }}
-									className={classNames(
-										'absolute inset-x-0 top-0 text-2xl font-bold whitespace-nowrap text-primary-500 md:text-3xl',
-										merryWeather.className,
-									)}
+									{...swap(dir)}
+									className={classNames(heading, merryWeather.className)}
 								>
 									{phase.title}
 								</motion.h2>
@@ -245,12 +234,7 @@ export default function StoryDeck({
 								style={{ opacity: introOpacity, y: introY }}
 								className='[grid-area:1/1] self-center'
 							>
-								<h1
-									className={classNames(
-										'text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl',
-										merryWeather.className,
-									)}
-								>
+								<h1 className={classNames(heading, merryWeather.className)}>
 									{title}
 								</h1>
 								<p className='mt-5 text-lg text-gray-600 dark:text-gray-400'>
@@ -271,14 +255,11 @@ export default function StoryDeck({
 								inert={!opened}
 								className='[grid-area:1/1] min-h-0 self-center'
 							>
-								<AnimatePresence mode='wait' initial={false} custom={dir}>
+								<AnimatePresence mode='wait' initial={false}>
 									{opened && (
 										<motion.div
 											key={phase.id}
-											initial={{ opacity: 0, y: dir * 14, filter: 'blur(6px)' }}
-											animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-											exit={{ opacity: 0, y: dir * -8, filter: 'blur(4px)' }}
-											transition={{ duration: 0.4, ease }}
+											{...swap(dir)}
 											data-lenis-prevent
 											className='max-h-full overflow-y-auto text-base sm:text-lg lg:text-xl'
 										>
@@ -286,10 +267,10 @@ export default function StoryDeck({
 											{isLast && (
 												<div className='mt-4 flex gap-5 text-base'>
 													<Link href='/blog' className='underline-magical'>
-														Read the blog &rarr;
+														Blogs &rarr;
 													</Link>
 													<Link href='/projects' className='underline-magical'>
-														See projects &rarr;
+														Projects &rarr;
 													</Link>
 												</div>
 											)}
@@ -299,42 +280,6 @@ export default function StoryDeck({
 							</div>
 						</div>
 					</div>
-
-					{/* Goals so far, growing by one per phase */}
-					<ul
-						aria-hidden='true'
-						className='mt-4 flex min-h-5 shrink-0 flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs md:text-sm'
-					>
-						<AnimatePresence initial={false}>
-							{phases.slice(0, opened ? current + 1 : 0).map((p, i) => (
-								<motion.li
-									key={p.id}
-									layout
-									initial={{ opacity: 0, x: -10 }}
-									animate={{ opacity: 1, x: 0 }}
-									exit={{ opacity: 0, x: -10 }}
-									transition={{ duration: 0.4, ease }}
-									className='flex items-center gap-2'
-								>
-									{i > 0 && <span className='text-gray-400'>&rarr;</span>}
-									<span
-										className={classNames(
-											'relative transition-colors duration-300',
-											i === current ? 'text-primary-500' : 'text-gray-500',
-										)}
-									>
-										{p.goal}
-										<motion.span
-											className='absolute top-1/2 left-0 h-px w-full origin-left bg-primary-500'
-											initial={false}
-											animate={{ scaleX: i < current ? 1 : 0 }}
-											transition={{ duration: 0.4, ease }}
-										/>
-									</span>
-								</motion.li>
-							))}
-						</AnimatePresence>
-					</ul>
 				</motion.div>
 			</div>
 
@@ -343,13 +288,11 @@ export default function StoryDeck({
 				{phases.map((p, i) => (
 					<li key={p.id}>
 						<h2>{p.title}</h2>
-						<p>Goal: {p.goal}</p>
 						{prose[i]}
 					</li>
 				))}
 				<li>
-					<Link href='/blog'>Read the blog</Link>{' '}
-					<Link href='/projects'>See projects</Link>
+					<Link href='/blog'>Blogs</Link> <Link href='/projects'>Projects</Link>
 				</li>
 			</ol>
 		</MotionConfig>

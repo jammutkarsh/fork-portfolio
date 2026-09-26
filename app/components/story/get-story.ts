@@ -6,7 +6,8 @@ import type { SketchId } from './sketches';
 export interface PhaseMeta {
 	id: string;
 	title: string;
-	goal: string;
+	/** Shown on the desk's wall calendar; omit for the current year. */
+	year?: number;
 	/** Framed on the wall of the desk; see sketches.tsx for the options. */
 	sketch: SketchId;
 }

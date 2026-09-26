@@ -22,7 +22,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 const FRAME = { x: 292, y: 16, size: 72 };
 const CALENDAR = { x: 180, y: 22, w: 64, h: 74 };
 // The day the calendar is on in each phase; the days before it are crossed
-// off as the page turns. No real dates: it only shows time passing.
+// off as the page turns. Only the year is real (from content/story.mdx).
 const today = [9, 23, 16, 28, 12, 20];
 const DAYS = Array.from({ length: 31 }, (_, i) => i);
 
@@ -261,7 +261,7 @@ export default function DeskScene({
 				/>
 			</Appear>
 
-			<Calendar phase={phase} />
+			<Calendar phase={phase} year={phases[phase].year} />
 
 			{/* Framed print: the current phase's sketch */}
 			<AnimatePresence initial={false}>
@@ -308,7 +308,7 @@ function Frame() {
  * A tear-off wall calendar. Each phase change tears the page off and the
  * new month's days get crossed off one by one, up to "today".
  */
-function Calendar({ phase }: { phase: number }) {
+function Calendar({ phase, year }: { phase: number; year?: number }) {
 	const { x, y, w, h } = CALENDAR;
 	const day = today[phase % today.length];
 	return (
@@ -343,6 +343,18 @@ function Calendar({ phase }: { phase: number }) {
 						fill={ACCENT}
 						stroke={ACCENT}
 					/>
+					<text
+						x={x + w / 2}
+						y={y + 10.5}
+						textAnchor='middle'
+						fontFamily={MONO}
+						fontSize={8.5}
+						fontWeight={700}
+						fill='#fff'
+						stroke='none'
+					>
+						{year ?? new Date().getFullYear()}
+					</text>
 					<circle cx={x + 16} cy={y} r={2} className={BG} />
 					<circle cx={x + w - 16} cy={y} r={2} className={BG} />
 					{DAYS.map((d) => {
