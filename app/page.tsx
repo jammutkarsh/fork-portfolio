@@ -10,6 +10,7 @@ export default function Home() {
 		<main className='w-full flex-1'>
 			<StoryDeck
 				title={siteMetadata.title}
+				avatar={siteMetadata.image}
 				bio={`${siteMetadata.bio}. ${siteMetadata.description} I write about Linux, Go, self-hosting and open source.`}
 				phases={phases.map(({ body, ...meta }) => meta)}
 				prose={phases.map((phase) => (
