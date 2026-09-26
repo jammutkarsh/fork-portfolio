@@ -81,3 +81,27 @@ html.frame-lines :is(header > nav, footer > div) {
 .post-body > :is(figure, pre) {
 	margin-inline: min(0px, max(-6rem, calc((1024px - 100vw) * 0.375)));
 }
+
+/*
+  Home page (app/components/story/story-deck.tsx): the footer is pinned to
+  the bottom of the screen and fades in on the last slide of the story.
+*/
+html.story-deck footer {
+	position: fixed;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 10;
+	opacity: 0;
+	pointer-events: none;
+	background-color: #fff;
+	transition: opacity 400ms ease;
+}
+
+html.dark.story-deck footer {
+	background-color: #000;
+}
+
+html.story-deck.story-end footer {
+	opacity: 1;
+	pointer-events: auto;
+}

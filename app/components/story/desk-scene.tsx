@@ -18,12 +18,13 @@ const BG = 'fill-white dark:fill-black';
 const SCREEN = 'fill-gray-100 dark:fill-gray-900';
 const ease = [0.22, 1, 0.36, 1] as const;
 
-// Framed prints on the wall: the phase's sketches.
-const frames = [
-	{ x: 168, y: 18, size: 58 },
-	{ x: 244, y: 30, size: 46 },
-	{ x: 308, y: 14, size: 66 },
-];
+// The framed print on the wall, and the wall calendar next to it.
+const FRAME = { x: 292, y: 16, size: 72 };
+const CALENDAR = { x: 180, y: 22, w: 64, h: 74 };
+// The day the calendar is on in each phase; the days before it are crossed
+// off as the page turns. No real dates: it only shows time passing.
+const today = [9, 23, 16, 28, 12, 20];
+const DAYS = Array.from({ length: 31 }, (_, i) => i);
 
 export default function DeskScene({
 	phases,
@@ -231,7 +232,7 @@ export default function DeskScene({
 
 			<Appear show={phase >= 4}>
 				{/* Gopher figurine on the monitor */}
-				<g transform='translate(236 84)'>
+				<g transform='translate(248 84)'>
 					<path d='M14 2c8 0 11 5 11 12v12H3V14C3 7 6 2 14 2z' className={BG} />
 					<circle cx={10} cy={10} r={3} />
 					<circle cx={18} cy={10} r={3} />
@@ -260,43 +261,132 @@ export default function DeskScene({
 				/>
 			</Appear>
 
-			{/* Framed prints: the current phase's sketches */}
-			<AnimatePresence mode='popLayout' initial={false}>
-				{phases[phase].sketches.map((id, i) => {
-					const { x, y, size } = frames[i];
-					const hook = `M${x + size / 2} ${y - 8}`;
-					return (
-						<motion.g
-							key={id}
-							initial={{ opacity: 0, y: -8 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 8 }}
-							transition={{ duration: 0.45, ease, delay: 0.1 + i * 0.08 }}
-						>
-							<path
-								d={`${hook}l-${size / 3} 8${hook}l${size / 3} 8`}
-								strokeWidth={1}
-							/>
-							<rect x={x} y={y} width={size} height={size} className={BG} />
-							<rect
-								x={x + 4}
-								y={y + 4}
-								width={size - 8}
-								height={size - 8}
-								strokeWidth={0.75}
-							/>
-							<Sketch
-								id={id}
-								x={x + 8}
-								y={y + 8}
-								width={size - 16}
-								height={size - 16}
-							/>
-						</motion.g>
-					);
-				})}
+			<Calendar phase={phase} />
+
+			{/* Framed print: the current phase's sketch */}
+			<AnimatePresence initial={false}>
+				<motion.g
+					key={phases[phase].sketch}
+					initial={{ opacity: 0, y: -8 }}
+					animate={{ opacity: 1, y: 0 }}
+					exit={{ opacity: 0, y: 8 }}
+					transition={{ duration: 0.45, ease, delay: 0.1 }}
+				>
+					<Frame />
+					<Sketch
+						id={phases[phase].sketch}
+						x={FRAME.x + 10}
+						y={FRAME.y + 10}
+						width={FRAME.size - 20}
+						height={FRAME.size - 20}
+					/>
+				</motion.g>
 			</AnimatePresence>
 		</svg>
+	);
+}
+
+function Frame() {
+	const { x, y, size } = FRAME;
+	const hook = `M${x + size / 2} ${y - 8}`;
+	return (
+		<>
+			<path d={`${hook}l-${size / 3} 8${hook}l${size / 3} 8`} strokeWidth={1} />
+			<rect x={x} y={y} width={size} height={size} className={BG} />
+			<rect
+				x={x + 4}
+				y={y + 4}
+				width={size - 8}
+				height={size - 8}
+				strokeWidth={0.75}
+			/>
+		</>
+	);
+}
+
+/**
+ * A tear-off wall calendar. Each phase change tears the page off and the
+ * new month's days get crossed off one by one, up to "today".
+ */
+function Calendar({ phase }: { phase: number }) {
+	const { x, y, w, h } = CALENDAR;
+	const day = today[phase % today.length];
+	return (
+		<g>
+			<path
+				d={`M${x + w / 2} ${y - 8}l-${w / 3} 8M${x + w / 2} ${y - 8}l${w / 3} 8`}
+				strokeWidth={1}
+			/>
+			{/* The pages underneath */}
+			<rect
+				x={x + 2}
+				y={y + 2}
+				width={w}
+				height={h}
+				className={BG}
+				strokeWidth={1}
+			/>
+			<AnimatePresence initial={false}>
+				<motion.g
+					key={phase}
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1, transition: { delay: 0.2, duration: 0.3 } }}
+					exit={{ scaleY: 0, opacity: 0, transition: { duration: 0.45, ease } }}
+					style={{ originY: 0 }}
+				>
+					<rect x={x} y={y} width={w} height={h} className={BG} />
+					<rect
+						x={x}
+						y={y}
+						width={w}
+						height={14}
+						fill={ACCENT}
+						stroke={ACCENT}
+					/>
+					<circle cx={x + 16} cy={y} r={2} className={BG} />
+					<circle cx={x + w - 16} cy={y} r={2} className={BG} />
+					{DAYS.map((d) => {
+						const cx = x + 8 + (d % 7) * 8;
+						const cy = y + 22 + Math.floor(d / 7) * 10;
+						if (d === day) {
+							return (
+								<circle
+									key={d}
+									cx={cx}
+									cy={cy}
+									r={3.5}
+									stroke={ACCENT}
+									strokeWidth={1.2}
+								/>
+							);
+						}
+						if (d < day) {
+							return (
+								<motion.path
+									key={d}
+									d={`M${cx - 2} ${cy - 2}l4 4m0-4l-4 4`}
+									strokeWidth={0.9}
+									initial={{ pathLength: 0 }}
+									animate={{ pathLength: 1 }}
+									transition={{ delay: 0.35 + d * 0.03, duration: 0.15 }}
+								/>
+							);
+						}
+						return (
+							<circle
+								key={d}
+								cx={cx}
+								cy={cy}
+								r={0.8}
+								fill='currentColor'
+								stroke='none'
+								opacity={0.5}
+							/>
+						);
+					})}
+				</motion.g>
+			</AnimatePresence>
+		</g>
 	);
 }
 

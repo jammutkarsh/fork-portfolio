@@ -7,7 +7,8 @@ export interface PhaseMeta {
 	id: string;
 	title: string;
 	goal: string;
-	sketches: SketchId[];
+	/** Framed on the wall of the desk; see sketches.tsx for the options. */
+	sketch: SketchId;
 }
 
 export interface Phase extends PhaseMeta {

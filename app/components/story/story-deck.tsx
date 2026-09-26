@@ -72,6 +72,10 @@ export default function StoryDeck({
 	const frame = useRef<HTMLDivElement>(null);
 	const metrics = useRef({ start: 0, step: 1 });
 	const [{ slide, dir }, setPosition] = useState({ slide: 0, dir: 1 });
+	// The story's text only shows once the frame has fully opened, so the
+	// paragraph never re-wraps while the frame is still widening.
+	const [opened, setOpened] = useState(false);
+	const [footerHeight, setFooterHeight] = useState(0);
 	const lenis = useLenis();
 	const { scrollY } = useScroll();
 
@@ -99,13 +103,13 @@ export default function StoryDeck({
 		const { start, step } = metrics.current;
 		return Math.min(1, Math.max(0, (y - start) / step));
 	});
+	useMotionValueEvent(spread, 'change', (s) => setOpened(s > 0.98));
 	const frameWidth = useTransform(
 		spread,
 		(s) => `calc(64rem + ${s} * (min(100vw, 90rem) - 64rem))`,
 	);
 	const introOpacity = useTransform(spread, [0, 0.5], [1, 0]);
 	const introY = useTransform(spread, [0, 0.5], [0, -30]);
-	const storyOpacity = useTransform(spread, [0.5, 1], [0, 1]);
 	const photoOpacity = useTransform(spread, [0.15, 0.7], [1, 0]);
 	const photoScale = useTransform(spread, [0, 0.7], [1, 0.85]);
 	const photoBlur = useTransform(spread, [0, 0.7], ['blur(0px)', 'blur(8px)']);
@@ -115,9 +119,21 @@ export default function StoryDeck({
 		['circle(0% at 50% 50%)', 'circle(75% at 50% 50%)'],
 	);
 
+	// On the home page the site footer is pinned to the bottom of the screen
+	// and fades in on the last slide (see site.css), so the page ends on the
+	// last slide instead of scrolling the frame away to reveal the footer.
+	const atEnd = opened && slide === slides - 1;
+	useEffect(() => {
+		const root = document.documentElement;
+		root.classList.add('story-deck');
+		return () => root.classList.remove('story-deck', 'story-end');
+	}, []);
+	useEffect(() => {
+		document.documentElement.classList.toggle('story-end', atEnd);
+	}, [atEnd]);
+
 	// Measure where each slide sits, and settle on the nearest slide once
-	// scrolling stops. The end of the page is a snap point too, so the footer
-	// stays reachable.
+	// scrolling stops.
 	useEffect(() => {
 		let snap: Snap | undefined;
 		const setup = () => {
@@ -129,12 +145,13 @@ export default function StoryDeck({
 			const step = (el.offsetHeight - pinned.offsetHeight) / (slides - 1);
 			metrics.current = { start, step };
 			setSlide(slideAt(window.scrollY));
+			setOpened((window.scrollY - start) / step > 0.98);
+			setFooterHeight(document.querySelector('footer')?.offsetHeight ?? 0);
 
 			snap?.destroy();
 			if (!lenis) return;
 			snap = new Snap(lenis, { debounce: 150, duration: 0.6 });
 			for (let i = 0; i < slides; i++) snap.add(start + i * step);
-			snap.add(document.documentElement.scrollHeight - window.innerHeight);
 		};
 		setup();
 		window.addEventListener('resize', setup);
@@ -164,33 +181,37 @@ export default function StoryDeck({
 			>
 				<motion.div
 					ref={frame}
-					style={{ maxWidth: frameWidth }}
-					className='sticky top-(--nav) mx-auto flex h-[calc(100svh-var(--nav))] w-full flex-col px-8 pt-6 pb-6 md:px-18 md:pt-10 md:pb-8'
+					style={{
+						maxWidth: frameWidth,
+						paddingBottom: atEnd ? footerHeight : undefined,
+					}}
+					className='sticky transition-[padding] duration-500 top-(--nav) mx-auto flex h-[calc(100svh-var(--nav))] w-full flex-col px-8 pt-6 pb-6 md:px-18 md:pt-10 md:pb-8'
 				>
 					{/* Phase title, top left */}
-					<motion.div
+					<div
 						aria-hidden='true'
-						style={{ opacity: storyOpacity }}
 						className='relative h-10 shrink-0 overflow-hidden perspective-[800px] md:h-12'
 					>
 						<AnimatePresence initial={false} custom={dir}>
-							<motion.h2
-								key={phase.id}
-								custom={dir}
-								variants={drum}
-								initial='enter'
-								animate='center'
-								exit='exit'
-								transition={{ duration: 0.55, ease }}
-								className={classNames(
-									'absolute inset-x-0 top-0 text-2xl font-bold whitespace-nowrap md:text-3xl',
-									merryWeather.className,
-								)}
-							>
-								{phase.title}
-							</motion.h2>
+							{opened && (
+								<motion.h2
+									key={phase.id}
+									custom={dir}
+									variants={drum}
+									initial='enter'
+									animate='center'
+									exit='exit'
+									transition={{ duration: 0.55, ease }}
+									className={classNames(
+										'absolute inset-x-0 top-0 text-2xl font-bold whitespace-nowrap text-primary-500 md:text-3xl',
+										merryWeather.className,
+									)}
+								>
+									{phase.title}
+								</motion.h2>
+							)}
 						</AnimatePresence>
-					</motion.div>
+					</div>
 
 					<div className='grid min-h-0 flex-1 grid-rows-[auto_1fr] gap-4 md:grid-cols-[1fr_1.15fr] md:grid-rows-1 md:items-center md:gap-14'>
 						{/* Photo on the intro, then the desk */}
@@ -245,47 +266,47 @@ export default function StoryDeck({
 							</motion.section>
 
 							{/* The paragraph: old one leaves, then the new one arrives */}
-							<motion.div
+							<div
 								aria-hidden='true'
-								inert={slide === 0}
-								style={{ opacity: storyOpacity }}
+								inert={!opened}
 								className='[grid-area:1/1] min-h-0 self-center'
 							>
 								<AnimatePresence mode='wait' initial={false} custom={dir}>
-									<motion.div
-										key={phase.id}
-										initial={{ opacity: 0, y: dir * 14, filter: 'blur(6px)' }}
-										animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-										exit={{ opacity: 0, y: dir * -8, filter: 'blur(4px)' }}
-										transition={{ duration: 0.4, ease }}
-										data-lenis-prevent
-										className='max-h-full overflow-y-auto text-base sm:text-lg lg:text-xl'
-									>
-										{prose[current]}
-										{isLast && (
-											<div className='mt-4 flex gap-5 text-base'>
-												<Link href='/blog' className='underline-magical'>
-													Read the blog &rarr;
-												</Link>
-												<Link href='/projects' className='underline-magical'>
-													See projects &rarr;
-												</Link>
-											</div>
-										)}
-									</motion.div>
+									{opened && (
+										<motion.div
+											key={phase.id}
+											initial={{ opacity: 0, y: dir * 14, filter: 'blur(6px)' }}
+											animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+											exit={{ opacity: 0, y: dir * -8, filter: 'blur(4px)' }}
+											transition={{ duration: 0.4, ease }}
+											data-lenis-prevent
+											className='max-h-full overflow-y-auto text-base sm:text-lg lg:text-xl'
+										>
+											{prose[current]}
+											{isLast && (
+												<div className='mt-4 flex gap-5 text-base'>
+													<Link href='/blog' className='underline-magical'>
+														Read the blog &rarr;
+													</Link>
+													<Link href='/projects' className='underline-magical'>
+														See projects &rarr;
+													</Link>
+												</div>
+											)}
+										</motion.div>
+									)}
 								</AnimatePresence>
-							</motion.div>
+							</div>
 						</div>
 					</div>
 
 					{/* Goals so far, growing by one per phase */}
-					<motion.ul
+					<ul
 						aria-hidden='true'
-						style={{ opacity: storyOpacity }}
 						className='mt-4 flex min-h-5 shrink-0 flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs md:text-sm'
 					>
 						<AnimatePresence initial={false}>
-							{phases.slice(0, current + 1).map((p, i) => (
+							{phases.slice(0, opened ? current + 1 : 0).map((p, i) => (
 								<motion.li
 									key={p.id}
 									layout
@@ -313,7 +334,7 @@ export default function StoryDeck({
 								</motion.li>
 							))}
 						</AnimatePresence>
-					</motion.ul>
+					</ul>
 				</motion.div>
 			</div>
 
