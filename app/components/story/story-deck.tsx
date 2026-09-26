@@ -19,6 +19,7 @@ import {
 	useState,
 } from 'react';
 import { merryWeather } from '../../fonts';
+import FrameLines from '../layouts/frame-lines';
 import DeskScene from './desk-scene';
 import type { PhaseMeta } from './get-story';
 
@@ -70,24 +71,10 @@ export default function StoryDeck({
 		const { start, step } = metrics.current;
 		return Math.min(1, Math.max(0, (y - start) / step));
 	});
-	// How far the lines travel: from the 64rem column's edge to off screen.
-	const lineShift = useTransform(spread, (s) =>
-		typeof window === 'undefined'
-			? 0
-			: s * (Math.max(0, (window.innerWidth - 1024) / 2) + 8),
-	);
-	const leftLine = useTransform(lineShift, (x) => -x);
 	const frameWidth = useTransform(
 		spread,
 		(s) => `calc(64rem + ${s} * (min(100vw, 90rem) - 64rem))`,
 	);
-
-	// The lines below stand in for the nav's and footer's side borders
-	// (hidden by site.css) so that they can move.
-	useEffect(() => {
-		document.documentElement.classList.add('story-deck');
-		return () => document.documentElement.classList.remove('story-deck');
-	}, []);
 
 	// Measure where each slide sits, and settle on the nearest slide once
 	// scrolling stops. The end of the page is a snap point too, so the footer
@@ -138,16 +125,7 @@ export default function StoryDeck({
 
 	return (
 		<MotionConfig reducedMotion='user'>
-			<motion.div
-				aria-hidden='true'
-				className='pointer-events-none fixed inset-y-0 left-[max(0px,calc(50vw-32rem))] z-30 w-px bg-gray-200 dark:bg-gray-300/20'
-				style={{ x: leftLine }}
-			/>
-			<motion.div
-				aria-hidden='true'
-				className='pointer-events-none fixed inset-y-0 right-[max(0px,calc(50vw-32rem))] z-30 w-px bg-gray-200 dark:bg-gray-300/20'
-				style={{ x: lineShift }}
-			/>
+			<FrameLines open={spread} />
 			<div
 				ref={container}
 				className='[--nav:3.5rem] sm:[--nav:4rem]'

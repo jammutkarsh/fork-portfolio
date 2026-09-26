@@ -66,10 +66,18 @@ html.theme-switching::view-transition-new(root) {
 }
 
 /*
-  Home page story deck (app/components/story/story-deck.tsx): it draws the
-  frame's vertical lines itself so it can slide them off screen, so hide
-  the nav's and footer's side borders while it is mounted.
+  FrameLines (app/components/layouts/frame-lines.tsx) draws the frame's
+  vertical lines itself so it can slide them off screen; hide the nav's and
+  footer's side borders while it is mounted.
 */
-html.story-deck :is(header > nav, footer > div) {
+html.frame-lines :is(header > nav, footer > div) {
 	border-inline-color: transparent;
+}
+
+/*
+  Blog posts: once the frame has opened up (app/blog/[slug]/open-frame.tsx),
+  code blocks break out of the text column by up to 6rem on each side.
+*/
+.post-body > :is(figure, pre) {
+	margin-inline: min(0px, max(-6rem, calc((1024px - 100vw) * 0.375)));
 }

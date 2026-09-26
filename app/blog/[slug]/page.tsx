@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import PostComments from '../../components/comments/post-comments';
-import BackNavigation from '../../components/layouts/back-navigation';
 import Tag from '../../components/tag';
 import siteMetadata from '../../site-metadata';
 import { formatDate, getPostFromSlug, getPosts } from '../utils';
@@ -53,7 +52,6 @@ export default async function Blog(props: {
 	return (
 		<>
 			<section>
-				<BackNavigation />
 				<PageTitle>{metadata.title}</PageTitle>
 				<div className='flex flex-wrap gap-2 items-center mt-2 text-sm text-neutral-600 dark:text-neutral-400'>
 					<time dateTime={metadata.publishedAt}>
@@ -62,15 +60,15 @@ export default async function Blog(props: {
 					<span aria-hidden>·</span>
 					<span>{readingTime}</span>
 				</div>
-				{metadata.tags.length > 0 && (
-					<div className='flex flex-wrap gap-2 mt-3'>
-						{metadata.tags.map((tag) => (
-							<Tag key={tag} text={tag} />
-						))}
-					</div>
-				)}
 			</section>
-			<article className='min-w-0 break-words md:max-w-5xl'>{content}</article>
+			<article className='post-body min-w-0 break-words'>{content}</article>
+			{metadata.tags.length > 0 && (
+				<div className='mt-8 flex flex-wrap justify-center gap-2'>
+					{metadata.tags.map((tag) => (
+						<Tag key={tag} text={tag} />
+					))}
+				</div>
+			)}
 			<PostComments />
 		</>
 	);
