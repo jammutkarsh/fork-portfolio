@@ -3,6 +3,7 @@ import PageContainer from './components/layouts/page-container';
 import { getStory } from './components/story/get-story';
 import PhaseProse from './components/story/phase-prose';
 import StoryList from './components/story/story-list';
+import VisionBoard from './components/story/vision-board';
 import { merryWeather } from './fonts';
 import siteMetadata from './site-metadata';
 
@@ -49,7 +50,11 @@ export default function Home() {
 				>
 					How I got here
 				</h2>
-				<StoryList phases={phases} prose={prose} />
+				<VisionBoard
+					phases={phases.map(({ body, ...meta }) => meta)}
+					prose={prose}
+					list={<StoryList phases={phases} prose={prose} />}
+				/>
 			</section>
 		</PageContainer>
 	);
