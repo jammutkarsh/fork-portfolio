@@ -66,12 +66,10 @@ html.theme-switching::view-transition-new(root) {
 }
 
 /*
-  Story stickers (app/components/story/stickers.tsx): a white die-cut edge
-  traced around the artwork's silhouette, plus a soft drop shadow.
+  Home page story deck (app/components/story/story-deck.tsx): it draws the
+  frame's vertical lines itself so it can slide them off screen, so hide
+  the nav's and footer's side borders while it is mounted.
 */
-.sticker {
-	overflow: visible;
-	filter: drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff)
-		drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff)
-		drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
+html.story-deck :is(header > nav, footer > div) {
+	border-inline-color: transparent;
 }

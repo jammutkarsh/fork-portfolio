@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import type { StickerId } from './stickers';
+import type { SketchId } from './sketches';
 
 export interface PhaseMeta {
 	id: string;
 	title: string;
 	goal: string;
-	stickers: StickerId[];
+	sketches: SketchId[];
 }
 
 export interface Phase extends PhaseMeta {
