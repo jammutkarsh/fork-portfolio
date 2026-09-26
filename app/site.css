@@ -64,3 +64,14 @@ html.theme-switching::view-transition-new(root) {
 		animation: none !important;
 	}
 }
+
+/*
+  Story stickers (app/components/story/stickers.tsx): a white die-cut edge
+  traced around the artwork's silhouette, plus a soft drop shadow.
+*/
+.sticker {
+	overflow: visible;
+	filter: drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff)
+		drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff)
+		drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
+}

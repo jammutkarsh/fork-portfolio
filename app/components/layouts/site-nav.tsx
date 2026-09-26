@@ -11,7 +11,6 @@ import ThemeSwitch from './theme-switch/theme-switch';
 export const navLinks = [
 	{ href: '/blog', title: 'Blog' },
 	{ href: '/projects', title: 'Projects' },
-	{ href: '/about', title: 'About' },
 	{ href: '/uses', title: 'Uses' },
 ];
 
