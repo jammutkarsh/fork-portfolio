@@ -25,7 +25,13 @@ interface OgImageOptions {
 }
 
 const fontsDir = path.join(process.cwd(), 'assets', 'fonts');
-const avatarPath = path.join(process.cwd(), 'public', 'images', 'avatar.jpg');
+// A small copy of public/images/avatar.png; the original is too large to embed.
+const avatarPath = path.join(
+	process.cwd(),
+	'public',
+	'images',
+	'avatar-og.jpg',
+);
 
 function truncate(text: string, max: number) {
 	return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
