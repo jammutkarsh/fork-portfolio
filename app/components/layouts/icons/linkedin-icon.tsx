@@ -149,7 +149,6 @@ const LinkedinIcon = forwardRef<LinkedinIconHandle, LinkedinIconProps>(
 					viewBox='0 0 24 24'
 					aria-label='LinkedIn icon'
 				>
-					<title>LinkedIn icon</title>
 					<motion.path
 						variants={pathVariants}
 						initial='normal'

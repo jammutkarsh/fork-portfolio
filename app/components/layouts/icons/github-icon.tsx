@@ -124,7 +124,6 @@ const GithubIcon = forwardRef<GithubIconHandle, GithubIconProps>(
 					strokeLinejoin='round'
 					aria-label='GitHub icon'
 				>
-					<title>GitHub icon</title>
 					<motion.path
 						variants={bodyVariants}
 						initial='normal'

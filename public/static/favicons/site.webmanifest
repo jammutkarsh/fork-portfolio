@@ -1,0 +1,22 @@
+{
+  "name": "Utkarsh Chourasia",
+  "short_name": "Utkarsh Chourasia",
+  "description": "Portfolio, blog and project showcase of Utkarsh Chourasia, a server-side engineer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/static/favicons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/favicons/favicon.png",
+      "sizes": "100x100",
+      "type": "image/png"
+    }
+  ]
+}

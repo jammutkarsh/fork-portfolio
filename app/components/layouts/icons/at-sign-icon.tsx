@@ -110,7 +110,6 @@ const AtSignIcon = forwardRef<AtSignIconHandle, AtSignIconProps>(
 					strokeLinejoin='round'
 					aria-label='At sign icon'
 				>
-					<title>At sign icon</title>
 					<motion.circle
 						variants={circleVariants}
 						animate={controls}
