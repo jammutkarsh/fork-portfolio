@@ -105,3 +105,8 @@ html.story-deck.story-end footer {
 	opacity: 1;
 	pointer-events: auto;
 }
+
+/* ...and let them widen with the page frame, so their edges stay aligned. */
+html.frame-lines :is(header > nav, footer > div) {
+	max-width: var(--frame-width, 64rem);
+}

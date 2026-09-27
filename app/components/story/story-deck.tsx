@@ -171,7 +171,7 @@ export default function StoryDeck({
 
 	return (
 		<MotionConfig reducedMotion='user'>
-			<FrameLines open={spread} />
+			<FrameLines open={spread} width={frameWidth} />
 			<div
 				ref={container}
 				className='[--nav:3.5rem] sm:[--nav:4rem]'
@@ -183,7 +183,7 @@ export default function StoryDeck({
 						maxWidth: frameWidth,
 						paddingBottom: atEnd ? footerHeight : undefined,
 					}}
-					className='sticky transition-[padding] duration-500 top-(--nav) mx-auto flex h-[calc(100svh-var(--nav))] w-full flex-col px-8 pt-6 pb-6 md:px-18 md:pt-10 md:pb-8 [@media(max-height:500px)]:py-3'
+					className='sticky transition-[padding] duration-500 top-(--nav) mx-auto flex h-[calc(100svh-var(--nav))] w-full flex-col px-5 pt-6 pb-6 sm:px-8 md:px-18 md:pt-10 md:pb-8 [@media(max-height:500px)]:py-3'
 				>
 					{/* Phase title, top left */}
 					<div

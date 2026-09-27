@@ -38,10 +38,10 @@ export default function OpenFrame({ children }: { children: ReactNode }) {
 
 	return (
 		<>
-			<FrameLines open={open} />
+			<FrameLines open={open} width={maxWidth} />
 			<motion.main
 				style={{ maxWidth }}
-				className='mx-auto flex w-full flex-1 flex-col p-8 pt-12 md:p-18 md:pt-14'
+				className='mx-auto flex w-full flex-1 flex-col px-5 py-8 pt-12 sm:px-8 md:px-18 md:py-18 md:pt-14'
 			>
 				{children}
 			</motion.main>

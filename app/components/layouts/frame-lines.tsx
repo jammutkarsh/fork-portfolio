@@ -1,6 +1,11 @@
 'use client';
 
-import { type MotionValue, motion, useTransform } from 'motion/react';
+import {
+	type MotionValue,
+	motion,
+	useMotionValueEvent,
+	useTransform,
+} from 'motion/react';
 import { useEffect } from 'react';
 
 const line =
@@ -11,8 +16,18 @@ const line =
  * `open` = 0 they sit on the edges of the 64rem column (where the nav's and
  * footer's side borders are), and at 1 they have slid off screen. While
  * mounted, site.css hides the nav's and footer's own side borders.
+ *
+ * `width` is the page frame's current max-width; the nav and footer follow
+ * it (through --frame-width, see site.css) so their edges stay aligned
+ * with the page as it widens.
  */
-export default function FrameLines({ open }: { open: MotionValue<number> }) {
+export default function FrameLines({
+	open,
+	width,
+}: {
+	open: MotionValue<number>;
+	width: MotionValue<string>;
+}) {
 	const right = useTransform(open, (value) =>
 		typeof window === 'undefined'
 			? 0
@@ -20,10 +35,18 @@ export default function FrameLines({ open }: { open: MotionValue<number> }) {
 	);
 	const left = useTransform(right, (x) => -x);
 
+	useMotionValueEvent(width, 'change', (value) =>
+		document.documentElement.style.setProperty('--frame-width', value),
+	);
 	useEffect(() => {
-		document.documentElement.classList.add('frame-lines');
-		return () => document.documentElement.classList.remove('frame-lines');
-	}, []);
+		const root = document.documentElement;
+		root.classList.add('frame-lines');
+		root.style.setProperty('--frame-width', width.get());
+		return () => {
+			root.classList.remove('frame-lines');
+			root.style.removeProperty('--frame-width');
+		};
+	}, [width]);
 
 	return (
 		<>
