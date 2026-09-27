@@ -28,6 +28,11 @@ interface OgImageOptions {
 	 * site's intro, instead of in the footer.
 	 */
 	profile?: boolean;
+	/**
+	 * A picture under the title that fills the rest of the image, e.g. a
+	 * project's architecture diagram or hero. `src` is a PNG or JPEG data URI.
+	 */
+	picture?: { src: string; fit: 'contain' | 'cover' };
 }
 
 const fontsDir = path.join(process.cwd(), 'assets', 'fonts');
@@ -50,6 +55,7 @@ export async function renderOgImage({
 	description,
 	meta,
 	profile = false,
+	picture,
 }: OgImageOptions) {
 	const [interLight, monoRegular, avatar] = await Promise.all([
 		fs.readFile(path.join(fontsDir, 'Inter-300.ttf')),
@@ -57,7 +63,13 @@ export async function renderOgImage({
 		fs.readFile(avatarPath),
 	]);
 	const avatarSrc = `data:image/jpeg;base64,${avatar.toString('base64')}`;
-	const titleSize = title.length > 70 ? 48 : title.length > 40 ? 58 : 68;
+	const titleSize = picture
+		? 40
+		: title.length > 70
+			? 48
+			: title.length > 40
+				? 58
+				: 68;
 	const terminal = truncate(terminalPath(pagePath), 60);
 
 	const text = (
@@ -133,31 +145,75 @@ export async function renderOgImage({
 					<span>{terminal.slice(2)}</span>
 				</div>
 
+				{/* Picture layout: the title, then the picture filling the rest */}
+				{picture && (
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							flex: 1,
+							padding: '32px 56px 40px',
+						}}
+					>
+						<span style={{ fontSize: titleSize, letterSpacing: -1 }}>
+							{truncate(title, 60)}
+						</span>
+						<div
+							style={{
+								display: 'flex',
+								flex: 1,
+								marginTop: 24,
+								borderRadius: 8,
+								border: `1px solid ${colors.border}`,
+								overflow: 'hidden',
+								backgroundColor: '#111111',
+							}}
+						>
+							{/* biome-ignore lint/performance/noImgElement: next/og renders plain img */}
+							<img
+								src={picture.src}
+								alt=''
+								width={926}
+								height={384}
+								style={{
+									width: '100%',
+									height: '100%',
+									objectFit: picture.fit,
+									// Diagrams are centred; cropped screenshots keep their top.
+									objectPosition: picture.fit === 'cover' ? 'top' : 'center',
+								}}
+							/>
+						</div>
+					</div>
+				)}
+
 				{/* Body */}
-				<div
-					style={{
-						display: 'flex',
-						flex: 1,
-						alignItems: profile ? 'center' : 'flex-start',
-						gap: 56,
-						padding: profile ? '0 56px' : '56px 56px 0',
-					}}
-				>
-					{text}
-					{profile && (
-						// biome-ignore lint/performance/noImgElement: next/og renders plain img
-						<img
-							src={avatarSrc}
-							alt=''
-							width={280}
-							height={280}
-							style={{ borderRadius: 8, objectFit: 'cover' }}
-						/>
-					)}
-				</div>
+				{!picture && (
+					<div
+						style={{
+							display: 'flex',
+							flex: 1,
+							alignItems: profile ? 'center' : 'flex-start',
+							gap: 56,
+							padding: profile ? '0 56px' : '56px 56px 0',
+						}}
+					>
+						{text}
+						{profile && (
+							// biome-ignore lint/performance/noImgElement: next/og renders plain img
+							<img
+								src={avatarSrc}
+								alt=''
+								width={280}
+								height={280}
+								style={{ borderRadius: 8, objectFit: 'cover' }}
+							/>
+						)}
+					</div>
+				)}
 
 				{/* Footer: avatar and handle, plus e.g. a post's date */}
-				{!profile && (
+				{!profile && !picture && (
 					<div
 						style={{
 							display: 'flex',

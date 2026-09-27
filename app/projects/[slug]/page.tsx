@@ -29,7 +29,6 @@ export async function generateMetadata(props: {
 			description,
 			type: 'article',
 			url: `/projects/${slug}`,
-			images: [project.hero],
 		},
 		alternates: { canonical: `/projects/${slug}` },
 	};
