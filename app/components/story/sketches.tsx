@@ -260,9 +260,10 @@ export function Sketch({
 			strokeWidth={1.5}
 			strokeLinecap='round'
 			strokeLinejoin='round'
+			role='img'
+			aria-label={label}
 			{...props}
 		>
-			<title>{label}</title>
 			{svg}
 		</svg>
 	);

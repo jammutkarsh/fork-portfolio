@@ -2,8 +2,11 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
+import JsonLd from '../../components/json-ld';
 import { CustomMDX } from '../../components/mdx';
 import { tagBadge } from '../../components/tag';
+import { createMetadata } from '../../lib/create-metadata';
+import siteMetadata from '../../site-metadata';
 import { getProject, getProjects } from '../utils';
 import InstallCommand from './install-command';
 import MermaidDiagram from './mermaid-diagram';
@@ -21,18 +24,13 @@ export async function generateMetadata(props: {
 	const { slug } = await props.params;
 	const project = getProject(slug);
 	if (!project) return {};
-	const description = project.summary;
-	return {
+
+	return createMetadata({
 		title: project.name,
-		description,
-		openGraph: {
-			title: project.name,
-			description,
-			type: 'article',
-			url: `/projects/${slug}`,
-		},
-		alternates: { canonical: `/projects/${slug}` },
-	};
+		description: project.summary,
+		path: `/projects/${slug}`,
+		type: 'article',
+	});
 }
 
 function Section({ label, children }: { label: string; children: ReactNode }) {
@@ -78,8 +76,23 @@ export default async function ProjectPage(props: {
 	const project = getProject(slug);
 	if (!project) notFound();
 
+	const jsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'CreativeWork',
+		name: project.name,
+		description: project.summary,
+		url: `${siteMetadata.siteUrl}/projects/${slug}`,
+		codeRepository: project.repo,
+		author: {
+			'@type': 'Person',
+			name: siteMetadata.author,
+		},
+		keywords: project.stack.join(', '),
+	};
+
 	return (
 		<article className='flex flex-col gap-12'>
+			<JsonLd data={jsonLd} />
 			<header className='space-y-5'>
 				<h1 className='text-3xl leading-tight font-light tracking-[-0.04em] sm:text-4xl lg:text-5xl'>
 					{project.name}

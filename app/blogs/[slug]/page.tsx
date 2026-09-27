@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import JsonLd from '../../components/json-ld';
 import Tag from '../../components/tag';
+import { createMetadata } from '../../lib/create-metadata';
 import siteMetadata from '../../site-metadata';
 import { kebabCase } from '../kebab-case';
 import { formatDate, getPostFromSlug, getPosts, getTagBadges } from '../utils';
@@ -17,29 +19,15 @@ export async function generateMetadata(props: {
 	const params = await props.params;
 	const { metadata } = await getPostFromSlug(params.slug);
 
-	const url = `/blogs/${params.slug}`;
-
-	return {
+	return createMetadata({
 		title: metadata.title,
 		description: metadata.summary,
-		openGraph: {
-			title: metadata.title,
-			description: metadata.summary,
-			type: 'article',
-			url: url,
-			publishedTime: metadata.publishedAt,
-			authors: [metadata.author ?? siteMetadata.author],
-			tags: metadata.tags,
-		},
-		twitter: {
-			card: 'summary_large_image',
-			title: metadata.title,
-			description: metadata.summary,
-		},
-		alternates: {
-			canonical: url,
-		},
-	};
+		path: `/blogs/${params.slug}`,
+		type: 'article',
+		publishedTime: metadata.publishedAt,
+		authors: [metadata.author ?? siteMetadata.author],
+		tags: metadata.tags,
+	});
 }
 
 export default async function Blog(props: {
@@ -50,8 +38,24 @@ export default async function Blog(props: {
 	const { metadata, content, readingTime } = await getPostFromSlug(params.slug);
 	const tagBadges = getTagBadges(getPosts());
 
+	const jsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'BlogPosting',
+		headline: metadata.title,
+		description: metadata.summary,
+		datePublished: metadata.publishedAt,
+		author: {
+			'@type': 'Person',
+			name: metadata.author ?? siteMetadata.author,
+		},
+		keywords: metadata.tags.join(', '),
+		url: `${siteMetadata.siteUrl}/blogs/${params.slug}`,
+		mainEntityOfPage: `${siteMetadata.siteUrl}/blogs/${params.slug}`,
+	};
+
 	return (
 		<>
+			<JsonLd data={jsonLd} />
 			<section>
 				<PageTitle>{metadata.title}</PageTitle>
 				<div className='meta mt-4'>

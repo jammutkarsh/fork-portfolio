@@ -26,6 +26,10 @@ const siteMetadata = {
 	headerTitle: '@jammutkarsh',
 	description: 'I build stuff in the backend.',
 	bio: 'Server Side Engineer',
+	// A longer, search/social-friendly description for the home page's meta
+	// and Open Graph tags (the on-page bio above stays short for the UI).
+	homeDescription:
+		'Utkarsh Chourasia is a server-side engineer building backend systems and open-source tools, writing about Linux, Go, and self-hosting along the way.',
 	language: 'en-us',
 	siteUrl: getDeploymentURL(),
 	siteRepo: 'https://github.com/jammutkarsh/fork-portfolio',
@@ -34,8 +38,10 @@ const siteMetadata = {
 	email: 'mail@utkarshchourasia.in',
 	github: 'https://github.com/jammutkarsh',
 	twitter: 'https://twitter.com/jammutkarsh',
+	twitterHandle: '@jammutkarsh',
 	linkedin: 'https://www.linkedin.com/in/jammutkarsh',
 	locale: 'en-US',
+	ogLocale: 'en_US',
 };
 
 export default siteMetadata;

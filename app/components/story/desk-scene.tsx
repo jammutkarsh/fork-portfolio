@@ -44,9 +44,9 @@ export default function DeskScene({
 			strokeLinecap='round'
 			strokeLinejoin='round'
 			className='h-auto w-full text-(--ds-text-primary)'
+			role='img'
+			aria-label='My desk, changing with each phase'
 		>
-			<title>My desk, changing with each phase</title>
-
 			{/* Desk */}
 			<path d='M0 214h400M0 222h400M28 222v78M372 222v78' />
 
