@@ -9,7 +9,7 @@ import { terminalPath } from './terminal-path';
 import ThemeSwitch from './theme-switch/theme-switch';
 
 export const navLinks = [
-	{ href: '/blog', title: 'Blog' },
+	{ href: '/blogs', title: 'Blogs' },
 	{ href: '/projects', title: 'Projects' },
 	{ href: '/uses', title: 'Uses' },
 ];

@@ -2,17 +2,20 @@
 
 import classNames from 'classnames';
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import { kebabCase } from '../blog/kebab-case';
-import type { PostSummary } from '../blog/utils';
+import { kebabCase } from '../blogs/kebab-case';
+import type { PostSummary } from '../blogs/utils';
 import { BlogPosts } from './blog-posts';
+import { tagBadge } from './tag';
 
 interface Props {
 	posts: PostSummary[];
 	tags: Record<string, number>;
 	tagNames: Record<string, string>;
+	/** Each tag's badge class (colour), from getTagBadges. */
+	tagBadges: Record<string, string>;
 }
 
-export function BlogExplorer({ posts, tags, tagNames }: Props) {
+export function BlogExplorer({ posts, tags, tagNames, tagBadges }: Props) {
 	const [query, setQuery] = useState('');
 	const [activeTag, setActiveTag] = useState<string | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -105,13 +108,18 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 
 			<fieldset className='flex flex-wrap gap-x-3 gap-y-2'>
 				<legend className='sr-only'>Filter by tag</legend>
-				<TagChip active={activeTag === null} onClick={() => selectTag(null)}>
+				<TagChip
+					active={activeTag === null}
+					badge='badge badge-primary'
+					onClick={() => selectTag(null)}
+				>
 					All ({posts.length})
 				</TagChip>
 				{sortedTags.map((tag) => (
 					<TagChip
 						key={tag}
 						active={activeTag === tag}
+						badge={tagBadges[tag] ?? tagBadge(tag)}
 						onClick={() => selectTag(activeTag === tag ? null : tag)}
 					>
 						{tagNames[tag] ?? tag} ({tags[tag]})
@@ -124,6 +132,7 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 					key={`${activeTag}-${query}`}
 					posts={filteredPosts}
 					onTagSelect={selectTag}
+					tagBadges={tagBadges}
 				/>
 			) : (
 				<p className='py-10 text-center font-mono text-sm text-(--ds-text-secondary)'>
@@ -136,10 +145,13 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 
 function TagChip({
 	active,
+	badge,
 	onClick,
 	children,
 }: {
 	active: boolean;
+	/** The tag's badge class (its colour), see tagBadge. */
+	badge: string;
 	onClick: () => void;
 	children: ReactNode;
 }) {
@@ -149,11 +161,13 @@ function TagChip({
 			aria-pressed={active}
 			onClick={onClick}
 			className={classNames(
-				// utc-ds badge look: a bracket-wrapped [tag (n)]
-				'badge cursor-pointer',
+				// utc-ds badge look: a bracket-wrapped [tag (n)] in the tag's colour;
+				// the selected one is tinted, the rest dimmed until hovered
+				badge,
+				'cursor-pointer',
 				active
-					? 'bg-(--ds-primary-muted) text-primary-500'
-					: 'text-(--ds-text-secondary) hover:text-primary-500',
+					? 'bg-[color-mix(in_oklch,currentColor_15%,transparent)]'
+					: 'opacity-60 hover:opacity-100',
 			)}
 		>
 			{children}

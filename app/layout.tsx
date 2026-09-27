@@ -5,7 +5,7 @@ import ThemeProvider from 'app/components/providers/ThemeProvider';
 import siteMetadata from 'app/site-metadata';
 import type { Metadata } from 'next';
 import { type ReactNode, ViewTransition } from 'react';
-import { getPosts } from './blog/utils';
+import { getPosts } from './blogs/utils';
 import CommandMenu from './components/command-menu';
 import { FrameProvider } from './components/layouts/frame';
 import SiteFooter from './components/layouts/site-footer';

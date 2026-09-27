@@ -5,6 +5,15 @@ import type { Project } from './types';
 
 const PROJECTS_DIR = path.join(process.cwd(), 'content/projects');
 
+/** Markdown to plain text: drop code ticks, emphasis and link targets. */
+function plain(markdown: string) {
+	return markdown
+		.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+		.replace(/[`*_]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
 function readProject(file: string): Project {
 	const slug = path.basename(file, '.mdx');
 	const { data, content } = matter(
@@ -34,6 +43,7 @@ function readProject(file: string): Project {
 		install: data.install,
 		stack: data.stack,
 		description: content.trim(),
+		summary: data.summary ?? plain(content.trim().split(/\n\s*\n/)[0]),
 		order: data.order,
 		demo: data.demo,
 		screenshots: data.screenshots,

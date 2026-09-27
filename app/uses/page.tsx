@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { Fragment } from 'react';
-import { readMDXFile } from '../blog/utils';
+import { readMDXFile } from '../blogs/utils';
 import Header from '../components/header';
 import { CustomMDX } from '../components/mdx';
 import UsesTitle from './uses-title';

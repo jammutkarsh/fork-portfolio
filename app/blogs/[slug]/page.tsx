@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Tag from '../../components/tag';
 import siteMetadata from '../../site-metadata';
-import { formatDate, getPostFromSlug, getPosts } from '../utils';
+import { kebabCase } from '../kebab-case';
+import { formatDate, getPostFromSlug, getPosts, getTagBadges } from '../utils';
 import PageTitle from './page-title';
 
 export const dynamicParams = false;
@@ -16,7 +17,7 @@ export async function generateMetadata(props: {
 	const params = await props.params;
 	const { metadata } = await getPostFromSlug(params.slug);
 
-	const url = `/blog/${params.slug}`;
+	const url = `/blogs/${params.slug}`;
 
 	return {
 		title: metadata.title,
@@ -47,6 +48,7 @@ export default async function Blog(props: {
 	const params = await props.params;
 
 	const { metadata, content, readingTime } = await getPostFromSlug(params.slug);
+	const tagBadges = getTagBadges(getPosts());
 
 	return (
 		<>
@@ -66,7 +68,7 @@ export default async function Blog(props: {
 			{metadata.tags.length > 0 && (
 				<div className='mt-8 flex flex-wrap justify-center gap-2'>
 					{metadata.tags.map((tag) => (
-						<Tag key={tag} text={tag} />
+						<Tag key={tag} text={tag} badge={tagBadges[kebabCase(tag)]} />
 					))}
 				</div>
 			)}

@@ -30,6 +30,7 @@ npm run dev
 - Home page story: `content/story.mdx` (one `## Title` section per phase; phase years and sketches in the frontmatter)
 - Uses page: `app/uses/content.mdx`
 - Projects: `content/projects/*.mdx`, one file per project (images go in `public/static/images/project/<name>/`)
+- Blog posts are served at `/blogs/<slug>`; old `/blog/...` links redirect there (`next.config.ts`)
 
 ## Licence
 

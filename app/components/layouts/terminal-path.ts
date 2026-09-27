@@ -2,8 +2,8 @@
 export const TERMINAL_HOME = '~/utc';
 
 /**
- * A page's URL as a terminal path: `/` is `~/utc`, `/blog/some-post` is
- * `~/utc/blog/some-post`. Used by the nav brand, the command menu prompt
+ * A page's URL as a terminal path: `/` is `~/utc`, `/blogs/some-post` is
+ * `~/utc/blogs/some-post`. Used by the nav brand, the command menu prompt
  * and the Open Graph images, so they always agree.
  */
 export function terminalPath(pathname: string) {

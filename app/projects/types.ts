@@ -17,6 +17,11 @@ export interface Project {
 	stack: string[];
 	/** The problem statement: the markdown body of the file. */
 	description: string;
+	/**
+	 * One or two plain-text sentences for link previews and meta tags: the
+	 * `summary` frontmatter field, or else the first paragraph of the body.
+	 */
+	summary: string;
 	order?: number;
 	/** A YouTube link or a video file path. */
 	demo?: string;

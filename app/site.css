@@ -102,7 +102,7 @@ html.story-deck.story-end footer {
 
 /*
   Code blocks carry colours for both themes (rehype-pretty-code, see
-  app/blog/utils.ts); show the set that matches the site theme.
+  app/blogs/utils.ts); show the set that matches the site theme.
 */
 [data-theme="dark"] [data-rehype-pretty-code-figure] :is(code, span) {
 	color: var(--shiki-dark);
@@ -110,4 +110,33 @@ html.story-deck.story-end footer {
 
 [data-theme="light"] [data-rehype-pretty-code-figure] :is(code, span) {
 	color: var(--shiki-light);
+}
+
+/*
+  Tag badges: utc-ds has no pink badge, so add one from its --ds-pink token.
+  Its colours are tuned for the dark theme; in light mode, darken the pale
+  ones (light blue, yellow, green, pink) so tags stay readable.
+*/
+.badge-pink {
+	color: var(--ds-pink);
+}
+
+.badge-pink:hover {
+	background: var(--ds-pink-muted);
+}
+
+[data-theme="light"] .badge-info {
+	color: color-mix(in oklch, var(--ds-info), black 45%);
+}
+
+[data-theme="light"] .badge-warning {
+	color: color-mix(in oklch, var(--ds-warning), black 35%);
+}
+
+[data-theme="light"] .badge-success {
+	color: color-mix(in oklch, var(--ds-success), black 20%);
+}
+
+[data-theme="light"] .badge-pink {
+	color: color-mix(in oklch, var(--ds-pink), black 50%);
 }

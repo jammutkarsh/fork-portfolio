@@ -1,4 +1,4 @@
-import { getTextContent, slugify } from 'app/blog/[slug]/extract-headings';
+import { getTextContent, slugify } from 'app/blogs/[slug]/extract-headings';
 import Link from 'next/link';
 import { MDXRemote, type MDXRemoteProps } from 'next-mdx-remote/rsc';
 import type { ComponentPropsWithoutRef } from 'react';

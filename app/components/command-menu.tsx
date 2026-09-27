@@ -34,7 +34,7 @@ export interface CommandMenuProject {
 
 const pages = [
 	{ href: '/', title: 'Home' },
-	{ href: '/blog', title: 'Blog' },
+	{ href: '/blogs', title: 'Blogs' },
 	{ href: '/projects', title: 'Projects' },
 	{ href: '/uses', title: 'Uses' },
 ];
@@ -85,7 +85,7 @@ function complete(entries: Entry[], query: string) {
 
 /**
  * The command menu as a shell prompt. It opens with the current page's
- * path already typed (~/utc/blog/some-post); edit it like a path, and the
+ * path already typed (~/utc/blogs/some-post); edit it like a path, and the
  * list below autocompletes the pages under it. Tab completes to the
  * highlighted path, Enter goes there. Anything that isn't a path searches
  * pages, posts, projects and commands (open github, theme --light).
@@ -154,7 +154,7 @@ export default function CommandMenu({
 		const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
 		return [
 			...pages.map((p) => page(p.href)),
-			...posts.map((post) => page(`/blog/${post.slug}`, post.title)),
+			...posts.map((post) => page(`/blogs/${post.slug}`, post.title)),
 			...projects.map((project) =>
 				page(`/projects/${project.slug}`, project.name),
 			),
@@ -185,7 +185,7 @@ export default function CommandMenu({
 	}, [matches]);
 
 	// Tab completes the input to the highlighted path, with a trailing slash
-	// when there is more below it (~/utc/blog/).
+	// when there is more below it (~/utc/blogs/).
 	const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		if (event.key !== 'Tab') return;
 		event.preventDefault();

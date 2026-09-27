@@ -29,8 +29,9 @@ interface OgImageOptions {
 	 */
 	profile?: boolean;
 	/**
-	 * A picture under the title that fills the rest of the image, e.g. a
-	 * project's architecture diagram or hero. `src` is a PNG or JPEG data URI.
+	 * A picture filling the body instead of the title and description, e.g. a
+	 * project's architecture diagram or hero (the path already names the
+	 * page). `src` is a PNG or JPEG data URI.
 	 */
 	picture?: { src: string; fit: 'contain' | 'cover' };
 }
@@ -44,8 +45,12 @@ const avatarPath = path.join(
 	'avatar-og.jpg',
 );
 
+/** Shortens text to `max` characters, cutting at a word boundary. */
 function truncate(text: string, max: number) {
-	return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+	if (text.length <= max) return text;
+	const cut = text.slice(0, max - 1);
+	const space = cut.lastIndexOf(' ');
+	return `${(space > max / 2 ? cut.slice(0, space) : cut).replace(/[\s,.;:–—-]+$/, '')}…`;
 }
 
 /** Renders a 1200×630 Open Graph image in the site's (utc-ds) style. */
@@ -63,13 +68,7 @@ export async function renderOgImage({
 		fs.readFile(avatarPath),
 	]);
 	const avatarSrc = `data:image/jpeg;base64,${avatar.toString('base64')}`;
-	const titleSize = picture
-		? 40
-		: title.length > 70
-			? 48
-			: title.length > 40
-				? 58
-				: 68;
+	const titleSize = title.length > 70 ? 48 : title.length > 40 ? 58 : 68;
 	const terminal = truncate(terminalPath(pagePath), 60);
 
 	const text = (
@@ -145,24 +144,20 @@ export async function renderOgImage({
 					<span>{terminal.slice(2)}</span>
 				</div>
 
-				{/* Picture layout: the title, then the picture filling the rest */}
+				{/* Picture layout: the picture filling the body, the description under it */}
 				{picture && (
 					<div
 						style={{
 							display: 'flex',
 							flexDirection: 'column',
 							flex: 1,
-							padding: '32px 56px 40px',
+							padding: '36px 56px 28px',
 						}}
 					>
-						<span style={{ fontSize: titleSize, letterSpacing: -1 }}>
-							{truncate(title, 60)}
-						</span>
 						<div
 							style={{
 								display: 'flex',
 								flex: 1,
-								marginTop: 24,
 								borderRadius: 8,
 								border: `1px solid ${colors.border}`,
 								overflow: 'hidden',
@@ -174,7 +169,7 @@ export async function renderOgImage({
 								src={picture.src}
 								alt=''
 								width={926}
-								height={384}
+								height={300}
 								style={{
 									width: '100%',
 									height: '100%',
@@ -184,6 +179,18 @@ export async function renderOgImage({
 								}}
 							/>
 						</div>
+						{description && (
+							<span
+								style={{
+									marginTop: 20,
+									fontSize: 26,
+									lineHeight: 1.35,
+									color: colors.muted,
+								}}
+							>
+								{truncate(description, 120)}
+							</span>
+						)}
 					</div>
 				)}
 
@@ -213,7 +220,7 @@ export async function renderOgImage({
 				)}
 
 				{/* Footer: avatar and handle, plus e.g. a post's date */}
-				{!profile && !picture && (
+				{!profile && (
 					<div
 						style={{
 							display: 'flex',
@@ -239,9 +246,17 @@ export async function renderOgImage({
 							/>
 							<span style={{ fontSize: 22 }}>{siteMetadata.headerTitle}</span>
 						</div>
-						{meta && (
-							<span style={{ fontSize: 18, color: colors.muted }}>{meta}</span>
-						)}
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								gap: 14,
+								fontSize: 16,
+								color: colors.muted,
+							}}
+						>
+							{meta && <span>{meta}</span>}
+						</div>
 					</div>
 				)}
 			</div>

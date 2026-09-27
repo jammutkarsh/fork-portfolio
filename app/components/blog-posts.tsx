@@ -3,15 +3,19 @@
 import { format } from 'date-fns';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
-import type { PostSummary } from '../blog/utils';
+import { kebabCase } from '../blogs/kebab-case';
+import type { PostSummary } from '../blogs/utils';
 import Tag from './tag';
 
 export function BlogPosts({
 	posts,
 	onTagSelect,
+	tagBadges = {},
 }: {
 	posts: PostSummary[];
 	onTagSelect?: (slug: string) => void;
+	/** Each tag's badge class (colour), from getTagBadges. */
+	tagBadges?: Record<string, string>;
 }) {
 	const prefersReducedMotion = useReducedMotion();
 
@@ -33,7 +37,7 @@ export function BlogPosts({
 					}}
 				>
 					<Link
-						href={`/blog/${post.slug}`}
+						href={`/blogs/${post.slug}`}
 						aria-label={`Read "${post.metadata.title}"`}
 					>
 						<article className='space-y-2 py-5'>
@@ -54,7 +58,12 @@ export function BlogPosts({
 					{post.metadata.tags.length > 0 && (
 						<div className='flex flex-wrap gap-2 pb-5 -mt-2'>
 							{post.metadata.tags.map((tag) => (
-								<Tag key={tag} text={tag} onSelect={onTagSelect} />
+								<Tag
+									key={tag}
+									text={tag}
+									badge={tagBadges[kebabCase(tag)]}
+									onSelect={onTagSelect}
+								/>
 							))}
 						</div>
 					)}

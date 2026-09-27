@@ -67,7 +67,8 @@ async function heroPng(hero: string) {
 
 /**
  * A project's link preview shows its architecture diagram when it has one
- * (and mermaid.ink can render it), and its hero image otherwise.
+ * (and mermaid.ink can render it), and its hero image otherwise, with the
+ * summary underneath. The name is left out: the path already shows it.
  */
 export default async function Image({
 	params,
@@ -88,5 +89,6 @@ export default async function Image({
 		picture: architecture
 			? { src: architecture, fit: 'contain' }
 			: { src: await heroPng(project.hero), fit: 'cover' },
+		description: project.summary,
 	});
 }

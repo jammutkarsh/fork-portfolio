@@ -302,7 +302,7 @@ export default function StoryDeck({
 											{/* Outside the scrolling text, so they are always in view */}
 											{isLast && (
 												<div className='mt-4 flex shrink-0 gap-5 text-base [@media(max-height:500px)]:mt-2'>
-													<Link href='/blog' className='underline-magical'>
+													<Link href='/blogs' className='underline-magical'>
 														Blogs &rarr;
 													</Link>
 													<Link href='/projects' className='underline-magical'>
@@ -360,7 +360,8 @@ export default function StoryDeck({
 					</li>
 				))}
 				<li>
-					<Link href='/blog'>Blogs</Link> <Link href='/projects'>Projects</Link>
+					<Link href='/blogs'>Blogs</Link>{' '}
+					<Link href='/projects'>Projects</Link>
 				</li>
 			</ol>
 		</MotionConfig>

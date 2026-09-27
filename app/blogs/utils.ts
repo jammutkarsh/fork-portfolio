@@ -200,6 +200,31 @@ export function getTagNames(posts: PostSummary[]): Record<string, string> {
 	return names;
 }
 
+// utc-ds badge colours for tags; orange (the accent) comes last so it's
+// used least, and red is left out because it reads as an error.
+const TAG_BADGES = [
+	'badge-success',
+	'badge-info',
+	'badge-warning',
+	'badge-purple',
+	'badge-pink',
+	'badge-primary',
+];
+
+/**
+ * The badge class of each tag (by slug). Colours are handed out in order,
+ * most-used tags first, so tags get distinct colours until the palette
+ * runs out, and a tag has the same colour on every page.
+ */
+export function getTagBadges(posts: PostSummary[]): Record<string, string> {
+	const tags = getAllTags(posts);
+	return Object.fromEntries(
+		Object.keys(tags)
+			.sort((a, b) => tags[b] - tags[a] || a.localeCompare(b))
+			.map((tag, i) => [tag, `badge ${TAG_BADGES[i % TAG_BADGES.length]}`]),
+	);
+}
+
 export function getAllTags(posts: PostSummary[]): Record<string, number> {
 	const tags: Record<string, number> = {};
 	for (const post of posts) {

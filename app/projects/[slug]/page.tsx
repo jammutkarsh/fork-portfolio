@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { CustomMDX } from '../../components/mdx';
+import { tagBadge } from '../../components/tag';
 import { getProject, getProjects } from '../utils';
 import InstallCommand from './install-command';
 import MermaidDiagram from './mermaid-diagram';
@@ -20,7 +21,7 @@ export async function generateMetadata(props: {
 	const { slug } = await props.params;
 	const project = getProject(slug);
 	if (!project) return {};
-	const description = project.description.split('\n\n')[0].replace(/\n/g, ' ');
+	const description = project.summary;
 	return {
 		title: project.name,
 		description,
@@ -126,7 +127,7 @@ export default async function ProjectPage(props: {
 			<Section label='Tech stack'>
 				<ul className='flex flex-wrap gap-2'>
 					{project.stack.map((tech) => (
-						<li key={tech} className='badge badge-info'>
+						<li key={tech} className={tagBadge(tech)}>
 							{tech}
 						</li>
 					))}

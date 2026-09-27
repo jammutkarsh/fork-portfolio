@@ -12,7 +12,7 @@ export const contentType = ogContentType;
 export default function Image() {
 	const count = getPosts().length;
 	return renderOgImage({
-		path: '/blog',
+		path: '/blogs',
 		title: 'Deep dives, how-tos and notes from the backend',
 		description: `${count} ${count === 1 ? 'article' : 'articles'}`,
 	});
