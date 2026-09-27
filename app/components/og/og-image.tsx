@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { ImageResponse } from 'next/og';
 import siteMetadata from '../../site-metadata';
+import { terminalPath } from '../layouts/terminal-path';
 
 export const ogSize = { width: 1200, height: 630 };
 export const ogContentType = 'image/png';
@@ -16,13 +17,17 @@ const colors = {
 };
 
 interface OgImageOptions {
-	/** Small uppercase label above the title, e.g. "Blog". */
-	label: string;
+	/** The page's URL path, shown as a terminal path (~/utc/...) in the top bar. */
+	path: string;
 	title: string;
 	description?: string;
 	/** Right-aligned footer text, e.g. "May 5, 2025 · 7 min read". */
 	meta?: string;
-	tags?: string[];
+	/**
+	 * Home page: the avatar sits beside the title and description, like the
+	 * site's intro, instead of in the footer.
+	 */
+	profile?: boolean;
 }
 
 const fontsDir = path.join(process.cwd(), 'assets', 'fonts');
@@ -38,27 +43,56 @@ function truncate(text: string, max: number) {
 	return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
 }
 
-/** Renders a 1200×630 Open Graph image in the site's visual style. */
+/** Renders a 1200×630 Open Graph image in the site's (utc-ds) style. */
 export async function renderOgImage({
-	label,
+	path: pagePath,
 	title,
 	description,
 	meta,
-	tags = [],
+	profile = false,
 }: OgImageOptions) {
-	const [interLight, interMedium, monoRegular, monoMedium, avatar] =
-		await Promise.all([
-			fs.readFile(path.join(fontsDir, 'Inter-300.ttf')),
-			fs.readFile(path.join(fontsDir, 'Inter-500.ttf')),
-			fs.readFile(path.join(fontsDir, 'JetBrainsMono-400.ttf')),
-			fs.readFile(path.join(fontsDir, 'JetBrainsMono-500.ttf')),
-			fs.readFile(avatarPath),
-		]);
+	const [interLight, monoRegular, avatar] = await Promise.all([
+		fs.readFile(path.join(fontsDir, 'Inter-300.ttf')),
+		fs.readFile(path.join(fontsDir, 'JetBrainsMono-400.ttf')),
+		fs.readFile(avatarPath),
+	]);
 	const avatarSrc = `data:image/jpeg;base64,${avatar.toString('base64')}`;
 	const titleSize = title.length > 70 ? 48 : title.length > 40 ? 58 : 68;
-	const siteHost = new URL(siteMetadata.siteUrl).host.startsWith('localhost')
-		? 'utkarshchourasia.in'
-		: new URL(siteMetadata.siteUrl).host;
+	const terminal = truncate(terminalPath(pagePath), 60);
+
+	const text = (
+		<div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+			<span
+				style={{
+					fontSize: titleSize,
+					lineHeight: 1.2,
+					letterSpacing: -2,
+				}}
+			>
+				{truncate(title, 110)}
+			</span>
+			<div
+				style={{
+					width: 120,
+					height: 4,
+					marginTop: 24,
+					backgroundColor: colors.primary,
+				}}
+			/>
+			{description && (
+				<span
+					style={{
+						marginTop: 24,
+						fontSize: 30,
+						lineHeight: 1.4,
+						color: colors.muted,
+					}}
+				>
+					{truncate(description, 140)}
+				</span>
+			)}
+		</div>
+	);
 
 	return new ImageResponse(
 		<div
@@ -83,152 +117,84 @@ export async function renderOgImage({
 					borderRight: `1px solid ${colors.border}`,
 				}}
 			>
-				{/* Top bar, like the site navbar */}
+				{/* Top bar, like the site navbar: the page's terminal path */}
 				<div
 					style={{
 						display: 'flex',
 						alignItems: 'center',
-						justifyContent: 'space-between',
 						height: 88,
 						padding: '0 56px',
 						borderBottom: `1px solid ${colors.border}`,
+						fontFamily: 'JetBrains Mono',
+						fontSize: 26,
 					}}
 				>
-					<span
-						style={{
-							display: 'flex',
-							fontFamily: 'JetBrains Mono',
-							fontSize: 26,
-						}}
-					>
-						<span style={{ color: colors.primary }}>~/</span>
-						{siteMetadata.title}
-					</span>
-					<span
-						style={{
-							fontFamily: 'JetBrains Mono',
-							fontSize: 22,
-							color: colors.muted,
-						}}
-					>
-						{siteHost}
-					</span>
+					<span style={{ color: colors.primary }}>~/</span>
+					<span>{terminal.slice(2)}</span>
 				</div>
 
 				{/* Body */}
 				<div
 					style={{
 						display: 'flex',
-						flexDirection: 'column',
 						flex: 1,
-						padding: '48px 56px 0',
+						alignItems: profile ? 'center' : 'flex-start',
+						gap: 56,
+						padding: profile ? '0 56px' : '56px 56px 0',
 					}}
 				>
-					<span
-						style={{
-							fontFamily: 'JetBrains Mono',
-							fontSize: 22,
-							fontWeight: 500,
-							color: colors.primary,
-							textTransform: 'uppercase',
-							letterSpacing: 4,
-						}}
-					>
-						{label}
-					</span>
-					<span
-						style={{
-							marginTop: 12,
-							fontFamily: 'Inter',
-							fontWeight: 300,
-							fontSize: titleSize,
-							lineHeight: 1.2,
-							letterSpacing: -2,
-						}}
-					>
-						{truncate(title, 110)}
-					</span>
-					<div
-						style={{
-							width: 120,
-							height: 4,
-							marginTop: 24,
-							backgroundColor: colors.primary,
-						}}
-					/>
-					{description && (
-						<span
-							style={{
-								marginTop: 24,
-								fontSize: 30,
-								lineHeight: 1.4,
-								color: colors.muted,
-							}}
-						>
-							{truncate(description, 140)}
-						</span>
-					)}
-				</div>
-
-				{/* Footer */}
-				<div
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'space-between',
-						gap: 32,
-						padding: '0 56px 44px',
-					}}
-				>
-					<div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-						{/* biome-ignore lint/performance/noImgElement: next/og renders plain img */}
+					{text}
+					{profile && (
+						// biome-ignore lint/performance/noImgElement: next/og renders plain img
 						<img
 							src={avatarSrc}
 							alt=''
-							width={56}
-							height={56}
-							style={{
-								borderRadius: 9999,
-								border: `2px solid ${colors.primary}`,
-								objectFit: 'cover',
-							}}
+							width={280}
+							height={280}
+							style={{ borderRadius: 8, objectFit: 'cover' }}
 						/>
-						<span style={{ fontFamily: 'JetBrains Mono', fontSize: 22 }}>
-							{siteMetadata.headerTitle}
-						</span>
-					</div>
+					)}
+				</div>
+
+				{/* Footer: avatar and handle, plus e.g. a post's date */}
+				{!profile && (
 					<div
 						style={{
 							display: 'flex',
 							alignItems: 'center',
-							gap: 14,
+							justifyContent: 'space-between',
+							gap: 32,
+							padding: '0 56px 44px',
 							fontFamily: 'JetBrains Mono',
-							fontSize: 16,
 						}}
 					>
-						{/* utc-ds badges: bracket-wrapped [tags] */}
-						{tags.slice(0, 2).map((tag) => (
-							<span
-								key={tag}
-								style={{ display: 'flex', color: colors.primary }}
-							>
-								<span style={{ color: colors.muted }}>[</span>
-								{tag}
-								<span style={{ color: colors.muted }}>]</span>
-							</span>
-						))}
-						{meta && <span style={{ color: colors.muted }}>{meta}</span>}
+						<div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+							{/* biome-ignore lint/performance/noImgElement: next/og renders plain img */}
+							<img
+								src={avatarSrc}
+								alt=''
+								width={56}
+								height={56}
+								style={{
+									borderRadius: 9999,
+									border: `2px solid ${colors.primary}`,
+									objectFit: 'cover',
+								}}
+							/>
+							<span style={{ fontSize: 22 }}>{siteMetadata.headerTitle}</span>
+						</div>
+						{meta && (
+							<span style={{ fontSize: 18, color: colors.muted }}>{meta}</span>
+						)}
 					</div>
-				</div>
+				)}
 			</div>
 		</div>,
 		{
 			...ogSize,
 			fonts: [
 				{ name: 'Inter', data: interLight, weight: 300 },
-				{ name: 'Inter', data: interMedium, weight: 500 },
 				{ name: 'JetBrains Mono', data: monoRegular, weight: 400 },
-				{ name: 'JetBrains Mono', data: monoMedium, weight: 500 },
 			],
 		},
 	);

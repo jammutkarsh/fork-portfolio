@@ -22,14 +22,13 @@ export default async function Image({
 	const post = getPosts().find((p) => p.slug === slug);
 
 	if (!post) {
-		return renderOgImage({ label: 'Blog', title: 'Blog post' });
+		return renderOgImage({ path: `/blog/${slug}`, title: 'Blog post' });
 	}
 
 	return renderOgImage({
-		label: 'Blog',
+		path: `/blog/${slug}`,
 		title: post.metadata.title,
 		description: post.metadata.summary,
 		meta: `${formatDate(post.metadata.publishedAt)} · ${post.readingTime}`,
-		tags: post.metadata.tags.slice(0, 2),
 	});
 }

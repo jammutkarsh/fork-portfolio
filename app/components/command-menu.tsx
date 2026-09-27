@@ -2,7 +2,7 @@
 
 import { Command } from 'cmdk';
 import { useLenis } from 'lenis/react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
 	type ComponentProps,
@@ -12,6 +12,7 @@ import {
 	useState,
 } from 'react';
 import siteMetadata from '../site-metadata';
+import { terminalPath } from './layouts/terminal-path';
 import { switchTheme } from './layouts/theme-switch/switch-theme';
 
 const OPEN_EVENT = 'open-command-menu';
@@ -34,15 +35,16 @@ const pages = [
 ];
 
 const socials = [
-	{ href: siteMetadata.github, title: 'GitHub' },
-	{ href: siteMetadata.linkedin, title: 'LinkedIn' },
-	{ href: siteMetadata.twitter, title: 'X (Twitter)' },
-	{ href: `mailto:${siteMetadata.email}`, title: 'Email' },
+	{ href: siteMetadata.github, title: 'github' },
+	{ href: siteMetadata.linkedin, title: 'linkedin' },
+	{ href: siteMetadata.twitter, title: 'x' },
+	{ href: `mailto:${siteMetadata.email}`, title: 'email' },
 ];
 
 export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
 	const [open, setOpen] = useState(false);
 	const router = useRouter();
+	const cwd = terminalPath(usePathname());
 	const { resolvedTheme, setTheme } = useTheme();
 	const lenis = useLenis();
 
@@ -77,72 +79,93 @@ export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
 		action();
 	}, []);
 
+	const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+
+	// A terminal window (utc-ds .terminal): the title bar and the prompt show
+	// the current page as a path, and entries read like paths or commands.
 	return (
 		<Command.Dialog
 			open={open}
 			onOpenChange={setOpen}
 			label='Command menu'
-			overlayClassName='fixed inset-0 z-40 bg-black/40 backdrop-blur-sm'
-			contentClassName='fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-xl border border-gray-200 bg-white text-black shadow-2xl dark:border-gray-800 dark:bg-neutral-950 dark:text-white'
+			overlayClassName='fixed inset-0 z-40 bg-black/50 backdrop-blur-sm'
+			contentClassName='fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-(--ds-radius-lg) border border-(--ds-border-strong) bg-(--ds-bg-code) font-mono text-(--ds-text-primary)'
 		>
-			<Command.Input
-				placeholder='Type a command or search…'
-				className='w-full border-b border-gray-200 bg-transparent px-4 py-3 text-base outline-none placeholder:text-gray-500 dark:border-gray-800'
-			/>
+			<div className='flex items-center gap-1.5 border-b border-(--ds-border) bg-(--ds-bg-secondary) px-3 py-2'>
+				<span className='size-2 bg-(--ds-danger)' />
+				<span className='size-2 bg-(--ds-warning)' />
+				<span className='size-2 bg-(--ds-success)' />
+				<span className='ml-2 truncate text-xs text-(--ds-text-secondary)'>
+					{cwd}
+				</span>
+			</div>
+			<div className='flex items-center gap-2 border-b border-(--ds-border) px-4 py-3 text-sm'>
+				<span className='max-w-[60%] shrink-0 truncate select-none'>
+					<span className='text-primary-500'>{cwd}</span>
+					<span className='text-(--ds-success)'> $</span>
+				</span>
+				<Command.Input
+					placeholder='type a command or search…'
+					className='min-w-0 flex-1 bg-transparent outline-none placeholder:text-(--ds-text-tertiary)'
+				/>
+			</div>
 			<Command.List
 				data-lenis-prevent
 				className='max-h-[min(19rem,60vh)] overflow-y-auto overscroll-contain p-2'
 			>
-				<Command.Empty className='py-6 text-center text-sm text-gray-500'>
-					No results found.
+				<Command.Empty className='py-6 text-center text-sm text-(--ds-text-secondary)'>
+					command not found
 				</Command.Empty>
 
-				<Group heading='Pages'>
+				<Group heading='cd'>
 					{pages.map(({ href, title }) => (
-						<Item key={href} onSelect={() => run(() => router.push(href))}>
-							{title}
-						</Item>
-					))}
-				</Group>
-
-				<Group heading='Links'>
-					{socials.map(({ href, title }) => (
 						<Item
-							key={title}
-							onSelect={() =>
-								run(() => window.open(href, '_blank', 'noopener,noreferrer'))
-							}
+							key={href}
+							value={`${title} ${terminalPath(href)}`}
+							onSelect={() => run(() => router.push(href))}
 						>
-							{title}
+							{terminalPath(href)}
 						</Item>
 					))}
 				</Group>
 
 				{posts.length > 0 && (
-					<Group heading='Blog posts'>
+					<Group heading='posts'>
 						{posts.map((post) => (
 							<Item
 								key={post.slug}
 								value={`${post.title} ${post.slug}`}
 								onSelect={() => run(() => router.push(`/blog/${post.slug}`))}
 							>
-								{post.title}
+								<span className='truncate'>{post.title}</span>
+								<span className='ml-auto hidden shrink-0 pl-4 text-xs text-(--ds-text-tertiary) sm:inline'>
+									{terminalPath(`/blog/${post.slug}`)}
+								</span>
 							</Item>
 						))}
 					</Group>
 				)}
 
-				<Group heading='Theme'>
+				<Group heading='open'>
+					{socials.map(({ href, title }) => (
+						<Item
+							key={title}
+							value={`open ${title}`}
+							onSelect={() =>
+								run(() => window.open(href, '_blank', 'noopener,noreferrer'))
+							}
+						>
+							open {title}
+						</Item>
+					))}
+				</Group>
+
+				<Group heading='theme'>
 					<Item
-						onSelect={() =>
-							run(() =>
-								switchTheme(() =>
-									setTheme(resolvedTheme === 'dark' ? 'light' : 'dark'),
-								),
-							)
-						}
+						value={`theme ${nextTheme} switch`}
+						onSelect={() => run(() => switchTheme(() => setTheme(nextTheme)))}
 					>
-						Switch to {resolvedTheme === 'dark' ? 'light' : 'dark'} theme
+						theme --{nextTheme}
 					</Item>
 				</Group>
 			</Command.List>
@@ -160,7 +183,7 @@ function Group({
 	return (
 		<Command.Group
 			heading={heading}
-			className='[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-gray-500'
+			className='[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-(--ds-text-tertiary) [&_[cmdk-group-heading]]:before:content-["#_"]'
 		>
 			{children}
 		</Command.Group>
@@ -171,7 +194,7 @@ function Item(props: ComponentProps<typeof Command.Item>) {
 	return (
 		<Command.Item
 			{...props}
-			className='cursor-pointer rounded-md px-2 py-2 text-sm data-[selected=true]:bg-primary-500/10 data-[selected=true]:text-primary-500'
+			className='flex cursor-pointer items-center rounded-(--ds-radius) px-2 py-1.5 text-sm before:mr-2 before:text-(--ds-text-tertiary) before:content-[">"] data-[selected=true]:bg-(--ds-primary-muted) data-[selected=true]:text-primary-500'
 		/>
 	);
 }

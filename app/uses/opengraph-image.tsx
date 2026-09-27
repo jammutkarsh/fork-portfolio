@@ -10,7 +10,7 @@ export const contentType = ogContentType;
 
 export default function Image() {
 	return renderOgImage({
-		label: 'Uses',
+		path: '/uses',
 		title: 'The tools I use to build things',
 		description: 'Hardware, software and everything in between.',
 	});

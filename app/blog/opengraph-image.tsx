@@ -3,19 +3,17 @@ import {
 	ogSize,
 	renderOgImage,
 } from '../components/og/og-image';
-import { getAllTags, getPosts } from './utils';
+import { getPosts } from './utils';
 
 export const alt = 'Tech blogs of Utkarsh Chourasia';
 export const size = ogSize;
 export const contentType = ogContentType;
 
 export default function Image() {
-	const posts = getPosts();
-	const tags = getAllTags(posts);
+	const count = getPosts().length;
 	return renderOgImage({
-		label: 'Blog',
+		path: '/blog',
 		title: 'Deep dives, how-tos and notes from the backend',
-		description: `${posts.length} articles written so far.`,
-		tags: Object.keys(tags).sort((a, b) => tags[b] - tags[a]),
+		description: `${count} ${count === 1 ? 'article' : 'articles'}`,
 	});
 }
