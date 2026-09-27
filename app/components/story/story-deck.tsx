@@ -280,6 +280,38 @@ export default function StoryDeck({
 							</div>
 						</div>
 					</div>
+
+					{/* Scroll cue: on to the next slide */}
+					<div className='mt-3 flex h-11 shrink-0 justify-center'>
+						<AnimatePresence>
+							{slide < slides - 1 && (
+								<motion.button
+									key='cue'
+									type='button'
+									aria-label={slide === 0 ? 'My journey' : 'Next'}
+									onClick={() => goTo(slide + 1)}
+									initial={{ opacity: 0, y: -6 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 6 }}
+									transition={{ duration: 0.3, ease }}
+									className='flex size-11 cursor-pointer items-center justify-center rounded-full bg-primary-500 text-white shadow-lg shadow-primary-500/30 transition-colors hover:bg-primary-400'
+								>
+									<svg
+										viewBox='0 0 24 24'
+										fill='none'
+										stroke='currentColor'
+										strokeWidth={2.2}
+										strokeLinecap='round'
+										strokeLinejoin='round'
+										aria-hidden='true'
+										className='story-cue size-5'
+									>
+										<path d='M12 5v14M6 13l6 6 6-6' />
+									</svg>
+								</motion.button>
+							)}
+						</AnimatePresence>
+					</div>
 				</motion.div>
 			</div>
 

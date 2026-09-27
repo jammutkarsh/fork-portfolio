@@ -82,7 +82,7 @@ export default function ProjectPreview({ modal, projects }: ProjectModalProps) {
 	return (
 		<>
 			<motion.div
-				className='pointer-events-none absolute flex h-[350px] w-[400px] items-center justify-center overflow-hidden bg-white'
+				className='pointer-events-none absolute flex h-[300px] w-[480px] items-center justify-center overflow-hidden rounded-lg bg-gray-100 shadow-2xl dark:bg-gray-900'
 				ref={modalContainer}
 				variants={scaleAnimation}
 				initial='initial'
@@ -95,24 +95,17 @@ export default function ProjectPreview({ modal, projects }: ProjectModalProps) {
 						transition: 'top 0.6s cubic-bezier(0.76, 0, 0.24, 1)',
 					}}
 				>
-					{projects.map((project) => {
-						const { src, color } = project;
-						return (
-							<div
-								className='flex h-full w-full items-center justify-center'
-								style={{ backgroundColor: color }}
-								key={`modal_${src}`}
-							>
-								<Image
-									className='h-auto'
-									src={`/static/images/project/${src}`}
-									width={300}
-									height={300}
-									alt='image'
-								/>
-							</div>
-						);
-					})}
+					{projects.map((project) => (
+						<div className='relative h-full w-full' key={project.slug}>
+							<Image
+								className='object-cover object-top'
+								src={project.hero}
+								fill
+								sizes='480px'
+								alt=''
+							/>
+						</div>
+					))}
 				</div>
 			</motion.div>
 			<motion.div

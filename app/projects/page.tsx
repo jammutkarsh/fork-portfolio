@@ -1,6 +1,7 @@
 import Projects from 'app/projects/projects';
-import { Fragment } from 'react';
 import Header from '../components/header';
+import PageContainer from '../components/layouts/page-container';
+import { getProjects } from './utils';
 
 export const metadata = {
 	title: 'Projects',
@@ -9,14 +10,14 @@ export const metadata = {
 
 export default function Page() {
 	return (
-		<Fragment>
+		<PageContainer>
 			<Header title='Projects' />
 			<div className='space-y-2 md:space-y-5 '>
 				<p className='text-lg leading-7 text-gray-500 dark:text-gray-400'>
 					Here are some of my selected projects worth sharing.
 				</p>
 			</div>
-			<Projects />
-		</Fragment>
+			<Projects projects={getProjects()} />
+		</PageContainer>
 	);
 }

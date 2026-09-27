@@ -8,11 +8,12 @@ import {
 	useTransform,
 } from 'motion/react';
 import { type ReactNode, useEffect } from 'react';
-import FrameLines from '../../components/layouts/frame-lines';
+import FrameLines from './frame-lines';
 
 /**
- * A post opens up: its frame lines slide off screen and the page widens,
- * leaving room for code blocks to break out of the text column.
+ * A detail page (blog post, project) opens up: its frame lines slide off
+ * screen and the page widens, leaving room for wide content such as code
+ * blocks and images.
  */
 export default function OpenFrame({ children }: { children: ReactNode }) {
 	const open = useMotionValue(0);
@@ -42,9 +43,7 @@ export default function OpenFrame({ children }: { children: ReactNode }) {
 				style={{ maxWidth }}
 				className='mx-auto flex w-full flex-1 flex-col p-8 pt-12 md:p-18 md:pt-14'
 			>
-				<div className='mx-auto flex w-full max-w-220 flex-col gap-4'>
-					{children}
-				</div>
+				{children}
 			</motion.main>
 		</>
 	);

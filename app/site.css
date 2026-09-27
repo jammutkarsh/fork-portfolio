@@ -105,3 +105,20 @@ html.story-deck.story-end footer {
 	opacity: 1;
 	pointer-events: auto;
 }
+
+/* The home page's round scroll cue: the arrow bobs gently. */
+@media (prefers-reduced-motion: no-preference) {
+	.story-cue {
+		animation: story-cue 1.6s ease-in-out infinite;
+	}
+}
+
+@keyframes story-cue {
+	0%,
+	100% {
+		transform: translateY(-2px);
+	}
+	50% {
+		transform: translateY(3px);
+	}
+}

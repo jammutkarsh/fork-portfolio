@@ -1,4 +1,5 @@
 import { getPosts } from './blog/utils';
+import { getProjects } from './projects/utils';
 import siteMetadata from './site-metadata';
 
 export default async function sitemap() {
@@ -10,10 +11,15 @@ export default async function sitemap() {
 		lastModified: post.metadata.publishedAt,
 	}));
 
+	const projects = getProjects().map((project) => ({
+		url: `${baseUrl}/projects/${project.slug}`,
+		lastModified: new Date().toISOString().split('T')[0],
+	}));
+
 	const routes = ['', 'blog', 'projects', 'uses'].map((route) => ({
 		url: route === '' ? `${baseUrl}/` : `${baseUrl}/${route}`,
 		lastModified: new Date().toISOString().split('T')[0],
 	}));
 
-	return [...routes, ...blogs];
+	return [...routes, ...blogs, ...projects];
 }
