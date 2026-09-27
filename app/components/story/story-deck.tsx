@@ -28,8 +28,9 @@ import type { PhaseMeta } from './get-story';
 const ease = [0.22, 1, 0.36, 1] as const;
 
 // The name on the intro and the phase titles share one size.
+// Short screens (a phone in landscape) step everything down a size.
 const heading =
-	'text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl';
+	'text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl [@media(max-height:500px)]:text-2xl';
 
 // The title and the paragraph change the same way: the old one fades out,
 // then the new one fades in.
@@ -182,12 +183,12 @@ export default function StoryDeck({
 						maxWidth: frameWidth,
 						paddingBottom: atEnd ? footerHeight : undefined,
 					}}
-					className='sticky transition-[padding] duration-500 top-(--nav) mx-auto flex h-[calc(100svh-var(--nav))] w-full flex-col px-8 pt-6 pb-6 md:px-18 md:pt-10 md:pb-8'
+					className='sticky transition-[padding] duration-500 top-(--nav) mx-auto flex h-[calc(100svh-var(--nav))] w-full flex-col px-8 pt-6 pb-6 md:px-18 md:pt-10 md:pb-8 [@media(max-height:500px)]:py-3'
 				>
 					{/* Phase title, top left */}
 					<div
 						aria-hidden='true'
-						className='min-h-19 shrink-0 sm:min-h-12 lg:min-h-15'
+						className='min-h-19 shrink-0 sm:min-h-12 lg:min-h-15 [@media(max-height:500px)]:min-h-9'
 					>
 						<AnimatePresence mode='wait' initial={false}>
 							{opened && (
@@ -202,9 +203,9 @@ export default function StoryDeck({
 						</AnimatePresence>
 					</div>
 
-					<div className='grid min-h-0 flex-1 grid-rows-[auto_1fr] gap-4 md:grid-cols-[1fr_1.15fr] md:grid-rows-1 md:items-center md:gap-14'>
+					<div className='grid min-h-0 flex-1 grid-rows-[auto_1fr] gap-4 md:grid-cols-[1fr_1.15fr] md:grid-rows-1 md:gap-14'>
 						{/* Photo on the intro, then the desk */}
-						<div className='relative mx-auto w-full max-w-[calc(30svh*4/3)] md:order-2 md:max-w-none'>
+						<div className='relative mx-auto w-full max-w-[calc(30svh*4/3)] md:order-2 md:max-w-none md:self-center'>
 							<motion.div aria-hidden='true' style={{ clipPath: deskReveal }}>
 								<DeskScene phases={phases} phase={current} />
 							</motion.div>
@@ -253,7 +254,7 @@ export default function StoryDeck({
 							<div
 								aria-hidden='true'
 								inert={!opened}
-								className='[grid-area:1/1] min-h-0 self-center'
+								className='[grid-area:1/1] flex min-h-0 flex-col justify-center-safe'
 							>
 								<AnimatePresence mode='wait' initial={false}>
 									{opened && (
@@ -261,7 +262,7 @@ export default function StoryDeck({
 											key={phase.id}
 											{...swap(dir)}
 											data-lenis-prevent
-											className='max-h-full overflow-y-auto text-base sm:text-lg lg:text-xl'
+											className='max-h-full overflow-y-auto text-base sm:text-lg lg:text-xl [@media(max-height:500px)]:text-sm'
 										>
 											{prose[current]}
 											{isLast && (
@@ -282,19 +283,19 @@ export default function StoryDeck({
 					</div>
 
 					{/* Scroll cue: on to the next slide */}
-					<div className='mt-3 flex h-11 shrink-0 justify-center'>
+					<div className='mt-3 flex h-8 shrink-0 justify-center [@media(max-height:500px)]:mt-1'>
 						<AnimatePresence>
-							{slide < slides - 1 && (
+							{slide > 0 && slide < slides - 1 && (
 								<motion.button
 									key='cue'
 									type='button'
-									aria-label={slide === 0 ? 'My journey' : 'Next'}
+									aria-label='Next'
 									onClick={() => goTo(slide + 1)}
 									initial={{ opacity: 0, y: -6 }}
 									animate={{ opacity: 1, y: 0 }}
 									exit={{ opacity: 0, y: 6 }}
 									transition={{ duration: 0.3, ease }}
-									className='flex size-11 cursor-pointer items-center justify-center rounded-full bg-primary-500 text-white shadow-lg shadow-primary-500/30 transition-colors hover:bg-primary-400'
+									className='flex size-8 cursor-pointer items-center justify-center rounded-full bg-primary-500 text-white transition-colors hover:bg-primary-400'
 								>
 									<svg
 										viewBox='0 0 24 24'
@@ -304,7 +305,7 @@ export default function StoryDeck({
 										strokeLinecap='round'
 										strokeLinejoin='round'
 										aria-hidden='true'
-										className='story-cue size-5'
+										className='size-4'
 									>
 										<path d='M12 5v14M6 13l6 6 6-6' />
 									</svg>
