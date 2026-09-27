@@ -81,14 +81,6 @@ html.theme-switching::view-transition-new(root) {
 }
 
 /*
-  Blog posts: once the frame has opened up (app/components/layouts/open-frame.tsx),
-  code blocks break out of the text column by up to 6rem on each side.
-*/
-.post-body > :is(figure, pre) {
-	margin-inline: min(0px, max(-6rem, calc((1024px - 100vw) * 0.375)));
-}
-
-/*
   Home page (app/components/story/story-deck.tsx): the footer is pinned to
   the bottom of the screen and fades in on the last slide of the story.
 */

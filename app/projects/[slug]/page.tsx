@@ -37,19 +37,9 @@ export async function generateMetadata(props: {
 	};
 }
 
-function Section({
-	label,
-	wide = false,
-	children,
-}: {
-	label: string;
-	wide?: boolean;
-	children: ReactNode;
-}) {
+function Section({ label, children }: { label: string; children: ReactNode }) {
 	return (
-		<section
-			className={classNames('mx-auto w-full space-y-4', !wide && 'max-w-220')}
-		>
+		<section className='space-y-4'>
 			<h2 className='font-mono text-xs uppercase tracking-widest text-gray-500'>
 				{label}
 			</h2>
@@ -93,7 +83,7 @@ export default async function ProjectPage(props: {
 
 	return (
 		<article className='flex flex-col gap-12'>
-			<header className='mx-auto w-full max-w-220 space-y-5'>
+			<header className='space-y-5'>
 				<h1
 					className={classNames(
 						'text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl',
@@ -131,7 +121,7 @@ export default async function ProjectPage(props: {
 					alt={`${project.name}`}
 					fill
 					priority
-					sizes='(min-width: 1280px) 80rem, 100vw'
+					sizes='(min-width: 1024px) 55rem, 100vw'
 					className='object-cover object-top'
 				/>
 			</div>
@@ -156,19 +146,19 @@ export default async function ProjectPage(props: {
 			</Section>
 
 			{project.demo && (
-				<Section label='Demo' wide>
+				<Section label='Demo'>
 					<Demo src={project.demo} />
 				</Section>
 			)}
 
 			{project.screenshots?.length ? (
-				<Section label='Screenshots' wide>
+				<Section label='Screenshots'>
 					<ScreenshotGallery screenshots={project.screenshots} />
 				</Section>
 			) : null}
 
 			{project.architecture && (
-				<Section label='Architecture' wide>
+				<Section label='Architecture'>
 					<MermaidDiagram source={project.architecture} />
 				</Section>
 			)}

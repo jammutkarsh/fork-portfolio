@@ -7,9 +7,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 		<Fragment>
 			<ScrollProgressBar />
 			<OpenFrame>
-				<div className='mx-auto flex w-full max-w-220 flex-col gap-4'>
-					{children}
-				</div>
+				<div className='flex flex-col gap-4'>{children}</div>
 			</OpenFrame>
 		</Fragment>
 	);

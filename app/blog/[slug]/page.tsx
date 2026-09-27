@@ -60,7 +60,7 @@ export default async function Blog(props: {
 					<span>{readingTime}</span>
 				</div>
 			</section>
-			<article className='post-body min-w-0 break-words'>{content}</article>
+			<article className='min-w-0 break-words'>{content}</article>
 			{metadata.tags.length > 0 && (
 				<div className='mt-8 flex flex-wrap justify-center gap-2'>
 					{metadata.tags.map((tag) => (
