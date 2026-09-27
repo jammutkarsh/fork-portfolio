@@ -1,17 +1,18 @@
-import { Merriweather, Mukta } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
-export const mukta = Mukta({
-	weight: ['200', '300', '400', '500', '600', '700'],
-	variable: '--font-mukta',
+// utc-ds fonts: Inter for headings and body, JetBrains Mono for code and the
+// terminal-style accents. Exposed as CSS variables, which the design
+// system's --ds-font-sans / --ds-font-mono tokens use (app/utc-ds.css).
+export const inter = Inter({
+	weight: ['300', '400', '500', '600'],
+	variable: '--font-inter',
 	subsets: ['latin'],
 	display: 'swap',
-	preload: true,
 });
 
-export const merryWeather = Merriweather({
-	weight: ['300', '400', '700', '900'],
-	variable: '--font-merriweather',
+export const jetbrainsMono = JetBrains_Mono({
+	weight: ['400', '500', '600'],
+	variable: '--font-jetbrains-mono',
 	subsets: ['latin'],
 	display: 'swap',
-	preload: true,
 });

@@ -3,15 +3,14 @@
 import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, ViewTransition } from 'react';
-import { merryWeather } from '../../fonts';
+import { Fragment, useEffect, useState, ViewTransition } from 'react';
 import { openCommandMenu } from '../command-menu';
+import { terminalPath } from './terminal-path';
 import ThemeSwitch from './theme-switch/theme-switch';
 
 export const navLinks = [
-	{ href: '/blog', title: 'Blog' },
+	{ href: '/blogs', title: 'Blogs' },
 	{ href: '/projects', title: 'Projects' },
-	{ href: '/about', title: 'About' },
 	{ href: '/uses', title: 'Uses' },
 ];
 
@@ -65,22 +64,21 @@ export default function SiteNav() {
 	}, [open]);
 
 	return (
-		<header className='sticky top-0 z-20 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-300/20 dark:bg-black/80'>
+		<header className='sticky top-0 z-20 w-full border-b border-(--ds-border) bg-[color-mix(in_oklch,var(--ds-bg-secondary)_85%,transparent)] backdrop-blur-md'>
 			{/*
 				The links are rendered once (the active indicator is a named view
 				transition and must be unique): inline on desktop, inside the
 				collapsible hamburger panel on mobile.
 			*/}
 			<nav className='mx-auto flex w-full max-w-5xl flex-wrap items-center border-x border-gray-200 px-5 dark:border-gray-300/20 sm:h-16 sm:flex-nowrap sm:px-8 md:px-18'>
+				{/* Terminal-style brand: the current path, e.g. ~/utc/blog */}
 				<Link
 					href='/'
 					aria-label='Home'
-					className={classNames(
-						'order-1 flex h-14 items-center text-lg font-bold sm:h-auto',
-						merryWeather.className,
-					)}
+					className='order-1 flex h-14 min-w-0 items-center font-mono text-sm font-semibold text-(--ds-text-primary) sm:h-auto'
 				>
-					UC
+					<span className='text-primary-500'>~/</span>
+					<span className='truncate'>{terminalPath(pathname).slice(2)}</span>
 				</Link>
 
 				{/* Mobile: hamburger toggle */}
@@ -122,47 +120,56 @@ export default function SiteNav() {
 					)}
 				>
 					<div className='min-h-0 overflow-hidden sm:overflow-visible'>
-						<div className='flex flex-col items-start gap-1 pt-1 pb-4 text-base sm:flex-row sm:items-center sm:gap-6 sm:p-0'>
-							{navLinks.map(({ href, title }) => {
+						<div className='flex flex-col items-start gap-1 pt-1 pb-4 text-sm font-semibold sm:flex-row sm:items-center sm:gap-0 sm:p-0'>
+							{navLinks.map(({ href, title }, index) => {
 								const isActive =
 									pathname === href || pathname.startsWith(`${href}/`);
 								return (
-									<Link
-										key={href}
-										href={href}
-										aria-current={isActive ? 'page' : undefined}
-										className={classNames(
-											'relative py-2 motion-safe:transition-colors motion-safe:duration-200 sm:py-1',
-											isActive
-												? 'text-black dark:text-white'
-												: 'text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white',
-										)}
-									>
-										{title}
-										{isActive && (
-											// Named view transition: on navigation the browser morphs
-											// this bar from the previous link to the new one.
-											<ViewTransition
-												name='nav-indicator'
-												share='nav-indicator'
-												default='none'
+									<Fragment key={href}>
+										{index > 0 && (
+											<span
+												aria-hidden='true'
+												className='hidden px-1 font-mono font-normal text-(--ds-text-tertiary) select-none sm:inline'
 											>
-												<span className='absolute inset-x-0 bottom-1 h-0.5 rounded-full bg-primary-500 sm:bottom-0' />
-											</ViewTransition>
+												|
+											</span>
 										)}
-									</Link>
+										<Link
+											href={href}
+											aria-current={isActive ? 'page' : undefined}
+											className={classNames(
+												'relative py-2 motion-safe:transition-colors motion-safe:duration-150 sm:px-2 sm:py-1',
+												isActive
+													? 'text-primary-500'
+													: 'text-(--ds-text-primary) hover:text-primary-500',
+											)}
+										>
+											{title}
+											{isActive && (
+												// Named view transition: on navigation the browser morphs
+												// this bar from the previous link to the new one.
+												<ViewTransition
+													name='nav-indicator'
+													share='nav-indicator'
+													default='none'
+												>
+													<span className='absolute inset-x-0 bottom-1 h-px bg-primary-500 sm:inset-x-2 sm:bottom-0' />
+												</ViewTransition>
+											)}
+										</Link>
+									</Fragment>
 								);
 							})}
 
 							{/* Mobile-only: search and theme inside the menu */}
-							<div className='mt-2 flex w-full items-center justify-between border-t border-gray-200 pt-3 dark:border-gray-300/20 sm:hidden'>
+							<div className='mt-2 flex w-full items-center justify-between border-t border-dashed border-(--ds-border-strong) pt-3 sm:hidden'>
 								<button
 									type='button'
 									onClick={() => {
 										setOpen(false);
 										openCommandMenu();
 									}}
-									className='-ml-1 flex cursor-pointer items-center gap-2 py-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white'
+									className='-ml-1 flex cursor-pointer items-center gap-2 py-2 text-(--ds-text-secondary) hover:text-primary-500'
 								>
 									<SearchIcon className='h-5 w-5' />
 									Search
@@ -174,14 +181,14 @@ export default function SiteNav() {
 				</div>
 
 				{/* Desktop: ⌘K and theme */}
-				<div className='order-3 hidden items-center sm:flex'>
+				<div className='order-3 hidden items-center gap-1 sm:flex'>
 					<button
 						type='button'
 						onClick={openCommandMenu}
 						aria-label='Open command menu'
-						className='cursor-pointer rounded-md border border-gray-300 px-2 py-0.5 text-xs text-gray-600 hover:text-black dark:border-gray-700 dark:text-gray-400 dark:hover:text-white'
+						className='cursor-pointer rounded-(--ds-radius) border border-(--ds-border-strong) px-2 py-0.5 font-mono text-xs text-(--ds-text-secondary) hover:border-primary-500 hover:text-primary-500'
 					>
-						<kbd className='font-sans'>⌘K</kbd>
+						<kbd className='font-mono'>⌘K</kbd>
 					</button>
 					<ThemeSwitch className='-mr-2 flex items-center' />
 				</div>

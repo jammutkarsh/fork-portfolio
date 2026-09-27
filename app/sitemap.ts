@@ -1,4 +1,5 @@
-import { getPosts } from './blog/utils';
+import { getPosts } from './blogs/utils';
+import { getProjects } from './projects/utils';
 import siteMetadata from './site-metadata';
 
 export default async function sitemap() {
@@ -6,14 +7,19 @@ export default async function sitemap() {
 	const posts = getPosts();
 
 	const blogs = posts.map((post) => ({
-		url: `${baseUrl}/blog/${post.slug}`,
+		url: `${baseUrl}/blogs/${post.slug}`,
 		lastModified: post.metadata.publishedAt,
 	}));
 
-	const routes = ['', 'blog', 'projects', 'about', 'uses'].map((route) => ({
+	const projects = getProjects().map((project) => ({
+		url: `${baseUrl}/projects/${project.slug}`,
+		lastModified: new Date().toISOString().split('T')[0],
+	}));
+
+	const routes = ['', 'blogs', 'projects', 'uses'].map((route) => ({
 		url: route === '' ? `${baseUrl}/` : `${baseUrl}/${route}`,
 		lastModified: new Date().toISOString().split('T')[0],
 	}));
 
-	return [...routes, ...blogs];
+	return [...routes, ...blogs, ...projects];
 }

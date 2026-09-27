@@ -5,12 +5,15 @@ import ThemeProvider from 'app/components/providers/ThemeProvider';
 import siteMetadata from 'app/site-metadata';
 import type { Metadata } from 'next';
 import { type ReactNode, ViewTransition } from 'react';
-import { getPosts } from './blog/utils';
+import { getPosts } from './blogs/utils';
 import CommandMenu from './components/command-menu';
+import { FrameProvider } from './components/layouts/frame';
 import SiteFooter from './components/layouts/site-footer';
 import SiteNav from './components/layouts/site-nav';
-import { mukta } from './fonts';
+import { inter, jetbrainsMono } from './fonts';
+import { getProjects } from './projects/utils';
 import './tailwind.css';
+import './utc-ds.css';
 import './site.css';
 
 export const metadata: Metadata = {
@@ -41,7 +44,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
 	}));
 
 	return (
-		<html lang='en' suppressHydrationWarning className={mukta.className}>
+		<html
+			lang='en'
+			suppressHydrationWarning
+			className={`${inter.variable} ${jetbrainsMono.variable}`}
+		>
 			<head>
 				<link
 					rel='apple-touch-icon'
@@ -63,23 +70,31 @@ export default function RootLayout({ children }: RootLayoutProps) {
 				<meta name='msapplication-TileColor' content='#000000' />
 				<meta name='theme-color' content='#000000' />
 			</head>
-			<body className='bg-white text-black antialiased dark:bg-black dark:text-white selection:bg-primary-500 selection:text-white'>
+			<body className='antialiased'>
 				<GoogleTagManager gtmId='G-65F69D270G' />
 				<ThemeProvider
-					attribute='class'
+					attribute={['class', 'data-theme']}
 					defaultTheme='dark'
 					themes={['dark', 'light']}
 				>
 					<LenisProvider>
-						<div className='flex min-h-svh flex-col'>
-							<SiteNav />
-							{/* Page content crossfades on navigation; nav/footer stay put. */}
-							<ViewTransition default='page'>
-								<div className='flex flex-1 flex-col'>{children}</div>
-							</ViewTransition>
-							<SiteFooter />
-						</div>
-						<CommandMenu posts={commandMenuPosts} />
+						<FrameProvider>
+							<div className='flex min-h-svh flex-col'>
+								<SiteNav />
+								{/* Page content crossfades on navigation; nav/footer stay put. */}
+								<ViewTransition default='page'>
+									<div className='flex flex-1 flex-col'>{children}</div>
+								</ViewTransition>
+								<SiteFooter />
+							</div>
+							<CommandMenu
+								posts={commandMenuPosts}
+								projects={getProjects().map(({ slug, name }) => ({
+									slug,
+									name,
+								}))}
+							/>
+						</FrameProvider>
 					</LenisProvider>
 					{process.env.NODE_ENV === 'production' && <Analytics />}
 				</ThemeProvider>

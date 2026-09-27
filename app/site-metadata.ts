@@ -30,27 +30,12 @@ const siteMetadata = {
 	siteUrl: getDeploymentURL(),
 	siteRepo: 'https://github.com/jammutkarsh/fork-portfolio',
 	siteLogo: '/static/favicons/favicon.png',
-	image: '/images/avatar.jpg',
+	image: '/images/avatar.png',
 	email: 'mail@utkarshchourasia.in',
 	github: 'https://github.com/jammutkarsh',
 	twitter: 'https://twitter.com/jammutkarsh',
 	linkedin: 'https://www.linkedin.com/in/jammutkarsh',
 	locale: 'en-US',
-	comment: {
-		provider: 'giscus',
-		giscusConfig: {
-			repo: process.env.NEXT_PUBLIC_GISCUS_REPO || '',
-			repositoryId: process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID || '',
-			category: process.env.NEXT_PUBLIC_GISCUS_CATEGORY || '',
-			categoryId: process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || '',
-			mapping: 'pathname',
-			reactions: '1',
-			metadata: '0',
-			theme: 'light',
-			darkTheme: 'transparent_dark',
-			themeURL: '',
-		},
-	},
 };
 
 export default siteMetadata;
