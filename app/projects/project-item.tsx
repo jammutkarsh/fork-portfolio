@@ -23,10 +23,10 @@ export default function ProjectItem({
 			}}
 			className='group flex w-full items-center justify-between gap-6 border-b border-dashed border-(--ds-border-strong) px-4 py-10 sm:px-10 sm:py-16'
 		>
-			<h2 className='text-2xl font-light tracking-[-0.04em] transition-[color,transform] group-hover:-translate-x-3 group-hover:text-primary-500 sm:text-6xl'>
+			<h2 className='text-2xl font-light tracking-[-0.04em] transition-colors duration-150 group-hover:text-primary-500 sm:text-6xl'>
 				{project.name}
 			</h2>
-			<p className='text-right font-mono text-xs text-(--ds-text-secondary) transition-transform group-hover:translate-x-3 sm:text-sm'>
+			<p className='text-right font-mono text-xs text-(--ds-text-secondary) transition-colors duration-150 group-hover:text-(--ds-text-primary) sm:text-sm'>
 				{project.stack.slice(0, 3).join(' · ')}
 			</p>
 		</Link>

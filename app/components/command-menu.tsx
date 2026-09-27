@@ -5,10 +5,10 @@ import { useLenis } from 'lenis/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
-	type ComponentProps,
-	type ReactNode,
-	useCallback,
+	type KeyboardEvent,
 	useEffect,
+	useMemo,
+	useRef,
 	useState,
 } from 'react';
 import siteMetadata from '../site-metadata';
@@ -27,6 +27,11 @@ export interface CommandMenuPost {
 	title: string;
 }
 
+export interface CommandMenuProject {
+	slug: string;
+	name: string;
+}
+
 const pages = [
 	{ href: '/', title: 'Home' },
 	{ href: '/blog', title: 'Blog' },
@@ -41,8 +46,62 @@ const socials = [
 	{ href: `mailto:${siteMetadata.email}`, title: 'email' },
 ];
 
-export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
+/** Something the menu can run: a page (with a terminal path) or a command. */
+interface Entry {
+	id: string;
+	label: string;
+	/** Shown dimmed on the right, e.g. a post's title. */
+	hint?: string;
+	/** For pages: the terminal path, e.g. ~/utc/blog. */
+	path?: string;
+	run: () => void;
+}
+
+/**
+ * Path mode (input starts with ~): like a shell, the pages in the folder
+ * being typed whose name starts with the typed part (~/utc/ lists blog,
+ * projects, uses; ~/utc/blog/ho lists the posts starting with "ho").
+ * Otherwise search mode: every entry whose path, label or title contains
+ * the text.
+ */
+function complete(entries: Entry[], query: string) {
+	const typed = query.trim().toLowerCase();
+	if (typed.startsWith('~')) {
+		const depth = typed.split('/').length;
+		return entries
+			.filter(
+				(entry) =>
+					entry.path?.toLowerCase().startsWith(typed) &&
+					entry.path.split('/').length === depth,
+			)
+			.sort((a, b) => (a.path ?? '').localeCompare(b.path ?? ''));
+	}
+	if (!typed) return entries;
+	return entries.filter((entry) =>
+		[entry.path, entry.label, entry.hint]
+			.filter(Boolean)
+			.some((text) => text?.toLowerCase().includes(typed)),
+	);
+}
+
+/**
+ * The command menu as a shell prompt. It opens with the current page's
+ * path already typed (~/utc/blog/some-post); edit it like a path, and the
+ * list below autocompletes the pages under it. Tab completes to the
+ * highlighted path, Enter goes there. Anything that isn't a path searches
+ * pages, posts, projects and commands (open github, theme --light).
+ */
+export default function CommandMenu({
+	posts,
+	projects,
+}: {
+	posts: CommandMenuPost[];
+	projects: CommandMenuProject[];
+}) {
 	const [open, setOpen] = useState(false);
+	const [query, setQuery] = useState('');
+	const [selected, setSelected] = useState('');
+	const input = useRef<HTMLInputElement>(null);
 	const router = useRouter();
 	const cwd = terminalPath(usePathname());
 	const { resolvedTheme, setTheme } = useTheme();
@@ -51,15 +110,12 @@ export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
 	// Lenis smooth-scroll hijacks wheel events page-wide; pause it while the
 	// menu is open so the page behind stays put.
 	useEffect(() => {
-		if (open) {
-			lenis?.stop();
-		} else {
-			lenis?.start();
-		}
+		if (open) lenis?.stop();
+		else lenis?.start();
 	}, [open, lenis]);
 
 	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDown = (event: globalThis.KeyboardEvent) => {
 			if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
 				event.preventDefault();
 				setOpen((value) => !value);
@@ -74,20 +130,95 @@ export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
 		};
 	}, []);
 
-	const run = useCallback((action: () => void) => {
-		setOpen(false);
-		action();
-	}, []);
+	// Each time it opens, start from the current page's path, caret at the end.
+	useEffect(() => {
+		if (!open) return;
+		setQuery(cwd);
+		requestAnimationFrame(() => {
+			const field = input.current;
+			field?.setSelectionRange(field.value.length, field.value.length);
+		});
+	}, [open, cwd]);
 
-	const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+	const entries = useMemo<Entry[]>(() => {
+		const go = (href: string) => () => {
+			setOpen(false);
+			router.push(href);
+		};
+		const page = (href: string, hint?: string): Entry => ({
+			id: href,
+			label: terminalPath(href),
+			hint,
+			path: terminalPath(href),
+			run: go(href),
+		});
+		const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+		return [
+			...pages.map((p) => page(p.href)),
+			...posts.map((post) => page(`/blog/${post.slug}`, post.title)),
+			...projects.map((project) =>
+				page(`/projects/${project.slug}`, project.name),
+			),
+			...socials.map((social) => ({
+				id: `open ${social.title}`,
+				label: `open ${social.title}`,
+				run: () => {
+					setOpen(false);
+					window.open(social.href, '_blank', 'noopener,noreferrer');
+				},
+			})),
+			{
+				id: 'theme',
+				label: `theme --${nextTheme}`,
+				run: () => {
+					setOpen(false);
+					switchTheme(() => setTheme(nextTheme));
+				},
+			},
+		];
+	}, [posts, projects, resolvedTheme, router, setTheme]);
 
-	// A terminal window (utc-ds .terminal): the title bar and the prompt show
-	// the current page as a path, and entries read like paths or commands.
+	const matches = useMemo(() => complete(entries, query), [entries, query]);
+
+	// Keep the first match highlighted as the list changes.
+	useEffect(() => {
+		setSelected(matches[0]?.id ?? '');
+	}, [matches]);
+
+	// Tab completes the input to the highlighted path, with a trailing slash
+	// when there is more below it (~/utc/blog/).
+	const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+		if (event.key !== 'Tab') return;
+		event.preventDefault();
+		const path = entries.find((entry) => entry.id === selected)?.path;
+		if (!path) return;
+		const hasChildren = entries.some((entry) =>
+			entry.path?.startsWith(`${path}/`),
+		);
+		setQuery(hasChildren ? `${path}/` : path);
+	};
+
+	const pathMode = query.trim().startsWith('~');
+	// In path mode the list shows names within the folder being typed, like
+	// a shell's completions (blog/, projects/, some-post); folders get a /.
+	const shown = (entry: Entry) => {
+		if (!pathMode || !entry.path) return entry.label;
+		const name = entry.path.slice(entry.path.lastIndexOf('/') + 1);
+		const isFolder = entries.some((other) =>
+			other.path?.startsWith(`${entry.path}/`),
+		);
+		return isFolder ? `${name}/` : name;
+	};
+
+	// A terminal window (utc-ds .terminal).
 	return (
 		<Command.Dialog
 			open={open}
 			onOpenChange={setOpen}
 			label='Command menu'
+			shouldFilter={false}
+			value={selected}
+			onValueChange={setSelected}
 			overlayClassName='fixed inset-0 z-40 bg-black/50 backdrop-blur-sm'
 			contentClassName='fixed left-1/2 top-[15vh] z-50 w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 overflow-hidden rounded-(--ds-radius-lg) border border-(--ds-border-strong) bg-(--ds-bg-code) font-mono text-(--ds-text-primary)'
 		>
@@ -100,101 +231,44 @@ export default function CommandMenu({ posts }: { posts: CommandMenuPost[] }) {
 				</span>
 			</div>
 			<div className='flex items-center gap-2 border-b border-(--ds-border) px-4 py-3 text-sm'>
-				<span className='max-w-[60%] shrink-0 truncate select-none'>
-					<span className='text-primary-500'>{cwd}</span>
-					<span className='text-(--ds-success)'> $</span>
-				</span>
+				<span className='shrink-0 text-(--ds-success) select-none'>$</span>
 				<Command.Input
-					placeholder='type a command or search…'
-					className='min-w-0 flex-1 bg-transparent outline-none placeholder:text-(--ds-text-tertiary)'
+					ref={input}
+					value={query}
+					onValueChange={setQuery}
+					onKeyDown={onInputKeyDown}
+					placeholder='type a path or a command…'
+					spellCheck={false}
+					autoCapitalize='off'
+					className='min-w-0 flex-1 bg-transparent text-primary-500 caret-(--ds-text-primary) outline-none placeholder:text-(--ds-text-tertiary)'
 				/>
+				<kbd className='hidden shrink-0 text-xs text-(--ds-text-tertiary) sm:inline'>
+					tab ↹
+				</kbd>
 			</div>
 			<Command.List
 				data-lenis-prevent
 				className='max-h-[min(19rem,60vh)] overflow-y-auto overscroll-contain p-2'
 			>
 				<Command.Empty className='py-6 text-center text-sm text-(--ds-text-secondary)'>
-					command not found
+					{pathMode ? 'no such file or directory' : 'command not found'}
 				</Command.Empty>
-
-				<Group heading='cd'>
-					{pages.map(({ href, title }) => (
-						<Item
-							key={href}
-							value={`${title} ${terminalPath(href)}`}
-							onSelect={() => run(() => router.push(href))}
-						>
-							{terminalPath(href)}
-						</Item>
-					))}
-				</Group>
-
-				{posts.length > 0 && (
-					<Group heading='posts'>
-						{posts.map((post) => (
-							<Item
-								key={post.slug}
-								value={`${post.title} ${post.slug}`}
-								onSelect={() => run(() => router.push(`/blog/${post.slug}`))}
-							>
-								<span className='truncate'>{post.title}</span>
-								<span className='ml-auto hidden shrink-0 pl-4 text-xs text-(--ds-text-tertiary) sm:inline'>
-									{terminalPath(`/blog/${post.slug}`)}
-								</span>
-							</Item>
-						))}
-					</Group>
-				)}
-
-				<Group heading='open'>
-					{socials.map(({ href, title }) => (
-						<Item
-							key={title}
-							value={`open ${title}`}
-							onSelect={() =>
-								run(() => window.open(href, '_blank', 'noopener,noreferrer'))
-							}
-						>
-							open {title}
-						</Item>
-					))}
-				</Group>
-
-				<Group heading='theme'>
-					<Item
-						value={`theme ${nextTheme} switch`}
-						onSelect={() => run(() => switchTheme(() => setTheme(nextTheme)))}
+				{matches.map((entry) => (
+					<Command.Item
+						key={entry.id}
+						value={entry.id}
+						onSelect={entry.run}
+						className='flex cursor-pointer items-center rounded-(--ds-radius) px-2 py-1.5 text-sm before:mr-2 before:text-(--ds-text-tertiary) before:content-[">"] data-[selected=true]:bg-(--ds-primary-muted) data-[selected=true]:text-primary-500'
 					>
-						theme --{nextTheme}
-					</Item>
-				</Group>
+						<span className='truncate'>{shown(entry)}</span>
+						{entry.hint && (
+							<span className='ml-auto hidden shrink-0 pl-4 text-xs text-(--ds-text-tertiary) sm:inline'>
+								{entry.hint}
+							</span>
+						)}
+					</Command.Item>
+				))}
 			</Command.List>
 		</Command.Dialog>
-	);
-}
-
-function Group({
-	heading,
-	children,
-}: {
-	heading: string;
-	children: ReactNode;
-}) {
-	return (
-		<Command.Group
-			heading={heading}
-			className='[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-(--ds-text-tertiary) [&_[cmdk-group-heading]]:before:content-["#_"]'
-		>
-			{children}
-		</Command.Group>
-	);
-}
-
-function Item(props: ComponentProps<typeof Command.Item>) {
-	return (
-		<Command.Item
-			{...props}
-			className='flex cursor-pointer items-center rounded-(--ds-radius) px-2 py-1.5 text-sm before:mr-2 before:text-(--ds-text-tertiary) before:content-[">"] data-[selected=true]:bg-(--ds-primary-muted) data-[selected=true]:text-primary-500'
-		/>
 	);
 }

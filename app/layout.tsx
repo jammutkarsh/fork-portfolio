@@ -11,6 +11,7 @@ import { FrameProvider } from './components/layouts/frame';
 import SiteFooter from './components/layouts/site-footer';
 import SiteNav from './components/layouts/site-nav';
 import { inter, jetbrainsMono } from './fonts';
+import { getProjects } from './projects/utils';
 import './tailwind.css';
 import './utc-ds.css';
 import './site.css';
@@ -86,7 +87,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
 								</ViewTransition>
 								<SiteFooter />
 							</div>
-							<CommandMenu posts={commandMenuPosts} />
+							<CommandMenu
+								posts={commandMenuPosts}
+								projects={getProjects().map(({ slug, name }) => ({
+									slug,
+									name,
+								}))}
+							/>
 						</FrameProvider>
 					</LenisProvider>
 					{process.env.NODE_ENV === 'production' && <Analytics />}
