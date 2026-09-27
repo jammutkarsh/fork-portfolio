@@ -36,12 +36,12 @@ or `app/components/mdx.tsx`.
 
 **Only ours: upstream never touches these, so they never conflict**
 
-- `app/site-metadata.ts`: name, links, bio, Giscus config
-- `content/`: blog posts (`content/blog`), about page (`content/about.mdx`)
+- `app/site-metadata.ts`: name, links, bio
+- `content/`: blog posts (`content/blog`), home page story (`content/story.mdx`), projects (`content/projects`)
 - `app/site.css`: fork-only styles (view transitions)
 - `app/components/layouts/site-nav.tsx`, `site-footer.tsx`, `command-menu.tsx`,
-  `blog-explorer.tsx`, `tag.tsx`, `comments/`, `og/`
-- `app/about/`, `app/blog/[slug]/toc-inline.tsx`, `app/blog/[slug]/extract-headings.ts`
+  `blog-explorer.tsx`, `tag.tsx`, `og/`, `story/`
+- `app/blog/[slug]/toc-inline.tsx`, `app/blog/[slug]/extract-headings.ts`
   (rewritten; port upstream changes to it by hand if they matter), `app/blog/kebab-case.ts`,
   `app/components/layouts/theme-switch/switch-theme.ts`
 - `assets/fonts/`, `public/images/`, `scripts/`, this file

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import PostComments from '../../components/comments/post-comments';
 import Tag from '../../components/tag';
 import siteMetadata from '../../site-metadata';
 import { formatDate, getPostFromSlug, getPosts } from '../utils';
@@ -69,7 +68,6 @@ export default async function Blog(props: {
 					))}
 				</div>
 			)}
-			<PostComments />
 		</>
 	);
 }

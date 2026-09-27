@@ -18,13 +18,7 @@ cd fork-portfolio
 npm install
 ```
 
-2. Create a `.env.local` file following the `.env.example` and fill in the Giscus values
-
-```bash
-cp .env.example .env.local
-```
-
-3. Run the development server
+2. Run the development server
 
 ```bash
 npm run dev
@@ -33,9 +27,9 @@ npm run dev
 ## Writing content
 
 - Blog posts: `content/blog/*.mdx` (frontmatter: `title`, `date`, `tags`, `draft`, `summary`)
-- About page: `content/about.mdx`
+- Home page story: `content/story.mdx` (one `## Title` section per phase; phase years and sketches in the frontmatter)
 - Uses page: `app/uses/content.mdx`
-- Projects: `app/projects/constants.ts` (preview images go in `public/static/images/project/`)
+- Projects: `content/projects/*.mdx`, one file per project (images go in `public/static/images/project/<name>/`)
 
 ## Licence
 
