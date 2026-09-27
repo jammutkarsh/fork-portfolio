@@ -32,18 +32,13 @@ export default function TOCInline({
 	);
 
 	const tocList = (
-		<ul className='list-disc pl-5 py-2 space-y-1'>
+		<ul className='py-2'>
 			{filteredToc.map((heading) => (
 				<li
 					key={heading.id}
 					className={heading.level >= indentDepth ? 'ml-6' : undefined}
 				>
-					<a
-						href={`#${heading.id}`}
-						className='border-b border-primary-500 text-gray-900 dark:text-gray-100 hover:text-primary-500'
-					>
-						{heading.text}
-					</a>
+					<a href={`#${heading.id}`}>{heading.text}</a>
 				</li>
 			))}
 		</ul>
@@ -55,7 +50,7 @@ export default function TOCInline({
 
 	return (
 		<details open>
-			<summary className='pt-2 pb-2 text-xl font-bold'>
+			<summary className='cursor-pointer pt-2 pb-2 font-mono text-sm text-(--ds-text-secondary)'>
 				Table of Contents
 			</summary>
 			{tocList}

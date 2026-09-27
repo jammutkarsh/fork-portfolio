@@ -52,15 +52,17 @@ export default async function Blog(props: {
 		<>
 			<section>
 				<PageTitle>{metadata.title}</PageTitle>
-				<div className='flex flex-wrap gap-2 items-center mt-2 text-sm text-neutral-600 dark:text-neutral-400'>
+				<div className='meta mt-4'>
 					<time dateTime={metadata.publishedAt}>
 						{formatDate(metadata.publishedAt)}
 					</time>
-					<span aria-hidden>·</span>
+					<span aria-hidden className='sep'>
+						|
+					</span>
 					<span>{readingTime}</span>
 				</div>
 			</section>
-			<article className='min-w-0 break-words'>{content}</article>
+			<article className='ds-prose min-w-0 break-words'>{content}</article>
 			{metadata.tags.length > 0 && (
 				<div className='mt-8 flex flex-wrap justify-center gap-2'>
 					{metadata.tags.map((tag) => (

@@ -93,17 +93,17 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 					value={query}
 					onChange={(event) => setQuery(event.target.value)}
 					placeholder='Search posts…'
-					className='w-full rounded-md border border-gray-300 bg-transparent px-4 py-2 pr-10 text-black outline-none placeholder:text-gray-500 focus:border-primary-500 dark:border-gray-700 dark:text-white'
+					className='w-full rounded-(--ds-radius) border border-(--ds-border-strong) bg-(--ds-bg-secondary) px-4 py-2 pr-10 font-mono text-sm text-(--ds-text-primary) outline-none placeholder:text-(--ds-text-tertiary) focus:border-primary-500'
 				/>
 				<kbd
 					hidden={query !== ''}
-					className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-gray-300 px-1.5 text-xs text-gray-500 dark:border-gray-700'
+					className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-(--ds-radius-sm) border border-(--ds-border-strong) px-1.5 font-mono text-xs text-(--ds-text-tertiary)'
 				>
 					/
 				</kbd>
 			</div>
 
-			<fieldset className='flex flex-wrap gap-2'>
+			<fieldset className='flex flex-wrap gap-x-3 gap-y-2'>
 				<legend className='sr-only'>Filter by tag</legend>
 				<TagChip active={activeTag === null} onClick={() => selectTag(null)}>
 					All ({posts.length})
@@ -126,7 +126,7 @@ export function BlogExplorer({ posts, tags, tagNames }: Props) {
 					onTagSelect={selectTag}
 				/>
 			) : (
-				<p className='py-10 text-center text-gray-500 dark:text-gray-400'>
+				<p className='py-10 text-center font-mono text-sm text-(--ds-text-secondary)'>
 					No posts found.
 				</p>
 			)}
@@ -149,10 +149,11 @@ function TagChip({
 			aria-pressed={active}
 			onClick={onClick}
 			className={classNames(
-				'cursor-pointer rounded-md border px-2.5 py-0.5 text-xs uppercase motion-safe:transition-colors motion-safe:duration-200',
+				// utc-ds badge look: a bracket-wrapped [tag (n)]
+				'badge cursor-pointer',
 				active
-					? 'border-primary-500 bg-primary-500 text-white'
-					: 'border-gray-300 text-gray-600 hover:border-primary-500 hover:text-primary-500 dark:border-gray-700 dark:text-gray-400',
+					? 'bg-(--ds-primary-muted) text-primary-500'
+					: 'text-(--ds-text-secondary) hover:text-primary-500',
 			)}
 		>
 			{children}

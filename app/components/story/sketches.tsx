@@ -6,7 +6,7 @@ import type { ReactNode, SVGProps } from 'react';
   the site's thin borders instead of looking like clip art.
 */
 
-const ACCENT = '#de1d8d';
+const ACCENT = '#ff5f00'; // utc-ds --ds-primary
 
 const dot = (cx: number, cy: number, r = 1.4, fill = 'currentColor') => (
 	<circle cx={cx} cy={cy} r={r} fill={fill} stroke='none' />

@@ -12,10 +12,10 @@ import { Sketch } from './sketches';
   that must hide what's behind them are filled with the page background.
 */
 
-const ACCENT = '#de1d8d';
+const ACCENT = '#ff5f00'; // utc-ds --ds-primary
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, monospace';
-const BG = 'fill-white dark:fill-black';
-const SCREEN = 'fill-gray-100 dark:fill-gray-900';
+const BG = 'fill-(--ds-bg-primary)';
+const SCREEN = 'fill-(--ds-bg-code)';
 const ease = [0.22, 1, 0.36, 1] as const;
 
 // The framed print on the wall, and the wall calendar next to it.
@@ -43,7 +43,7 @@ export default function DeskScene({
 			strokeWidth={1.5}
 			strokeLinecap='round'
 			strokeLinejoin='round'
-			className='h-auto w-full text-gray-900 dark:text-gray-100'
+			className='h-auto w-full text-(--ds-text-primary)'
 		>
 			<title>My desk, changing with each phase</title>
 

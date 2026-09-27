@@ -39,6 +39,8 @@ or `app/components/mdx.tsx`.
 - `app/site-metadata.ts`: name, links, bio
 - `content/`: blog posts (`content/blog`), home page story (`content/story.mdx`), projects (`content/projects`)
 - `app/site.css`: fork-only styles (view transitions)
+- `app/utc-ds.css`: the utc-ds design system (vendored from jammutkarsh/design-system)
+- `app/fonts.ts`: Inter and JetBrains Mono (utc-ds fonts)
 - `app/components/layouts/site-nav.tsx`, `site-footer.tsx`, `command-menu.tsx`,
   `blog-explorer.tsx`, `tag.tsx`, `og/`, `story/`
 - `app/blog/[slug]/toc-inline.tsx`, `app/blog/[slug]/extract-headings.ts`
@@ -58,7 +60,8 @@ or `app/components/mdx.tsx`.
 (upstream `thoughts.tsx`), `app/components/mdx.tsx`, `app/components/layouts/page-container.tsx`,
 `app/components/layouts/theme-switch/theme-switch.tsx`, `app/components/analytics/analytics.tsx`,
 `app/not-found.tsx`, `app/projects/page.tsx`, `app/uses/page.tsx`, `app/uses/uses-title.tsx`,
-`next.config.ts`, `package.json`
+`next.config.ts`, `package.json`, `app/tailwind.css` (only the `@theme` colours: primary,
+gray and black map onto the utc-ds tokens)
 
 **Removed upstream features:** see `.upstream-exclude`.
 
@@ -67,7 +70,8 @@ or `app/components/mdx.tsx`.
 - Put personal data in `app/site-metadata.ts` or `content/`, not inline in components.
 - Build new features as **new files** and hook them in with a line or two, instead
   of rewriting upstream files.
-- Add styles to `app/site.css`, and leave `app/tailwind.css` identical to upstream.
+- Add styles to `app/site.css`. In `app/tailwind.css`, only the `@theme` colours differ
+  from upstream (they come from utc-ds); leave the rest identical.
 - Don't reformat or reorder upstream files. Biome uses upstream's config, so
   `npm run lint` keeps the formatting the same.
 - If you drop another upstream feature, add its paths to `.upstream-exclude`.

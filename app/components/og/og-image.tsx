@@ -6,12 +6,13 @@ import siteMetadata from '../../site-metadata';
 export const ogSize = { width: 1200, height: 630 };
 export const ogContentType = 'image/png';
 
+// utc-ds dark theme tokens (app/utc-ds.css).
 const colors = {
-	background: '#000000',
-	border: '#262626',
-	text: '#ffffff',
-	muted: '#a3a3a3',
-	primary: '#de1d8d',
+	background: '#0a0a0a',
+	border: '#333333',
+	text: '#e8e8e8',
+	muted: '#888888',
+	primary: '#ff5f00',
 };
 
 interface OgImageOptions {
@@ -45,14 +46,14 @@ export async function renderOgImage({
 	meta,
 	tags = [],
 }: OgImageOptions) {
-	const [merriweather, muktaRegular, muktaSemiBold, avatar] = await Promise.all(
-		[
-			fs.readFile(path.join(fontsDir, 'Merriweather-700.ttf')),
-			fs.readFile(path.join(fontsDir, 'Mukta-400.ttf')),
-			fs.readFile(path.join(fontsDir, 'Mukta-600.ttf')),
+	const [interLight, interMedium, monoRegular, monoMedium, avatar] =
+		await Promise.all([
+			fs.readFile(path.join(fontsDir, 'Inter-300.ttf')),
+			fs.readFile(path.join(fontsDir, 'Inter-500.ttf')),
+			fs.readFile(path.join(fontsDir, 'JetBrainsMono-400.ttf')),
+			fs.readFile(path.join(fontsDir, 'JetBrainsMono-500.ttf')),
 			fs.readFile(avatarPath),
-		],
-	);
+		]);
 	const avatarSrc = `data:image/jpeg;base64,${avatar.toString('base64')}`;
 	const titleSize = title.length > 70 ? 48 : title.length > 40 ? 58 : 68;
 	const siteHost = new URL(siteMetadata.siteUrl).host.startsWith('localhost')
@@ -68,7 +69,8 @@ export async function renderOgImage({
 				padding: '0 80px',
 				backgroundColor: colors.background,
 				color: colors.text,
-				fontFamily: 'Mukta',
+				fontFamily: 'Inter',
+				fontWeight: 300,
 			}}
 		>
 			<div
@@ -92,10 +94,25 @@ export async function renderOgImage({
 						borderBottom: `1px solid ${colors.border}`,
 					}}
 				>
-					<span style={{ fontFamily: 'Merriweather', fontSize: 26 }}>
+					<span
+						style={{
+							display: 'flex',
+							fontFamily: 'JetBrains Mono',
+							fontSize: 26,
+						}}
+					>
+						<span style={{ color: colors.primary }}>~/</span>
 						{siteMetadata.title}
 					</span>
-					<span style={{ fontSize: 24, color: colors.muted }}>{siteHost}</span>
+					<span
+						style={{
+							fontFamily: 'JetBrains Mono',
+							fontSize: 22,
+							color: colors.muted,
+						}}
+					>
+						{siteHost}
+					</span>
 				</div>
 
 				{/* Body */}
@@ -109,8 +126,9 @@ export async function renderOgImage({
 				>
 					<span
 						style={{
-							fontSize: 24,
-							fontWeight: 600,
+							fontFamily: 'JetBrains Mono',
+							fontSize: 22,
+							fontWeight: 500,
 							color: colors.primary,
 							textTransform: 'uppercase',
 							letterSpacing: 4,
@@ -121,9 +139,11 @@ export async function renderOgImage({
 					<span
 						style={{
 							marginTop: 12,
-							fontFamily: 'Merriweather',
+							fontFamily: 'Inter',
+							fontWeight: 300,
 							fontSize: titleSize,
-							lineHeight: 1.25,
+							lineHeight: 1.2,
+							letterSpacing: -2,
 						}}
 					>
 						{truncate(title, 110)}
@@ -156,6 +176,7 @@ export async function renderOgImage({
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'space-between',
+						gap: 32,
 						padding: '0 56px 44px',
 					}}
 				>
@@ -172,27 +193,31 @@ export async function renderOgImage({
 								objectFit: 'cover',
 							}}
 						/>
-						<span style={{ fontSize: 26 }}>{siteMetadata.headerTitle}</span>
+						<span style={{ fontFamily: 'JetBrains Mono', fontSize: 22 }}>
+							{siteMetadata.headerTitle}
+						</span>
 					</div>
-					<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-						{tags.slice(0, 3).map((tag) => (
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: 14,
+							fontFamily: 'JetBrains Mono',
+							fontSize: 16,
+						}}
+					>
+						{/* utc-ds badges: bracket-wrapped [tags] */}
+						{tags.slice(0, 2).map((tag) => (
 							<span
 								key={tag}
-								style={{
-									padding: '2px 14px',
-									borderRadius: 6,
-									border: `1px solid ${colors.primary}`,
-									color: colors.primary,
-									fontSize: 20,
-									textTransform: 'uppercase',
-								}}
+								style={{ display: 'flex', color: colors.primary }}
 							>
+								<span style={{ color: colors.muted }}>[</span>
 								{tag}
+								<span style={{ color: colors.muted }}>]</span>
 							</span>
 						))}
-						{meta && (
-							<span style={{ fontSize: 24, color: colors.muted }}>{meta}</span>
-						)}
+						{meta && <span style={{ color: colors.muted }}>{meta}</span>}
 					</div>
 				</div>
 			</div>
@@ -200,9 +225,10 @@ export async function renderOgImage({
 		{
 			...ogSize,
 			fonts: [
-				{ name: 'Merriweather', data: merriweather, weight: 700 },
-				{ name: 'Mukta', data: muktaRegular, weight: 400 },
-				{ name: 'Mukta', data: muktaSemiBold, weight: 600 },
+				{ name: 'Inter', data: interLight, weight: 300 },
+				{ name: 'Inter', data: interMedium, weight: 500 },
+				{ name: 'JetBrains Mono', data: monoRegular, weight: 400 },
+				{ name: 'JetBrains Mono', data: monoMedium, weight: 500 },
 			],
 		},
 	);

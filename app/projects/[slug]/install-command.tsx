@@ -7,9 +7,9 @@ export default function InstallCommand({ command }: { command: string }) {
 	const [copied, setCopied] = useState(false);
 
 	return (
-		<div className='flex items-center gap-3 rounded-md border border-gray-200 py-1.5 pr-1.5 pl-4 font-mono text-sm dark:border-gray-300/20'>
+		<div className='flex items-center gap-3 rounded-(--ds-radius) border border-(--ds-border) bg-(--ds-bg-code) py-1.5 pr-1.5 pl-4 font-mono text-sm'>
 			<code className='min-w-0 flex-1 overflow-x-auto whitespace-nowrap'>
-				<span className='text-primary-500 select-none'>$ </span>
+				<span className='text-(--ds-success) select-none'>$ </span>
 				{command}
 			</code>
 			<button
@@ -19,7 +19,7 @@ export default function InstallCommand({ command }: { command: string }) {
 					setCopied(true);
 					setTimeout(() => setCopied(false), 1500);
 				}}
-				className='cursor-pointer rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-900'
+				className='btn btn-ghost btn-sm'
 			>
 				{copied ? 'Copied' : 'Copy'}
 			</button>

@@ -21,16 +21,22 @@ export default function MermaidDiagram({ source }: { source: string }) {
 				startOnLoad: false,
 				securityLevel: 'strict',
 				theme: 'base',
-				fontFamily: 'inherit',
+				// Mermaid sizes the boxes by measuring the labels, so it needs the
+				// real font name (next/font's JetBrains Mono), not 'inherit'.
+				fontFamily:
+					getComputedStyle(document.documentElement)
+						.getPropertyValue('--font-jetbrains-mono')
+						.trim() || 'monospace',
 				themeVariables: {
 					darkMode: dark,
 					background: 'transparent',
-					primaryColor: dark ? '#000000' : '#ffffff',
-					primaryTextColor: dark ? '#f3f4f6' : '#111827',
-					primaryBorderColor: dark ? '#f3f4f6' : '#111827',
-					lineColor: '#de1d8d',
-					secondaryColor: dark ? '#111827' : '#f3f4f6',
-					tertiaryColor: dark ? '#111827' : '#f3f4f6',
+					// utc-ds tokens (app/utc-ds.css) for each theme
+					primaryColor: dark ? '#111111' : '#f0f0f0',
+					primaryTextColor: dark ? '#e8e8e8' : '#1a1a1a',
+					primaryBorderColor: dark ? '#333333' : '#cccccc',
+					lineColor: '#ff5f00',
+					secondaryColor: dark ? '#1a1a1a' : '#e6e6e6',
+					tertiaryColor: dark ? '#1a1a1a' : '#e6e6e6',
 				},
 			});
 			try {
@@ -47,14 +53,14 @@ export default function MermaidDiagram({ source }: { source: string }) {
 
 	if (!svg) {
 		return (
-			<pre className='overflow-x-auto rounded-md bg-gray-100 p-4 text-sm dark:bg-gray-900'>
+			<pre className='overflow-x-auto rounded-(--ds-radius) border border-(--ds-border) bg-(--ds-bg-code) p-4 font-mono text-sm'>
 				{source}
 			</pre>
 		);
 	}
 	return (
 		<div
-			className='flex justify-center overflow-x-auto [&_svg]:h-auto [&_svg]:max-w-full'
+			className='flex justify-center overflow-x-auto font-mono text-sm [&_svg]:h-auto [&_svg]:max-w-full'
 			// biome-ignore lint/security/noDangerouslySetInnerHtml: SVG produced by Mermaid from repo content, with securityLevel 'strict'
 			dangerouslySetInnerHTML={{ __html: svg }}
 		/>

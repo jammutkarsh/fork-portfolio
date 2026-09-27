@@ -1,6 +1,5 @@
 'use client';
 
-import classNames from 'classnames';
 import { useLenis } from 'lenis/react';
 import Snap from 'lenis/snap';
 import {
@@ -20,7 +19,6 @@ import {
 	useRef,
 	useState,
 } from 'react';
-import { merryWeather } from '../../fonts';
 import { animateFrame, useFrame } from '../layouts/frame';
 import DeskScene from './desk-scene';
 import type { PhaseMeta } from './get-story';
@@ -30,7 +28,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 // The name on the intro and the phase titles share one size.
 // Short screens (a phone in landscape) step everything down a size.
 const heading =
-	'text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl [@media(max-height:500px)]:text-2xl';
+	'text-3xl font-light leading-tight tracking-[-0.04em] sm:text-4xl lg:text-5xl [@media(max-height:500px)]:text-2xl';
 
 // The width the intro text has on the intro, where the frame is at its
 // narrowest (64rem, minus padding and the gap, split between the columns).
@@ -232,11 +230,7 @@ export default function StoryDeck({
 					>
 						<AnimatePresence mode='wait' initial={false}>
 							{opened && (
-								<motion.h2
-									key={phase.id}
-									{...swap(dir)}
-									className={classNames(heading, merryWeather.className)}
-								>
+								<motion.h2 key={phase.id} {...swap(dir)} className={heading}>
 									{phase.title}
 								</motion.h2>
 							)}
@@ -264,7 +258,7 @@ export default function StoryDeck({
 									height={640}
 									priority
 									sizes='(min-width: 768px) 28rem, 30svh'
-									className='aspect-square h-[92%] w-auto rounded-3xl object-cover'
+									className='aspect-square h-[92%] w-auto rounded-(--ds-radius-lg) object-cover'
 								/>
 							</motion.div>
 						</div>
@@ -275,12 +269,8 @@ export default function StoryDeck({
 								style={{ opacity: introOpacity, y: introY, width: introPx }}
 								className='[grid-area:1/1] self-center'
 							>
-								<h1 className={classNames(heading, merryWeather.className)}>
-									{title}
-								</h1>
-								<p className='mt-5 text-lg text-gray-600 dark:text-gray-400'>
-									{bio}
-								</p>
+								<h1 className={heading}>{title}</h1>
+								<p className='mt-5 text-lg text-(--ds-text-secondary)'>{bio}</p>
 								<button
 									type='button'
 									onClick={() => goTo(1)}

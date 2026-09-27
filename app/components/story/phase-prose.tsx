@@ -9,7 +9,7 @@ export default function PhaseProse({ source }: { source: string }) {
 			components={{
 				p: (props: ComponentPropsWithoutRef<'p'>) => (
 					<p
-						className='py-1.5 leading-relaxed text-gray-800 dark:text-gray-200'
+						className='py-1.5 leading-relaxed text-(--ds-text-primary)'
 						{...props}
 					/>
 				),

@@ -91,15 +91,23 @@ html.story-deck footer {
 	z-index: 10;
 	opacity: 0;
 	pointer-events: none;
-	background-color: #fff;
+	background-color: var(--ds-bg-primary);
 	transition: opacity 400ms ease;
-}
-
-html.dark.story-deck footer {
-	background-color: #000;
 }
 
 html.story-deck.story-end footer {
 	opacity: 1;
 	pointer-events: auto;
+}
+
+/*
+  Code blocks carry colours for both themes (rehype-pretty-code, see
+  app/blog/utils.ts); show the set that matches the site theme.
+*/
+[data-theme="dark"] [data-rehype-pretty-code-figure] :is(code, span) {
+	color: var(--shiki-dark);
+}
+
+[data-theme="light"] [data-rehype-pretty-code-figure] :is(code, span) {
+	color: var(--shiki-light);
 }

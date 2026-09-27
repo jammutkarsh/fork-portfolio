@@ -21,15 +21,30 @@
 }
 
 @theme inline {
-	--color-primary-100: #fdd1d9;
-	--color-primary-200: #fba4bc;
-	--color-primary-300: #f575a5;
-	--color-primary-400: #eb519b;
-	--color-primary-500: #de1d8d;
-	--color-primary-600: #be1588;
-	--color-primary-700: #9f0e7f;
-	--color-primary-800: #800972;
-	--color-primary-900: #6a0568;
+	/* Fork: primary comes from the utc-ds design system (app/utc-ds.css). */
+	--color-primary-100: color-mix(in oklch, var(--ds-primary) 20%, white);
+	--color-primary-200: color-mix(in oklch, var(--ds-primary) 40%, white);
+	--color-primary-300: color-mix(in oklch, var(--ds-primary) 65%, white);
+	--color-primary-400: var(--ds-primary-hover);
+	--color-primary-500: var(--ds-primary);
+	--color-primary-600: var(--ds-primary-active);
+	--color-primary-700: color-mix(in oklch, var(--ds-primary), black 30%);
+	--color-primary-800: color-mix(in oklch, var(--ds-primary), black 45%);
+	--color-primary-900: color-mix(in oklch, var(--ds-primary), black 60%);
+
+	/* Fork: utc-ds greys are neutral (no blue tint), and its black is #0a0a0a. */
+	--color-black: #0a0a0a;
+	--color-gray-50: oklch(98.5% 0 0);
+	--color-gray-100: oklch(97% 0 0);
+	--color-gray-200: oklch(92.2% 0 0);
+	--color-gray-300: oklch(87% 0 0);
+	--color-gray-400: oklch(70.8% 0 0);
+	--color-gray-500: oklch(55.6% 0 0);
+	--color-gray-600: oklch(43.9% 0 0);
+	--color-gray-700: oklch(37.1% 0 0);
+	--color-gray-800: oklch(26.9% 0 0);
+	--color-gray-900: oklch(20.5% 0 0);
+	--color-gray-950: oklch(14.5% 0 0);
 
 	--animate-first: moveVertical 30s ease infinite;
 	--animate-second: moveInCircle 20s reverse infinite;

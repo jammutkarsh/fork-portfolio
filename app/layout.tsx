@@ -10,8 +10,9 @@ import CommandMenu from './components/command-menu';
 import { FrameProvider } from './components/layouts/frame';
 import SiteFooter from './components/layouts/site-footer';
 import SiteNav from './components/layouts/site-nav';
-import { mukta } from './fonts';
+import { inter, jetbrainsMono } from './fonts';
 import './tailwind.css';
+import './utc-ds.css';
 import './site.css';
 
 export const metadata: Metadata = {
@@ -42,7 +43,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
 	}));
 
 	return (
-		<html lang='en' suppressHydrationWarning className={mukta.className}>
+		<html
+			lang='en'
+			suppressHydrationWarning
+			className={`${inter.variable} ${jetbrainsMono.variable}`}
+		>
 			<head>
 				<link
 					rel='apple-touch-icon'
@@ -64,10 +69,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
 				<meta name='msapplication-TileColor' content='#000000' />
 				<meta name='theme-color' content='#000000' />
 			</head>
-			<body className='bg-white text-black antialiased dark:bg-black dark:text-white selection:bg-primary-500 selection:text-white'>
+			<body className='antialiased'>
 				<GoogleTagManager gtmId='G-65F69D270G' />
 				<ThemeProvider
-					attribute='class'
+					attribute={['class', 'data-theme']}
 					defaultTheme='dark'
 					themes={['dark', 'light']}
 				>

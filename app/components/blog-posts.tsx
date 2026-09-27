@@ -20,7 +20,7 @@ export function BlogPosts({
 			{posts.map((post, index) => (
 				<motion.li
 					key={post.slug}
-					className='border-b border-gray-300 dark:border-gray-800 dark:hover:border-gray-700 hover:border-gray-400 transition-colors duration-500'
+					className='group border-b border-dashed border-(--ds-border-strong)'
 					initial={{
 						scale: prefersReducedMotion ? 1 : 0.8,
 						opacity: 0,
@@ -36,17 +36,17 @@ export function BlogPosts({
 						href={`/blog/${post.slug}`}
 						aria-label={`Read "${post.metadata.title}"`}
 					>
-						<article className='space-y-2 py-5 border-b border-gray-300/20'>
+						<article className='space-y-2 py-5'>
 							<div className='flex w-full items-center justify-between'>
-								<h2 className='text-md w-full max-w-2xl truncate whitespace-nowrap pr-2 font-medium text-black dark:text-white group-hover:underline md:w-auto md:flex-none md:text-xl'>
+								<h2 className='w-full max-w-2xl truncate whitespace-nowrap pr-2 text-base font-medium text-(--ds-text-primary) transition-colors duration-150 group-hover:text-primary-500 md:w-auto md:flex-none md:text-xl'>
 									{post.metadata.title}
 								</h2>
-								<div className='mx-1 flex flex-1 border-b border-primary-500' />
-								<time className='w-max whitespace-nowrap text-sm pl-2 text-gray-500 dark:text-gray-400'>
+								<div className='mx-1 flex flex-1 border-b border-dotted border-(--ds-border-strong)' />
+								<time className='w-max whitespace-nowrap pl-2 font-mono text-xs text-(--ds-text-secondary)'>
 									{format(new Date(post.metadata.publishedAt), 'MMMM dd, yyyy')}
 								</time>
 							</div>
-							<p className='text-gray-500 dark:text-gray-400'>
+							<p className='text-sm text-(--ds-text-secondary)'>
 								{post.metadata.summary}
 							</p>
 						</article>

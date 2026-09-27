@@ -1,0 +1,1274 @@
+/*
+  utc-ds design system, vendored from
+  https://github.com/jammutkarsh/design-system (v0.0.9).
+
+  How it is wired into this Tailwind site:
+  - Tokens (--ds-*) apply site-wide. Light mode is [data-theme="light"],
+    which next-themes sets alongside the .dark class Tailwind uses.
+  - The classless element styles (headings, lists, code, tables...) are
+    scoped to .ds-prose, i.e. written content such as blog posts, so they
+    don't restyle the site's own layout. :where() keeps their specificity
+    at zero so Tailwind utilities still win.
+  - Content components (.btn, .card, .badge, .callout, .terminal, .ascii,
+    .meta, .sep, .arrow) are available as classes.
+  - Left out: the reset and root rules (Tailwind's preflight covers them;
+    the fluid root font size would rescale the whole layout), and the
+    container/nav/footer/utility classes, which collide with Tailwind's
+    class names or duplicate the site's own nav and footer.
+  Everything sits in Tailwind's base/components layers, below utilities.
+*/
+
+@layer base {
+	:root {
+		/* ──────────────────────────────────────────────────────────
+     USER-CONFIGURABLE: Set your brand colors here.
+     Everything else is auto-derived.
+     ────────────────────────────────────────────────────────── */
+		--ds-primary: #ff5f00;
+		--ds-secondary: #afd7ff;
+
+		/* ──────────────────────────────────────────────────────────
+     DERIVED: Primary variants (auto-generated via color-mix)
+     ────────────────────────────────────────────────────────── */
+		--ds-primary-hover: color-mix(in oklch, var(--ds-primary), white 20%);
+		--ds-primary-active: color-mix(in oklch, var(--ds-primary), black 15%);
+		--ds-primary-muted: color-mix(in oklch, var(--ds-primary) 12%, transparent);
+		--ds-primary-subtle: color-mix(
+			in oklch,
+			var(--ds-primary) 6%,
+			var(--ds-bg-secondary)
+		);
+
+		/* ──────────────────────────────────────────────────────────
+     DERIVED: Secondary variants
+     ────────────────────────────────────────────────────────── */
+		--ds-secondary-hover: color-mix(in oklch, var(--ds-secondary), white 20%);
+		--ds-secondary-active: color-mix(in oklch, var(--ds-secondary), black 15%);
+		--ds-secondary-muted: color-mix(
+			in oklch,
+			var(--ds-secondary) 12%,
+			transparent
+		);
+		--ds-secondary-subtle: color-mix(
+			in oklch,
+			var(--ds-secondary) 6%,
+			var(--ds-bg-secondary)
+		);
+
+		/* ──────────────────────────────────────────────────────────
+     BACKGROUNDS — Dark mode (default)
+     ────────────────────────────────────────────────────────── */
+		--ds-bg-primary: #0a0a0a;
+		--ds-bg-secondary: #111111;
+		--ds-bg-tertiary: #1a1a1a;
+		--ds-bg-code: #141414;
+		--ds-bg-elevated: #1e1e1e;
+
+		/* ──────────────────────────────────────────────────────────
+     TEXT
+     ────────────────────────────────────────────────────────── */
+		--ds-text-primary: #e8e8e8;
+		--ds-text-secondary: #888888;
+		--ds-text-tertiary: #555555;
+		--ds-text-link: var(--ds-primary);
+		--ds-text-link-hover: var(--ds-primary-hover);
+
+		/* ──────────────────────────────────────────────────────────
+     BORDERS
+     ────────────────────────────────────────────────────────── */
+		--ds-border: #222222;
+		--ds-border-strong: #333333;
+		--ds-border-muted: #1a1a1a;
+
+		/* ──────────────────────────────────────────────────────────
+     SEMANTIC COLORS
+     ────────────────────────────────────────────────────────── */
+		--ds-success: #22a652;
+		--ds-info: var(--ds-secondary);
+		--ds-warning: #f5a623;
+		--ds-danger: #ff0000;
+		--ds-purple: #af00d7;
+		--ds-pink: #ffd7ff;
+
+		--ds-success-muted: color-mix(in oklch, var(--ds-success) 12%, transparent);
+		--ds-info-muted: color-mix(in oklch, var(--ds-info) 12%, transparent);
+		--ds-warning-muted: color-mix(in oklch, var(--ds-warning) 12%, transparent);
+		--ds-danger-muted: color-mix(in oklch, var(--ds-danger) 12%, transparent);
+		--ds-purple-muted: color-mix(in oklch, var(--ds-purple) 12%, transparent);
+		--ds-pink-muted: color-mix(in oklch, var(--ds-pink) 12%, transparent);
+
+		/* ──────────────────────────────────────────────────────────
+     TYPOGRAPHY
+     ────────────────────────────────────────────────────────── */
+		--ds-font-sans:
+			var(--font-inter), "Inter", system-ui, -apple-system, "Segoe UI",
+			sans-serif;
+		--ds-font-mono:
+			var(--font-jetbrains-mono), "JetBrains Mono", "Fira Code",
+			"Cascadia Code", "Consolas", monospace;
+
+		--ds-text-xs: 0.75rem; /* 12px */
+		--ds-text-sm: 0.875rem; /* 14px */
+		--ds-text-base: 1rem; /* 16px */
+		--ds-text-lg: 1.125rem; /* 18px */
+		--ds-text-xl: 1.25rem; /* 20px */
+		--ds-text-2xl: 1.5rem; /* 24px */
+		--ds-text-3xl: 1.875rem; /* 30px */
+		--ds-text-4xl: 2.25rem; /* 36px */
+		--ds-text-5xl: 3rem; /* 48px */
+
+		--ds-leading: 1.7;
+		--ds-leading-tight: 1.2;
+		--ds-leading-snug: 1.4;
+
+		--ds-tracking-tight: -0.02em;
+		--ds-tracking-normal: 0em;
+		--ds-tracking-wide: 0.02em;
+
+		--ds-weight-normal: 400;
+		--ds-weight-medium: 500;
+		--ds-weight-semibold: 600;
+		--ds-weight-bold: 700;
+
+		/* ──────────────────────────────────────────────────────────
+     SPACING (4px base grid)
+     ────────────────────────────────────────────────────────── */
+		--ds-space-1: 0.25rem; /* 4px  */
+		--ds-space-2: 0.5rem; /* 8px  */
+		--ds-space-3: 0.75rem; /* 12px */
+		--ds-space-4: 1rem; /* 16px */
+		--ds-space-6: 1.5rem; /* 24px */
+		--ds-space-8: 2rem; /* 32px */
+		--ds-space-12: 3rem; /* 48px */
+		--ds-space-16: 4rem; /* 64px */
+		--ds-space-24: 6rem; /* 96px */
+
+		/* ──────────────────────────────────────────────────────────
+     LAYOUT
+     ────────────────────────────────────────────────────────── */
+		--ds-max-width: 72rem; /* 1152px */
+		--ds-content-width: 48rem; /* 768px  */
+		--ds-radius-sm: 2px;
+		--ds-radius: 4px;
+		--ds-radius-lg: 8px;
+
+		/* ──────────────────────────────────────────────────────────
+     TRANSITIONS
+     ────────────────────────────────────────────────────────── */
+		--ds-transition: 150ms ease;
+		--ds-transition-slow: 300ms ease;
+	}
+
+	/* ============================================================
+   LIGHT MODE
+   ============================================================
+   Applied via <html data-theme="light"> or toggled with JS.
+   Only overrides color tokens — typography, spacing, layout
+   remain unchanged.
+   ============================================================ */
+
+	[data-theme="light"] {
+		--ds-bg-primary: #fafafa;
+		--ds-bg-secondary: #f0f0f0;
+		--ds-bg-tertiary: #e6e6e6;
+		--ds-bg-code: #f4f4f5;
+		--ds-bg-elevated: #ffffff;
+
+		--ds-text-primary: #1a1a1a;
+		--ds-text-secondary: #666666;
+		--ds-text-tertiary: #999999;
+
+		--ds-border: #e0e0e0;
+		--ds-border-strong: #cccccc;
+		--ds-border-muted: #eeeeee;
+
+		/* Re-derive primary-subtle against the new bg */
+		--ds-primary-subtle: color-mix(
+			in oklch,
+			var(--ds-primary) 8%,
+			var(--ds-bg-secondary)
+		);
+		--ds-secondary-subtle: color-mix(
+			in oklch,
+			var(--ds-secondary) 8%,
+			var(--ds-bg-secondary)
+		);
+	}
+
+	/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+	@media (prefers-reduced-motion: reduce) {
+		:root {
+			--ds-transition: 0ms;
+			--ds-transition-slow: 0ms;
+		}
+	}
+
+	body {
+		font-family: var(--ds-font-sans);
+		line-height: var(--ds-leading);
+		color: var(--ds-text-primary);
+		background: var(--ds-bg-primary);
+	}
+
+	::selection {
+		background: var(--ds-primary);
+		color: #ffffff;
+	}
+
+	/* ────────────────────────────────────────────────────────────
+   3. HEADINGS (h1 – h6)
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) h1,
+	:where(.ds-prose) h2,
+	:where(.ds-prose) h3,
+	:where(.ds-prose) h4,
+	:where(.ds-prose) h5,
+	:where(.ds-prose) h6 {
+		font-weight: var(--ds-weight-medium);
+		line-height: var(--ds-leading-tight);
+		color: var(--ds-text-primary);
+	}
+	/* Tight tracking for large headings */
+	:where(.ds-prose) h1,
+	:where(.ds-prose) h2,
+	:where(.ds-prose) h3 {
+		letter-spacing: var(--ds-tracking-tight);
+	}
+	:where(.ds-prose) h4,
+	:where(.ds-prose) h5,
+	:where(.ds-prose) h6 {
+		letter-spacing: var(--ds-tracking-normal);
+	}
+	/* ── h1 ── */
+	:where(.ds-prose) h1 {
+		font-size: var(--ds-text-5xl);
+		font-weight: 300;
+		letter-spacing: -0.04em;
+		margin-top: 0;
+		margin-bottom: var(--ds-space-6);
+	}
+	/* ── h2 — dashed bottom border, like glow renders h2 ── */
+	:where(.ds-prose) h2 {
+		font-size: var(--ds-text-3xl);
+		font-weight: 300;
+		margin-top: var(--ds-space-12);
+		margin-bottom: var(--ds-space-4);
+		padding-bottom: var(--ds-space-2);
+		border-bottom: 1px dashed var(--ds-border-strong);
+	}
+	/* ── h3 ── */
+	:where(.ds-prose) h3 {
+		font-size: var(--ds-text-2xl);
+		margin-top: var(--ds-space-8);
+		margin-bottom: var(--ds-space-3);
+	}
+	/* ── h4 ── */
+	:where(.ds-prose) h4 {
+		font-size: var(--ds-text-xl);
+		margin-top: var(--ds-space-6);
+		margin-bottom: var(--ds-space-2);
+	}
+	/* ── h5 ── */
+	:where(.ds-prose) h5 {
+		font-size: var(--ds-text-lg);
+		margin-top: var(--ds-space-6);
+		margin-bottom: var(--ds-space-2);
+	}
+	/* ── h6 — uppercase mono label ── */
+	:where(.ds-prose) h6 {
+		font-size: var(--ds-text-sm);
+		font-family: var(--ds-font-mono);
+		margin-top: var(--ds-space-4);
+		margin-bottom: var(--ds-space-2);
+		color: var(--ds-text-secondary);
+		text-transform: uppercase;
+		letter-spacing: var(--ds-tracking-wide);
+	}
+	/* Heading prefixes removed — clean headings without # symbols */
+	/* ────────────────────────────────────────────────────────────
+   4. PARAGRAPHS
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) p {
+		margin-bottom: var(--ds-space-4);
+	}
+	/* Larger intro / lede paragraph */
+	:where(.ds-prose) .lead {
+		font-size: var(--ds-text-xl);
+		color: var(--ds-text-primary);
+		line-height: var(--ds-leading);
+	}
+	/* ────────────────────────────────────────────────────────────
+   5. LINKS (a)
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) a {
+		color: var(--ds-text-link);
+		text-decoration: underline;
+		text-decoration-color: color-mix(
+			in srgb,
+			var(--ds-text-link) 40%,
+			transparent
+		);
+		text-underline-offset: 3px;
+		transition:
+			color var(--ds-transition),
+			text-decoration-color var(--ds-transition);
+	}
+	:where(.ds-prose) a:hover {
+		color: var(--ds-text-link-hover);
+		text-decoration-color: var(--ds-text-link-hover);
+	}
+	/* ────────────────────────────────────────────────────────────
+   6. LISTS (ul, ol, dl)
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) ul,
+	:where(.ds-prose) ol {
+		padding-left: var(--ds-space-6);
+		margin-bottom: var(--ds-space-4);
+	}
+	:where(.ds-prose) li {
+		margin-bottom: var(--ds-space-1);
+	}
+	/* Terminal-style triangle marker for unordered lists */
+	:where(.ds-prose) ul {
+		list-style-type: "▸ ";
+	}
+	/* Decimal markers in monospace for ordered lists */
+	:where(.ds-prose) ol {
+		list-style-type: decimal;
+	}
+	:where(.ds-prose) ol li::marker {
+		font-family: var(--ds-font-mono);
+	}
+	/* Nested lists: tighten up */
+	:where(.ds-prose) ul ul,
+	:where(.ds-prose) ol ol,
+	:where(.ds-prose) ul ol,
+	:where(.ds-prose) ol ul {
+		margin-top: var(--ds-space-1);
+		margin-bottom: 0;
+	}
+	/* ── Definition lists ── */
+	:where(.ds-prose) dl {
+		margin-bottom: var(--ds-space-4);
+	}
+	:where(.ds-prose) dt {
+		font-weight: var(--ds-weight-semibold);
+		color: var(--ds-text-primary);
+		margin-top: var(--ds-space-3);
+	}
+	:where(.ds-prose) dd {
+		margin-left: var(--ds-space-4);
+		padding-left: var(--ds-space-4);
+		border-left: 2px solid var(--ds-border);
+		color: var(--ds-text-secondary);
+		margin-bottom: var(--ds-space-2);
+	}
+	/* ────────────────────────────────────────────────────────────
+   7. BLOCKQUOTES
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) blockquote {
+		border-left: 3px solid var(--ds-primary);
+		padding: var(--ds-space-3) var(--ds-space-4);
+		margin: var(--ds-space-4) 0;
+		background: var(--ds-bg-secondary);
+		color: var(--ds-text-secondary);
+		border-radius: 0 var(--ds-radius) var(--ds-radius) 0;
+	}
+	:where(.ds-prose) blockquote p:last-child {
+		margin-bottom: 0;
+	}
+	/* Nested blockquotes: extra indent */
+	:where(.ds-prose) blockquote blockquote {
+		margin-left: var(--ds-space-4);
+		border-left-color: var(--ds-border-strong);
+	}
+	/* Citation / attribution inside blockquote */
+	:where(.ds-prose) blockquote cite {
+		display: block;
+		margin-top: var(--ds-space-3);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		color: var(--ds-text-tertiary);
+		font-style: normal;
+	}
+	/* ────────────────────────────────────────────────────────────
+   8. HORIZONTAL RULES (hr)
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) hr {
+		border: none;
+		border-top: 1px dashed var(--ds-border-strong);
+		margin: var(--ds-space-8) 0;
+	}
+	/* Dot-fill variant — PlanetScale-style dotted line */
+	:where(.ds-prose) hr.dot-fill {
+		border: none;
+		height: 2px;
+		background-image: radial-gradient(
+			circle,
+			var(--ds-text-tertiary) 1px,
+			transparent 1px
+		);
+		background-size: 8px 2px;
+	}
+	/* ASCII box-drawing line variant */
+	:where(.ds-prose) hr.ascii-hr {
+		border: none;
+		height: auto;
+		overflow: hidden;
+		white-space: nowrap;
+		color: var(--ds-text-tertiary);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-sm);
+		line-height: 1;
+		display: block;
+	}
+	:where(.ds-prose) hr.ascii-hr::before {
+		content: "────────────────────────────────────────────────────────────────────────────────";
+		display: block;
+	}
+	/* Labeled divider — centered text with lines on each side */
+	:where(.ds-prose) .hr-label {
+		display: flex;
+		align-items: center;
+		gap: var(--ds-space-4);
+		margin: var(--ds-space-8) 0;
+		color: var(--ds-text-tertiary);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+	:where(.ds-prose) .hr-label::before,
+	:where(.ds-prose) .hr-label::after {
+		content: "";
+		flex: 1;
+		height: 1px;
+		background: var(--ds-border);
+	}
+	/* ────────────────────────────────────────────────────────────
+   9. CODE
+   ──────────────────────────────────────────────────────────── */
+	/* ── Inline code (code NOT inside pre) ── */
+	:where(.ds-prose) code {
+		font-family: var(--ds-font-mono);
+		font-size: 0.9em;
+		background: var(--ds-bg-code);
+		padding: 2px 6px;
+		border-radius: var(--ds-radius-sm);
+		border: 1px solid var(--ds-border);
+		color: var(--ds-primary-hover);
+	}
+	/* ── Code blocks (pre) ── */
+	:where(.ds-prose) pre {
+		background: var(--ds-bg-code);
+		border: 1px solid var(--ds-border);
+		border-radius: var(--ds-radius);
+		padding: var(--ds-space-4);
+		overflow-x: auto;
+		margin: var(--ds-space-4) 0;
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-sm);
+		line-height: 1.6;
+		tab-size: 2;
+		-moz-tab-size: 2;
+	}
+	/* Reset inline code styles when inside a pre block */
+	:where(.ds-prose) pre code {
+		background: none;
+		border: none;
+		padding: 0;
+		font-size: inherit;
+		color: inherit;
+		border-radius: 0;
+	}
+	/* ── Syntax highlighting classes for code blocks ── */
+	:where(.ds-prose) .token-keyword {
+		color: var(--ds-secondary);
+	}
+	/* light blue — keywords */
+	:where(.ds-prose) .token-function {
+		color: var(--ds-primary);
+	}
+	/* orange — function names */
+	:where(.ds-prose) .token-string {
+		color: var(--ds-warning);
+	}
+	/* yellow — strings */
+	:where(.ds-prose) .token-comment {
+		color: var(--ds-text-tertiary);
+	}
+	/* dim — comments */
+	:where(.ds-prose) .token-type {
+		color: var(--ds-secondary);
+	}
+	/* light blue — types */
+	:where(.ds-prose) .token-number {
+		color: var(--ds-purple);
+	}
+	/* purple — numbers */
+	:where(.ds-prose) .token-operator {
+		color: var(--ds-text-secondary);
+	}
+	/* gray — operators */
+	:where(.ds-prose) .token-variable {
+		color: var(--ds-pink, #ffd7ff);
+	}
+	/* pink — variables */
+	:where(.ds-prose) .token-builtin {
+		color: var(--ds-success);
+	}
+	/* green — builtins */
+	/* ────────────────────────────────────────────────────────────
+   10. TABLES
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) .table-responsive {
+		width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+	:where(.ds-prose) table {
+		width: 100%;
+		border-collapse: collapse;
+		margin: var(--ds-space-4) 0;
+		font-size: var(--ds-text-sm);
+	}
+	:where(.ds-prose) th {
+		font-weight: var(--ds-weight-semibold);
+		text-align: left;
+		padding: var(--ds-space-2) var(--ds-space-3);
+		border-bottom: 2px solid var(--ds-border-strong);
+		color: var(--ds-text-primary);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--ds-tracking-wide);
+		white-space: nowrap;
+	}
+	:where(.ds-prose) td {
+		padding: var(--ds-space-2) var(--ds-space-3);
+		border-bottom: 1px solid var(--ds-border);
+		color: var(--ds-text-secondary);
+		white-space: nowrap;
+	}
+	:where(.ds-prose) tr:hover {
+		background: var(--ds-bg-secondary);
+	}
+	/* Monospace table variant — apply .table-mono to <table> */
+	:where(.ds-prose) .table-mono td {
+		font-family: var(--ds-font-mono);
+	}
+	/* ────────────────────────────────────────────────────────────
+   11. IMAGES & FIGURES
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) img {
+		max-width: 100%;
+		height: auto;
+		border-radius: var(--ds-radius);
+		display: block;
+	}
+	:where(.ds-prose) figure {
+		margin: var(--ds-space-6) 0;
+	}
+	:where(.ds-prose) figcaption {
+		font-size: var(--ds-text-sm);
+		color: var(--ds-text-secondary);
+		margin-top: var(--ds-space-2);
+		text-align: center;
+		font-family: var(--ds-font-mono);
+	}
+	/* ────────────────────────────────────────────────────────────
+   12. INLINE SEMANTIC ELEMENTS
+   ──────────────────────────────────────────────────────────── */
+	/* Bold / strong — ensure it's bright in dark mode */
+	:where(.ds-prose) strong,
+	:where(.ds-prose) b {
+		font-weight: var(--ds-weight-semibold);
+		color: var(--ds-text-primary);
+	}
+	/* Italic */
+	:where(.ds-prose) em,
+	:where(.ds-prose) i {
+		font-style: italic;
+	}
+	/* Strikethrough */
+	:where(.ds-prose) del,
+	:where(.ds-prose) s {
+		text-decoration: line-through;
+		color: var(--ds-text-tertiary);
+		text-decoration-color: var(--ds-danger);
+	}
+	/* Highlight / mark */
+	:where(.ds-prose) mark {
+		background: var(--ds-primary-muted);
+		color: var(--ds-primary);
+		padding: 1px 4px;
+		border-radius: var(--ds-radius-sm);
+	}
+	/* Keyboard key — styled like a physical keycap */
+	:where(.ds-prose) kbd {
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-sm);
+		background: var(--ds-bg-tertiary);
+		border: 1px solid var(--ds-border-strong);
+		border-bottom-width: 2px;
+		border-radius: var(--ds-radius-sm);
+		padding: 1px 6px;
+		white-space: nowrap;
+	}
+	/* Abbreviation with tooltip */
+	:where(.ds-prose) abbr[title] {
+		text-decoration: underline dotted var(--ds-text-tertiary);
+		cursor: help;
+	}
+	/* Superscript / subscript */
+	:where(.ds-prose) sup,
+	:where(.ds-prose) sub {
+		font-size: 0.75em;
+		line-height: 0;
+		position: relative;
+		vertical-align: baseline;
+	}
+	:where(.ds-prose) sup {
+		top: -0.5em;
+	}
+	:where(.ds-prose) sub {
+		bottom: -0.25em;
+	}
+	/* Small text */
+	:where(.ds-prose) small {
+		font-size: var(--ds-text-sm);
+		color: var(--ds-text-secondary);
+	}
+	/* ────────────────────────────────────────────────────────────
+   13. DETAILS / SUMMARY
+   ──────────────────────────────────────────────────────────── */
+	:where(.ds-prose) details {
+		margin: var(--ds-space-4) 0;
+		border: 1px dashed var(--ds-border-strong);
+		border-radius: var(--ds-radius);
+		padding: 0 var(--ds-space-4);
+	}
+	:where(.ds-prose) details[open] {
+		padding-bottom: var(--ds-space-4);
+	}
+	:where(.ds-prose) summary {
+		margin: 0 calc(-1 * var(--ds-space-4));
+		padding: var(--ds-space-3) var(--ds-space-4);
+		cursor: pointer;
+		font-weight: var(--ds-weight-medium);
+		font-family: var(--ds-font-mono);
+		list-style: none;
+	}
+	/* Remove default disclosure marker */
+	:where(.ds-prose) summary::-webkit-details-marker {
+		display: none;
+	}
+	/* Custom triangle marker — closed state */
+	:where(.ds-prose) summary::before {
+		content: "▸ ";
+		color: var(--ds-text-tertiary);
+	}
+	/* Custom triangle marker — open state */
+	:where(.ds-prose) details[open] > summary::before {
+		content: "▾ ";
+	}
+	/* Add bottom border to summary when open for visual separation */
+	:where(.ds-prose) details[open] > summary {
+		border-bottom: 1px dashed var(--ds-border);
+		margin-bottom: var(--ds-space-3);
+	}
+	/* ────────────────────────────────────────────────────────────
+   14. MISC
+   ──────────────────────────────────────────────────────────── */
+	/* Address should not be italic by default */
+	:where(.ds-prose) address {
+		font-style: normal;
+	}
+	/* Tighter spacing between paragraphs and their lists */
+	:where(.ds-prose) p + ul,
+	:where(.ds-prose) p + ol {
+		margin-top: calc(-1 * var(--ds-space-2));
+	}
+}
+
+@layer components {
+	/* --------------------------------------------------------------------------
+ * 5. Buttons
+ *
+ * Monospace, token-driven buttons. Default is a ghost-outlined style;
+ * .btn-primary fills with accent colour; .btn-ghost is borderless.
+ * ------------------------------------------------------------------------ */
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--ds-space-2);
+		padding: var(--ds-space-2) var(--ds-space-4);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-sm);
+		font-weight: var(--ds-weight-medium);
+		border-radius: var(--ds-radius);
+		border: 1px solid var(--ds-border-strong);
+		background: transparent;
+		color: var(--ds-text-primary);
+		cursor: pointer;
+		transition: all var(--ds-transition);
+		text-decoration: none;
+		line-height: 1.4;
+		white-space: nowrap;
+	}
+
+	.btn:hover {
+		border-color: var(--ds-primary);
+		color: var(--ds-primary);
+	}
+
+	/* Primary — filled accent button */
+	.btn-primary {
+		background: var(--ds-primary);
+		color: #fff;
+		border-color: var(--ds-primary);
+	}
+
+	.btn-primary:hover {
+		background: var(--ds-primary-hover);
+		border-color: var(--ds-primary-hover);
+		color: #fff;
+	}
+
+	/* Ghost — borderless, minimal */
+	.btn-ghost {
+		border: none;
+		color: var(--ds-text-link);
+		padding: var(--ds-space-1) var(--ds-space-2);
+	}
+
+	.btn-ghost:hover {
+		background: var(--ds-primary-muted);
+		color: var(--ds-primary-hover);
+	}
+
+	/* Small size modifier */
+	.btn-sm {
+		padding: var(--ds-space-1) var(--ds-space-3);
+		font-size: var(--ds-text-xs);
+	}
+	/* --------------------------------------------------------------------------
+ * 6. Cards
+ *
+ * Subtle border with raised background. Includes title, body, and footer
+ * areas. Variants: card-raised, card-accent, card-image.
+ * ------------------------------------------------------------------------ */
+
+	.card {
+		background: transparent;
+		border: 1px dashed var(--ds-border-strong);
+		border-radius: var(--ds-radius);
+		padding: var(--ds-space-4);
+		transition: all var(--ds-transition);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.card:hover {
+		border-color: var(--ds-primary);
+		background: var(--ds-bg-secondary);
+	}
+
+	.card h3,
+	.card h4 {
+		font-size: var(--ds-text-base);
+		font-weight: var(--ds-weight-medium);
+		color: var(--ds-primary);
+		margin-top: 0;
+		margin-bottom: var(--ds-space-2);
+	}
+
+	.card p {
+		font-size: var(--ds-text-sm);
+		color: var(--ds-text-secondary);
+		line-height: 1.65;
+		margin-bottom: var(--ds-space-2);
+	}
+
+	.card-footer {
+		margin-top: auto;
+		padding-top: var(--ds-space-4);
+		border-top: 1px dashed var(--ds-border-strong);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	/* Ensure a minimum gap before the footer when cards aren't stretched */
+	.card > *:has(+ .card-footer) {
+		margin-bottom: var(--ds-space-4);
+	}
+
+	/* Raised variant — slightly lighter bg */
+	.card-raised {
+		background: var(--ds-bg-tertiary);
+	}
+
+	/* Accent variant — same layout, different border color to stand out */
+	.card-accent {
+		border-color: var(--ds-primary-muted);
+	}
+
+	.card-accent:hover {
+		border-color: var(--ds-primary);
+		background: var(--ds-bg-secondary);
+	}
+
+	/* Image card layout — internal flex wrapper for emoji and content */
+	.card-image-layout {
+		display: flex;
+		align-items: center;
+		gap: var(--ds-space-6);
+	}
+
+	/* Pixel art emoji — icon square on the left */
+	.card-pixel-placeholder {
+		width: 56px;
+		height: 56px;
+		min-width: 56px;
+		background: var(--ds-bg-tertiary);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 2rem;
+		border-radius: var(--ds-radius);
+		border: 1px dashed var(--ds-border);
+		user-select: none;
+		flex-shrink: 0;
+	}
+
+	.card-image-layout .card-content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	/* Tighter gap before footer inside image-layout cards */
+	.card-image-layout + .card-footer {
+		padding-top: var(--ds-space-3);
+		margin-top: var(--ds-space-3);
+	}
+
+	.card:has(.card-image-layout) > *:has(+ .card-footer) {
+		margin-bottom: 0;
+	}
+
+	/* Blog Post Card — fully redirectable */
+	.card-blog {
+		position: relative;
+	}
+
+	.card-blog h4 a::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+	}
+
+	/* Ensure interactive elements are clickable if clicked directly */
+	.card-blog .btn,
+	.card-blog .badge,
+	.card-blog a:not(h4 a) {
+		position: relative;
+		z-index: 2;
+	}
+
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		gap: var(--ds-space-4);
+	}
+
+	.grid-2 {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: var(--ds-space-4);
+	}
+
+	.grid-3 {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--ds-space-4);
+	}
+	/* --------------------------------------------------------------------------
+ * 7. Badges & Tags
+ *
+ * Bracket-wrapped labels: [Engineering], [Product], etc.
+ * Colour variants match the semantic palette.
+ * ------------------------------------------------------------------------ */
+
+	/* Card Tags Container */
+	.card-tags {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: var(--ds-space-2);
+	}
+
+	.badge {
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		font-weight: var(--ds-weight-medium);
+		padding: 1px var(--ds-space-1);
+		border-radius: var(--ds-radius-sm);
+		white-space: nowrap;
+		transition: background var(--ds-transition);
+	}
+
+	/* Bracket wrappers */
+	.badge::before {
+		content: "[";
+		color: var(--ds-text-tertiary);
+	}
+
+	.badge::after {
+		content: "]";
+		color: var(--ds-text-tertiary);
+	}
+
+	/* Colour variants */
+	.badge-primary {
+		color: var(--ds-primary);
+	}
+	.badge-primary:hover {
+		background: var(--ds-primary-muted);
+	}
+
+	.badge-success {
+		color: var(--ds-success);
+	}
+	.badge-success:hover {
+		background: var(--ds-success-muted);
+	}
+
+	.badge-info {
+		color: var(--ds-info);
+	}
+	.badge-info:hover {
+		background: var(--ds-info-muted);
+	}
+
+	.badge-warning {
+		color: var(--ds-warning);
+	}
+	.badge-warning:hover {
+		background: var(--ds-warning-muted);
+	}
+
+	.badge-danger {
+		color: var(--ds-danger);
+	}
+	.badge-danger:hover {
+		background: var(--ds-danger-muted);
+	}
+
+	.badge-purple {
+		color: var(--ds-purple);
+	}
+	.badge-purple:hover {
+		background: var(--ds-purple-muted);
+	}
+	/* --------------------------------------------------------------------------
+ * 8. Callouts / Alerts
+ *
+ * GitHub-style alerts with a 3 px left accent border.
+ * Title line is uppercase mono, preceded by a symbol.
+ * ------------------------------------------------------------------------ */
+
+	.callout {
+		border-left: 3px solid var(--ds-border-strong);
+		padding: var(--ds-space-3) var(--ds-space-4);
+		margin: var(--ds-space-4) 0;
+		background: var(--ds-bg-secondary);
+		border-radius: 0 var(--ds-radius) var(--ds-radius) 0;
+		font-size: var(--ds-text-sm);
+	}
+
+	.callout-title {
+		font-weight: var(--ds-weight-semibold);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--ds-tracking-wide);
+		margin-bottom: var(--ds-space-2);
+		display: flex;
+		align-items: center;
+		gap: var(--ds-space-2);
+	}
+
+	.callout p:last-child {
+		margin-bottom: 0;
+	}
+
+	/* Note — blue / info */
+	.callout-note {
+		border-left-color: color-mix(in oklch, var(--ds-info) 50%, transparent);
+	}
+	.callout-note .callout-title {
+		color: var(--ds-info);
+	}
+	.callout-note .callout-title::before {
+		content: "ℹ ";
+	}
+
+	/* Tip — green / success */
+	.callout-tip {
+		border-left-color: color-mix(in oklch, var(--ds-success) 50%, transparent);
+	}
+	.callout-tip .callout-title {
+		color: var(--ds-success);
+	}
+	.callout-tip .callout-title::before {
+		content: "✦ ";
+	}
+
+	/* Warning — yellow / warning */
+	.callout-warning {
+		border-left-color: color-mix(in oklch, var(--ds-warning) 50%, transparent);
+	}
+	.callout-warning .callout-title {
+		color: var(--ds-warning);
+	}
+	.callout-warning .callout-title::before {
+		content: "⚠ ";
+	}
+
+	/* Caution — red / danger */
+	.callout-caution {
+		border-left-color: color-mix(in oklch, var(--ds-danger) 50%, transparent);
+	}
+	.callout-caution .callout-title {
+		color: var(--ds-danger);
+	}
+	.callout-caution .callout-title::before {
+		content: "✕ ";
+	}
+	/* --------------------------------------------------------------------------
+ * 9. Terminal Block
+ *
+ * Faux terminal window with a header (three pixel-square dots + optional
+ * title) and a scrollable mono body. Prompt lines get a green `$ `.
+ * ------------------------------------------------------------------------ */
+
+	.terminal {
+		border: 1px solid var(--ds-border);
+		border-radius: var(--ds-radius-lg);
+		overflow: hidden;
+		margin: var(--ds-space-6) 0;
+		background: var(--ds-bg-code);
+	}
+
+	.terminal-header {
+		background: var(--ds-bg-tertiary);
+		padding: var(--ds-space-2) var(--ds-space-3);
+		display: flex;
+		align-items: center;
+		gap: var(--ds-space-2);
+		border-bottom: 1px solid var(--ds-border);
+	}
+
+	/* Three pixel-style dots — square, not round */
+	.terminal-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 0;
+		display: inline-block;
+	}
+
+	.terminal-dot:nth-child(1) {
+		background: var(--ds-danger);
+	}
+	.terminal-dot:nth-child(2) {
+		background: var(--ds-warning);
+	}
+	.terminal-dot:nth-child(3) {
+		background: var(--ds-success);
+	}
+
+	.terminal-title {
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		color: var(--ds-text-secondary);
+		margin-left: var(--ds-space-2);
+	}
+
+	.terminal-body {
+		padding: var(--ds-space-4);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-sm);
+		line-height: 1.6;
+		color: var(--ds-text-primary);
+		overflow-x: auto;
+	}
+
+	/* Prompt line: green `$ ` prefix */
+	.terminal-body .prompt::before {
+		content: "$ ";
+		color: var(--ds-success);
+	}
+
+	.terminal-body pre.output {
+		color: var(--ds-text-secondary);
+		margin: 0;
+		padding: 0;
+		background: none;
+		border: none;
+		border-radius: 0;
+	}
+
+	/* Copy button — appears on hover over terminal-body sections */
+	.terminal-cmd {
+		position: relative;
+		padding: var(--ds-space-2) var(--ds-space-3);
+		border-radius: var(--ds-radius-sm);
+		cursor: pointer;
+		transition: background var(--ds-transition);
+	}
+
+	.terminal-cmd:hover {
+		background: var(--ds-bg-elevated);
+	}
+
+	.copy-btn {
+		position: absolute;
+		opacity: 0;
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		color: var(--ds-text-tertiary);
+		background: var(--ds-bg-tertiary);
+		border: 1px solid var(--ds-border);
+		border-radius: var(--ds-radius-sm);
+		padding: 2px var(--ds-space-2);
+		cursor: pointer;
+		transition: all var(--ds-transition);
+		white-space: nowrap;
+	}
+
+	.copy-btn:hover {
+		color: var(--ds-primary);
+		border-color: var(--ds-primary);
+	}
+
+	.copy-btn.copied {
+		color: var(--ds-success);
+		border-color: var(--ds-success);
+	}
+
+	.terminal-cmd .copy-btn {
+		top: var(--ds-space-2);
+		right: var(--ds-space-2);
+	}
+
+	.code-block-wrapper {
+		position: relative;
+		cursor: pointer;
+	}
+
+	.code-header {
+		padding: var(--ds-space-2) var(--ds-space-4);
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-xs);
+		color: var(--ds-text-secondary);
+		background: var(--ds-bg-tertiary);
+		border: 1px dashed var(--ds-border-strong);
+		border-bottom: none;
+		border-radius: var(--ds-radius) var(--ds-radius) 0 0;
+		margin-bottom: 0;
+	}
+
+	.code-header + pre {
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
+		margin-top: 0;
+	}
+
+	.code-block-wrapper .copy-btn {
+		top: var(--ds-space-2);
+		right: var(--ds-space-2);
+	}
+
+	.terminal-cmd:hover .copy-btn,
+	.code-block-wrapper:hover .copy-btn {
+		opacity: 1;
+	}
+	/* --------------------------------------------------------------------------
+ * 10. ASCII Diagram
+ *
+ * Pre-formatted monospace block with dashed border for displaying
+ * ASCII art, diagrams, and box-drawing layouts.
+ * ------------------------------------------------------------------------ */
+
+	.ascii {
+		font-family: var(--ds-font-mono);
+		font-size: var(--ds-text-sm);
+		line-height: 1.4;
+		background: var(--ds-bg-secondary);
+		border: 1px dashed var(--ds-border-strong);
+		border-radius: var(--ds-radius);
+		padding: var(--ds-space-4);
+		margin: var(--ds-space-4) 0;
+		overflow-x: auto;
+		white-space: pre;
+		color: var(--ds-text-secondary);
+	}
+
+	.ascii .highlight {
+		color: var(--ds-primary);
+	}
+
+	.ascii .dim {
+		color: var(--ds-text-tertiary);
+	}
+	/* --------------------------------------------------------------------------
+ * 12. Metadata Line
+ *
+ * Blog / post metadata: Author | Date | Tags, with @handle support.
+ * ------------------------------------------------------------------------ */
+
+	.meta {
+		font-size: var(--ds-text-sm);
+		color: var(--ds-text-secondary);
+		font-family: var(--ds-font-mono);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--ds-space-1);
+	}
+
+	.meta a {
+		color: var(--ds-text-primary);
+		text-decoration: none;
+	}
+
+	.meta a:hover {
+		color: var(--ds-primary);
+	}
+
+	.meta .handle {
+		color: var(--ds-text-tertiary);
+	}
+
+	.meta .handle:hover {
+		color: var(--ds-info);
+		background: var(--ds-info-muted);
+		text-decoration: none;
+	}
+
+	.sep {
+		color: var(--ds-text-tertiary);
+		user-select: none;
+		padding: 0 var(--ds-space-1);
+	}
+
+	.arrow::after {
+		content: " →";
+	}
+}

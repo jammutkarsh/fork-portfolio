@@ -165,7 +165,10 @@ export const getPostFromSlug = cache(async (slug: string) => {
 					[
 						rehypePrettyCode,
 						{
-							theme: 'dracula',
+							// One theme per site theme (switched in site.css); the code
+							// block background comes from the utc-ds tokens instead.
+							theme: { dark: 'vesper', light: 'github-light' },
+							keepBackground: false,
 						},
 					],
 				],

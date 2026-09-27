@@ -39,7 +39,7 @@ export default function ScreenshotGallery({
 						<button
 							type='button'
 							onClick={() => open(i)}
-							className='relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-lg border border-gray-200 dark:border-gray-300/20'
+							className='relative block aspect-[16/10] w-full cursor-zoom-in overflow-hidden rounded-(--ds-radius-lg) border border-dashed border-(--ds-border-strong) transition-colors duration-150 hover:border-primary-500'
 							aria-label={`Open screenshot: ${shot.caption ?? shot.src}`}
 						>
 							<Image
@@ -47,11 +47,11 @@ export default function ScreenshotGallery({
 								alt={shot.caption ?? ''}
 								fill
 								sizes='(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'
-								className='object-cover object-top transition-transform duration-500 hover:scale-105'
+								className='object-cover object-top'
 							/>
 						</button>
 						{shot.caption && (
-							<figcaption className='text-sm text-gray-500'>
+							<figcaption className='font-mono text-xs text-(--ds-text-secondary)'>
 								{shot.caption}
 							</figcaption>
 						)}

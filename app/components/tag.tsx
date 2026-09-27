@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { kebabCase } from '../blog/kebab-case';
 
-const className =
-	'cursor-pointer rounded-md bg-primary-500 px-2 py-0.5 text-xs uppercase text-white motion-safe:transition-colors motion-safe:duration-300 hover:bg-primary-400';
+// utc-ds badge: a bracket-wrapped [tag] in the accent colour.
+const className = 'badge badge-primary cursor-pointer';
 
 /**
  * A post tag. Links to the blog filtered by this tag, or — when `onSelect`
