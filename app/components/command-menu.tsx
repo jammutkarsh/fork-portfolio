@@ -58,23 +58,22 @@ interface Entry {
 }
 
 /**
- * Path mode (input starts with ~): like a shell, the pages in the folder
- * being typed whose name starts with the typed part (~/utc/ lists blog,
- * projects, uses; ~/utc/blog/ho lists the posts starting with "ho").
- * Otherwise search mode: every entry whose path, label or title contains
- * the text.
+ * Path mode (input starts with ~): every page whose path starts with what
+ * is typed, in breadth-first order: the typed folder itself, then its
+ * direct children, then theirs (~/utc, then blog, projects, uses, then the
+ * posts and projects). Otherwise search mode: every entry whose path,
+ * label or title contains the text.
  */
 function complete(entries: Entry[], query: string) {
 	const typed = query.trim().toLowerCase();
 	if (typed.startsWith('~')) {
-		const depth = typed.split('/').length;
+		const depth = (entry: Entry) => entry.path?.split('/').length ?? 0;
 		return entries
-			.filter(
-				(entry) =>
-					entry.path?.toLowerCase().startsWith(typed) &&
-					entry.path.split('/').length === depth,
-			)
-			.sort((a, b) => (a.path ?? '').localeCompare(b.path ?? ''));
+			.filter((entry) => entry.path?.toLowerCase().startsWith(typed))
+			.sort(
+				(a, b) =>
+					depth(a) - depth(b) || (a.path ?? '').localeCompare(b.path ?? ''),
+			);
 	}
 	if (!typed) return entries;
 	return entries.filter((entry) =>
@@ -199,16 +198,6 @@ export default function CommandMenu({
 	};
 
 	const pathMode = query.trim().startsWith('~');
-	// In path mode the list shows names within the folder being typed, like
-	// a shell's completions (blog/, projects/, some-post); folders get a /.
-	const shown = (entry: Entry) => {
-		if (!pathMode || !entry.path) return entry.label;
-		const name = entry.path.slice(entry.path.lastIndexOf('/') + 1);
-		const isFolder = entries.some((other) =>
-			other.path?.startsWith(`${entry.path}/`),
-		);
-		return isFolder ? `${name}/` : name;
-	};
 
 	// A terminal window (utc-ds .terminal).
 	return (
@@ -260,9 +249,9 @@ export default function CommandMenu({
 						onSelect={entry.run}
 						className='flex cursor-pointer items-center rounded-(--ds-radius) px-2 py-1.5 text-sm before:mr-2 before:text-(--ds-text-tertiary) before:content-[">"] data-[selected=true]:bg-(--ds-primary-muted) data-[selected=true]:text-primary-500'
 					>
-						<span className='truncate'>{shown(entry)}</span>
+						<span className='min-w-0 truncate sm:shrink-0'>{entry.label}</span>
 						{entry.hint && (
-							<span className='ml-auto hidden shrink-0 pl-4 text-xs text-(--ds-text-tertiary) sm:inline'>
+							<span className='ml-auto hidden min-w-0 truncate pl-4 text-xs text-(--ds-text-tertiary) sm:inline'>
 								{entry.hint}
 							</span>
 						)}
