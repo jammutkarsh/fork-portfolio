@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import { type ReactNode, ViewTransition } from 'react';
 import { getPosts } from './blog/utils';
 import CommandMenu from './components/command-menu';
+import { FrameProvider } from './components/layouts/frame';
 import SiteFooter from './components/layouts/site-footer';
 import SiteNav from './components/layouts/site-nav';
 import { mukta } from './fonts';
@@ -71,15 +72,17 @@ export default function RootLayout({ children }: RootLayoutProps) {
 					themes={['dark', 'light']}
 				>
 					<LenisProvider>
-						<div className='flex min-h-svh flex-col'>
-							<SiteNav />
-							{/* Page content crossfades on navigation; nav/footer stay put. */}
-							<ViewTransition default='page'>
-								<div className='flex flex-1 flex-col'>{children}</div>
-							</ViewTransition>
-							<SiteFooter />
-						</div>
-						<CommandMenu posts={commandMenuPosts} />
+						<FrameProvider>
+							<div className='flex min-h-svh flex-col'>
+								<SiteNav />
+								{/* Page content crossfades on navigation; nav/footer stay put. */}
+								<ViewTransition default='page'>
+									<div className='flex flex-1 flex-col'>{children}</div>
+								</ViewTransition>
+								<SiteFooter />
+							</div>
+							<CommandMenu posts={commandMenuPosts} />
+						</FrameProvider>
 					</LenisProvider>
 					{process.env.NODE_ENV === 'production' && <Analytics />}
 				</ThemeProvider>

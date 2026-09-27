@@ -1,22 +1,17 @@
 'use client';
 
-import {
-	animate,
-	motion,
-	useMotionValue,
-	useReducedMotion,
-	useTransform,
-} from 'motion/react';
+import { motion, useReducedMotion, useTransform } from 'motion/react';
 import { type ReactNode, useEffect } from 'react';
-import FrameLines from './frame-lines';
+import { animateFrame, useFrame } from './frame';
 
 /**
- * A detail page (blog post, project) opens up: its frame lines slide off
+ * A detail page (blog post, project) opens up: the frame lines slide off
  * screen and the page widens, leaving room for wide content such as code
- * blocks and images.
+ * blocks and images. The nav and footer stay aligned with the text column.
+ * Leaving the page closes the frame again.
  */
 export default function OpenFrame({ children }: { children: ReactNode }) {
-	const open = useMotionValue(0);
+	const { open } = useFrame();
 	const reduceMotion = useReducedMotion();
 	const maxWidth = useTransform(
 		open,
@@ -24,27 +19,20 @@ export default function OpenFrame({ children }: { children: ReactNode }) {
 	);
 
 	useEffect(() => {
-		if (reduceMotion) {
-			open.set(1);
-			return;
-		}
-		const controls = animate(open, 1, {
-			duration: 0.9,
-			delay: 0.15,
-			ease: [0.22, 1, 0.36, 1],
-		});
-		return () => controls.stop();
+		if (reduceMotion) open.set(1);
+		else animateFrame(open, 1);
+		return () => {
+			if (reduceMotion) open.set(0);
+			else animateFrame(open, 0);
+		};
 	}, [open, reduceMotion]);
 
 	return (
-		<>
-			<FrameLines open={open} width={maxWidth} />
-			<motion.main
-				style={{ maxWidth }}
-				className='mx-auto flex w-full flex-1 flex-col px-5 py-8 pt-12 sm:px-8 md:px-18 md:py-18 md:pt-14'
-			>
-				{children}
-			</motion.main>
-		</>
+		<motion.main
+			style={{ maxWidth }}
+			className='mx-auto flex w-full flex-1 flex-col px-5 py-8 pt-12 sm:px-8 md:px-18 md:py-18 md:pt-14'
+		>
+			{children}
+		</motion.main>
 	);
 }

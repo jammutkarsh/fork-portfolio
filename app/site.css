@@ -66,16 +66,22 @@ html.theme-switching::view-transition-new(root) {
 }
 
 /*
-  FrameLines (app/components/layouts/frame-lines.tsx) draws the frame's
-  vertical lines itself so it can slide them off screen; hide the nav's and
-  footer's side borders while it is mounted.
+  The frame's vertical lines are drawn once for the whole site by
+  FrameProvider (app/components/layouts/frame.tsx), so they can move and
+  never re-draw between pages. Hide the side borders the nav, footer and
+  page containers would otherwise draw, and let the nav and footer rows
+  widen with the home story (--frame-wide goes from 0 to 1).
 */
-html.frame-lines :is(header > nav, footer > div) {
+:is(header > nav, footer > div, main) {
 	border-inline-color: transparent;
 }
 
+:is(header > nav, footer > div) {
+	max-width: calc(64rem + var(--frame-wide, 0) * (min(100vw, 90rem) - 64rem));
+}
+
 /*
-  Blog posts: once the frame has opened up (app/blog/[slug]/open-frame.tsx),
+  Blog posts: once the frame has opened up (app/components/layouts/open-frame.tsx),
   code blocks break out of the text column by up to 6rem on each side.
 */
 .post-body > :is(figure, pre) {
@@ -104,9 +110,4 @@ html.dark.story-deck footer {
 html.story-deck.story-end footer {
 	opacity: 1;
 	pointer-events: auto;
-}
-
-/* ...and let them widen with the page frame, so their edges stay aligned. */
-html.frame-lines :is(header > nav, footer > div) {
-	max-width: var(--frame-width, 64rem);
 }

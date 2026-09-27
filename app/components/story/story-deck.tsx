@@ -21,7 +21,7 @@ import {
 	useState,
 } from 'react';
 import { merryWeather } from '../../fonts';
-import FrameLines from '../layouts/frame-lines';
+import { animateFrame, useFrame } from '../layouts/frame';
 import DeskScene from './desk-scene';
 import type { PhaseMeta } from './get-story';
 
@@ -31,6 +31,16 @@ const ease = [0.22, 1, 0.36, 1] as const;
 // Short screens (a phone in landscape) step everything down a size.
 const heading =
 	'text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl [@media(max-height:500px)]:text-2xl';
+
+// The width the intro text has on the intro, where the frame is at its
+// narrowest (64rem, minus padding and the gap, split between the columns).
+// The intro keeps this width while the frame widens so it doesn't re-wrap.
+function introWidth() {
+	const vw = window.innerWidth;
+	const padding = vw >= 768 ? 72 : vw >= 640 ? 32 : 20;
+	const content = Math.min(vw, 1024) - 2 * padding;
+	return vw >= 768 ? (content - 56) / 2.15 : content;
+}
 
 // The title and the paragraph change the same way: the old one fades out,
 // then the new one fades in.
@@ -97,10 +107,12 @@ export default function StoryDeck({
 	useMotionValueEvent(scrollY, 'change', (y) => setSlide(slideAt(y)));
 
 	// 0 on the intro, 1 from the first phase on.
-	const spread = useTransform(scrollY, (y) => {
+	const progressAt = useCallback((y: number) => {
 		const { start, step } = metrics.current;
 		return Math.min(1, Math.max(0, (y - start) / step));
-	});
+	}, []);
+	const spread = useTransform(scrollY, progressAt);
+	const [introPx, setIntroPx] = useState<number>();
 	useMotionValueEvent(spread, 'change', (s) => setOpened(s > 0.98));
 	const frameWidth = useTransform(
 		spread,
@@ -116,6 +128,34 @@ export default function StoryDeck({
 		[0.2, 1],
 		['circle(0% at 50% 50%)', 'circle(75% at 50% 50%)'],
 	);
+
+	// Drive the site's frame (lines, nav and footer width) from the scroll:
+	// first glide it from wherever the previous page left it, then follow;
+	// on leaving, glide it back to the default.
+	const { open, wide } = useFrame();
+	useEffect(() => {
+		let following = false;
+		const target = progressAt(window.scrollY);
+		const toOpen = animateFrame(open, target);
+		const toWide = animateFrame(wide, target);
+		Promise.all([toOpen, toWide]).then(() => {
+			following = true;
+			open.set(progressAt(window.scrollY));
+			wide.set(progressAt(window.scrollY));
+		});
+		const unsubscribe = spread.on('change', (value) => {
+			if (!following) return;
+			open.set(value);
+			wide.set(value);
+		});
+		return () => {
+			unsubscribe();
+			toOpen.stop();
+			toWide.stop();
+			animateFrame(open, 0);
+			animateFrame(wide, 0);
+		};
+	}, [open, wide, spread, progressAt]);
 
 	// On the home page the site footer is pinned to the bottom of the screen
 	// and fades in on the last slide (see site.css), so the page ends on the
@@ -145,6 +185,7 @@ export default function StoryDeck({
 			setSlide(slideAt(window.scrollY));
 			setOpened((window.scrollY - start) / step > 0.98);
 			setFooterHeight(document.querySelector('footer')?.offsetHeight ?? 0);
+			setIntroPx(introWidth());
 
 			snap?.destroy();
 			if (!lenis) return;
@@ -171,7 +212,6 @@ export default function StoryDeck({
 
 	return (
 		<MotionConfig reducedMotion='user'>
-			<FrameLines open={spread} width={frameWidth} />
 			<div
 				ref={container}
 				className='[--nav:3.5rem] sm:[--nav:4rem]'
@@ -232,7 +272,7 @@ export default function StoryDeck({
 						<div className='grid min-h-0 md:order-1'>
 							<motion.section
 								inert={slide !== 0}
-								style={{ opacity: introOpacity, y: introY }}
+								style={{ opacity: introOpacity, y: introY, width: introPx }}
 								className='[grid-area:1/1] self-center'
 							>
 								<h1 className={classNames(heading, merryWeather.className)}>
@@ -261,12 +301,17 @@ export default function StoryDeck({
 										<motion.div
 											key={phase.id}
 											{...swap(dir)}
-											data-lenis-prevent
-											className='max-h-full overflow-y-auto text-base sm:text-lg lg:text-xl [@media(max-height:500px)]:text-sm'
+											className='flex max-h-full min-h-0 flex-col'
 										>
-											{prose[current]}
+											<div
+												data-lenis-prevent
+												className='min-h-0 overflow-y-auto text-base sm:text-lg lg:text-xl [@media(max-height:500px)]:text-sm'
+											>
+												{prose[current]}
+											</div>
+											{/* Outside the scrolling text, so they are always in view */}
 											{isLast && (
-												<div className='mt-4 flex gap-5 text-base'>
+												<div className='mt-4 flex shrink-0 gap-5 text-base [@media(max-height:500px)]:mt-2'>
 													<Link href='/blog' className='underline-magical'>
 														Blogs &rarr;
 													</Link>
