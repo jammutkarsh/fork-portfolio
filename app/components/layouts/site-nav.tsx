@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Fragment, useEffect, useState, ViewTransition } from 'react';
+import siteMetadata from '../../site-metadata';
 import { openCommandMenu } from '../command-menu';
 import Breadcrumbs from './breadcrumbs';
 import ThemeSwitch from './theme-switch/theme-switch';
@@ -192,6 +193,20 @@ export default function SiteNav() {
 									</Fragment>
 								);
 							})}
+							<span
+								aria-hidden='true'
+								className='hidden px-1 font-mono font-normal text-(--ds-text-tertiary) select-none sm:inline'
+							>
+								|
+							</span>
+							<a
+								href={siteMetadata.resume}
+								target='_blank'
+								rel='noreferrer'
+								className='py-2 text-(--ds-text-primary) hover:text-primary-500 motion-safe:transition-colors motion-safe:duration-150 sm:px-2 sm:py-1'
+							>
+								Resume ↗
+							</a>
 
 							{/* Mobile-only: search and theme inside the menu */}
 							<div className='mt-2 flex w-full items-center justify-between border-t border-dashed border-(--ds-border-strong) pt-3 sm:hidden'>

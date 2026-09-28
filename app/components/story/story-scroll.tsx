@@ -123,7 +123,11 @@ export default function StoryScroll({
 				</div>
 			)}
 
-			<Thesis thesis={thesis} closing={closing} />
+			<Thesis
+				thesis={thesis}
+				closing={closing}
+				thread={portrait === false ? phases.at(-1)?.color : undefined}
+			/>
 		</MotionConfig>
 	);
 }

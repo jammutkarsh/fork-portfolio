@@ -3,9 +3,11 @@ import siteMetadata from '../../site-metadata';
 import { AtSignIcon } from './icons/at-sign-icon';
 import { GithubIcon } from './icons/github-icon';
 import { LinkedinIcon } from './icons/linkedin-icon';
+import { ResumeIcon } from './icons/resume-icon';
 import { XIcon } from './icons/x-icon';
 
 const socials = [
+	{ href: siteMetadata.resume, label: 'Resume', Icon: ResumeIcon },
 	{ href: siteMetadata.github, label: 'GitHub', Icon: GithubIcon },
 	{ href: siteMetadata.linkedin, label: 'LinkedIn', Icon: LinkedinIcon },
 	{ href: siteMetadata.twitter, label: 'X (Twitter)', Icon: XIcon },
@@ -21,14 +23,6 @@ export default function SiteFooter() {
 					reserved.
 				</p>
 				<div className='-mx-2 flex items-center'>
-					<a
-						href={siteMetadata.resume}
-						target='_blank'
-						rel='noreferrer'
-						className='mr-3 rounded-(--ds-radius) border border-(--ds-border-strong) px-2 py-0.5 text-(--ds-text-primary) transition-colors duration-150 hover:border-primary-500 hover:text-primary-500'
-					>
-						resume ↗
-					</a>
 					{socials.map(({ href, label, Icon }) => (
 						<Link
 							key={label}
