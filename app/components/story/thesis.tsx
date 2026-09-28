@@ -7,7 +7,7 @@ import {
 	useTransform,
 } from 'motion/react';
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import siteMetadata from '../../site-metadata';
 
 /**
@@ -40,31 +40,18 @@ export default function Thesis({
 
 	return (
 		<>
-			{thread && (
-				// The chapters' thread (on the left edge of the column layout)
-				// bends over to the middle of the page.
-				<div
-					aria-hidden='true'
-					className='mx-auto w-full max-w-[90rem] px-5 sm:px-8 md:px-18'
-				>
-					<div
-						className='h-16 w-1/2 rounded-bl-3xl border-b border-l'
-						style={{ borderColor: thread }}
-					/>
-				</div>
-			)}
+			{thread && <Connector color={thread} />}
 			<section
 				ref={ref}
 				className='relative mx-auto flex w-full max-w-4xl flex-col items-center px-5 pb-24 text-center sm:px-8 md:pb-36'
 			>
-				<motion.div
-					aria-hidden='true'
-					style={{
-						scaleY: thread ? 1 : line,
-						backgroundImage: `linear-gradient(to bottom, ${thread ?? 'var(--ds-border-strong)'}, var(--color-primary-500))`,
-					}}
-					className='-mt-px h-24 w-px origin-top md:h-32'
-				/>
+				{!thread && (
+					<motion.div
+						aria-hidden='true'
+						style={{ scaleY: line }}
+						className='h-24 w-px origin-top bg-linear-to-b from-(--ds-border-strong) to-primary-500 md:h-32'
+					/>
+				)}
 				<blockquote className='mt-8 text-3xl leading-tight font-light tracking-[-0.03em] sm:text-4xl lg:text-5xl'>
 					<span className='text-primary-500'>“</span>
 					{words.map((word, k) => (
@@ -129,5 +116,78 @@ function Word({
 			<motion.span style={{ opacity }}>{children}</motion.span>
 			{last ? null : ' '}
 		</>
+	);
+}
+
+// The connector's shape: down from the thread, round a corner, across to the
+// middle, round another corner, and down to the quote.
+const DROP = 64;
+const RADIUS = 24;
+const FALL = 128;
+
+/**
+ * Carries the chapters' thread (on the left edge of the column layout) over
+ * to the middle of the page and down into the thesis, drawing itself as it
+ * scrolls past the middle of the screen, as the thread does.
+ */
+function Connector({ color }: { color: string }) {
+	const ref = useRef<HTMLDivElement>(null);
+	const [width, setWidth] = useState(0);
+	const { scrollYProgress } = useScroll({
+		target: ref,
+		offset: ['start center', 'end 0.6'],
+	});
+
+	useEffect(() => {
+		const el = ref.current;
+		if (!el) return;
+		const measure = () => setWidth(el.clientWidth);
+		measure();
+		const resize = new ResizeObserver(measure);
+		resize.observe(el);
+		return () => resize.disconnect();
+	}, []);
+
+	const x = width / 2;
+	const height = DROP + FALL;
+	const r = Math.min(RADIUS, x / 2);
+	const d = `M0.5 0V${DROP - r}Q0.5 ${DROP} ${r} ${DROP}H${x - r}Q${x} ${DROP} ${x} ${DROP + r}V${height}`;
+
+	return (
+		<div
+			aria-hidden='true'
+			className='mx-auto w-full max-w-[90rem] px-5 sm:px-8 md:px-18'
+		>
+			<div ref={ref} style={{ height }}>
+				{width > 0 && (
+					<svg
+						width={width}
+						height={height}
+						className='block overflow-visible'
+						fill='none'
+					>
+						<defs>
+							<linearGradient
+								id='thesis-thread'
+								gradientUnits='userSpaceOnUse'
+								x1={0}
+								y1={DROP}
+								x2={0}
+								y2={height}
+							>
+								<stop offset='0' stopColor={color} />
+								<stop offset='1' stopColor='var(--color-primary-500)' />
+							</linearGradient>
+						</defs>
+						<motion.path
+							d={d}
+							stroke='url(#thesis-thread)'
+							strokeWidth={1}
+							style={{ pathLength: scrollYProgress }}
+						/>
+					</svg>
+				)}
+			</div>
+		</div>
 	);
 }
