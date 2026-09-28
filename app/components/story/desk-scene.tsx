@@ -8,7 +8,7 @@ import { Sketch } from './sketches';
 /*
   One desk, drawn as a line sketch on a 400×300 grid, that changes with the
   story. Nothing here switches at a threshold: every part follows `p`, the
-  scroll position as a phase (0 = gamer … 5 = now, fractions in between), so
+  scroll position as a phase (0 = gamer … 4 = gopher, fractions in between), so
   the scene drifts from one phase to the next as you scroll, both ways.
 
   Everything is drawn in currentColor with the site's orange as the only
@@ -26,7 +26,7 @@ const FRAME = { x: 292, y: 16, size: 72 };
 const CALENDAR = { x: 180, y: 22, w: 64, h: 74 };
 // The day the calendar is on in each phase; the days before it are crossed
 // off as the phase scrolls in. Only the year is real (from content/story.mdx).
-const today = [9, 23, 16, 28, 12, 20];
+const today = [9, 23, 16, 28, 12];
 const DAYS = Array.from({ length: 31 }, (_, i) => i);
 
 type Phase = MotionValue<number>;
@@ -244,20 +244,6 @@ export default function DeskScene({
 						stroke={ACCENT}
 					/>
 				</g>
-			</Appear>
-
-			<Appear p={p} at={5}>
-				{/* Coffee */}
-				<Draw.path
-					d='M128 194h16v16a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3z'
-					className={BG}
-				/>
-				<Draw.path d='M144 198a5 5 0 0 1 0 10' />
-				<path
-					d='M133 188c0-3 2-3 2-6M139 188c0-3 2-3 2-6'
-					strokeWidth={1}
-					className='motion-safe:animate-pulse'
-				/>
 			</Appear>
 
 			{/* Wall calendar: one page per phase, the top one tears off */}
@@ -613,22 +599,5 @@ const screens = [
 		<Line y={146}>func main() {'{'}</Line>
 		<Line y={160}>{'  '}fmt.Println("hi")</Line>
 		<Line y={174}>{'}'}</Line>
-	</g>,
-	// Open source
-	<g key='now'>
-		<Line y={130}>$ git push origin main</Line>
-		<rect x={161} y={138} width={52} height={15} rx={7.5} stroke={ACCENT} />
-		<text
-			x={187}
-			y={148.5}
-			textAnchor='middle'
-			fontFamily={MONO}
-			fontSize={7.5}
-			stroke='none'
-			fill={ACCENT}
-		>
-			merged
-		</text>
-		<Line y={172}>open source, always</Line>
 	</g>,
 ];

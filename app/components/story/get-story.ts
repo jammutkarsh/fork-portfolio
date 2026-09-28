@@ -12,14 +12,6 @@ export interface PhaseMeta {
 	sketch: SketchId;
 	/** Tints the page while this phase is on screen. */
 	color: string;
-	/** What this version of me was after. */
-	drive: string;
-	/** What stood in the way. */
-	friction: string;
-	/** How the phase ties back to the story's thesis. */
-	thread: string;
-	/** Terminal lines that type out as the phase scrolls in. */
-	scenario: string[];
 }
 
 export interface Phase extends PhaseMeta {
@@ -33,6 +25,8 @@ export interface Story {
 	occupation: string;
 	/** The idea every phase leads back to; closes the home page. */
 	thesis: string;
+	/** Follows the thesis, continuing its sentence. */
+	closing: string;
 	phases: Phase[];
 }
 
@@ -66,6 +60,7 @@ export function getStory(): Story {
 		avatar: data.avatar,
 		occupation: data.occupation,
 		thesis: data.thesis,
+		closing: data.closing,
 		phases,
 	};
 }

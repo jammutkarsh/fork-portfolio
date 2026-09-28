@@ -3,28 +3,23 @@
 import {
 	type MotionValue,
 	motion,
-	useReducedMotion,
 	useScroll,
 	useTransform,
 } from 'motion/react';
 import Link from 'next/link';
 import { useRef } from 'react';
-import type { PhaseMeta } from './get-story';
 
 /**
  * The end of the story: the thread that ran down the chapters arrives at
- * the thesis, which reveals itself word by word as it scrolls up, while the
- * chapters' personas drift in from all over and line up beneath it. Each
- * persona is a button back to its chapter.
+ * the thesis, which reveals itself word by word as it scrolls up, followed
+ * by the line that closes the story.
  */
 export default function Thesis({
 	thesis,
-	phases,
-	onPick,
+	closing,
 }: {
 	thesis: string;
-	phases: PhaseMeta[];
-	onPick: (index: number) => void;
+	closing: string;
 }) {
 	const ref = useRef<HTMLElement>(null);
 	const { scrollYProgress: t } = useScroll({
@@ -32,6 +27,8 @@ export default function Thesis({
 		offset: ['start end', 'center center'],
 	});
 	const line = useTransform(t, [0, 0.35], [0, 1]);
+	const closingOpacity = useTransform(t, [0.75, 0.95], [0, 1]);
+	const closingY = useTransform(t, [0.75, 0.95], [16, 0]);
 	const words = thesis.split(' ');
 
 	return (
@@ -57,10 +54,10 @@ export default function Thesis({
 					<Word
 						// biome-ignore lint/suspicious/noArrayIndexKey: words can repeat
 						key={k}
-						last={k === words.length - 1}
 						t={t}
-						from={0.25 + (k / words.length) * 0.55}
-						to={0.25 + ((k + 1) / words.length) * 0.55}
+						last={k === words.length - 1}
+						from={0.25 + (k / words.length) * 0.5}
+						to={0.25 + ((k + 1) / words.length) * 0.5}
 					>
 						{word}
 					</Word>
@@ -68,17 +65,12 @@ export default function Thesis({
 				<span className='text-primary-500'>”</span>
 			</blockquote>
 
-			<ul className='mt-10 flex max-w-2xl flex-wrap justify-center gap-2'>
-				{phases.map((phase, i) => (
-					<Persona
-						key={phase.id}
-						t={t}
-						i={i}
-						phase={phase}
-						onPick={() => onPick(i)}
-					/>
-				))}
-			</ul>
+			<motion.p
+				style={{ opacity: closingOpacity, y: closingY }}
+				className='mt-8 max-w-2xl text-lg leading-relaxed text-(--ds-text-secondary) sm:text-xl'
+			>
+				{closing}
+			</motion.p>
 
 			<div className='mt-12 flex gap-6 text-base md:text-lg'>
 				<Link href='/blogs' className='underline-magical'>
@@ -100,9 +92,9 @@ function Word({
 	children,
 }: {
 	t: MotionValue<number>;
-	last: boolean;
 	from: number;
 	to: number;
+	last: boolean;
 	children: string;
 }) {
 	const opacity = useTransform(t, [from, to], [0.15, 1]);
@@ -111,47 +103,5 @@ function Word({
 			<motion.span style={{ opacity }}>{children}</motion.span>
 			{last ? null : ' '}
 		</>
-	);
-}
-
-function Persona({
-	t,
-	i,
-	phase,
-	onPick,
-}: {
-	t: MotionValue<number>;
-	i: number;
-	phase: PhaseMeta;
-	onPick: () => void;
-}) {
-	const still = useReducedMotion();
-	// Scattered start positions, fixed per chip so they don't jump on reload.
-	const dx = still ? 0 : Math.sin(i * 2.3 + 1) * 160;
-	const dy = still ? 0 : 60 + Math.cos(i * 1.7) * 70;
-	const tilt = still ? 0 : Math.sin(i * 3.1) * 14;
-	const x = useTransform(t, [0.3, 0.95], [dx, 0]);
-	const y = useTransform(t, [0.3, 0.95], [dy, 0]);
-	const rotate = useTransform(t, [0.3, 0.95], [tilt, 0]);
-	const opacity = useTransform(t, [0.3, 0.7], [0, 1]);
-
-	return (
-		<motion.li style={{ x, y, rotate, opacity }}>
-			<button
-				type='button'
-				onClick={onPick}
-				className='flex cursor-pointer items-center gap-2 rounded-full border border-(--ds-border-strong) bg-[color-mix(in_oklch,var(--ds-bg-secondary)_80%,transparent)] px-3 py-1.5 text-sm backdrop-blur-sm transition-colors hover:border-primary-500 hover:text-primary-500'
-			>
-				<span
-					aria-hidden='true'
-					className='size-2 rounded-full'
-					style={{
-						backgroundColor: phase.color,
-						boxShadow: `0 0 10px ${phase.color}`,
-					}}
-				/>
-				{phase.title}
-			</button>
-		</motion.li>
 	);
 }

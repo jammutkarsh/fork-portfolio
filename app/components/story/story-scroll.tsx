@@ -45,6 +45,7 @@ export default function StoryScroll({
 	bio,
 	avatar,
 	thesis,
+	closing,
 	phases,
 	prose,
 }: {
@@ -52,6 +53,7 @@ export default function StoryScroll({
 	bio: string;
 	avatar: string;
 	thesis: string;
+	closing: string;
 	phases: PhaseMeta[];
 	prose: ReactNode[];
 }) {
@@ -251,7 +253,6 @@ export default function StoryScroll({
 								}}
 								phase={phase}
 								index={i}
-								total={phases.length}
 								pos={pos}
 							>
 								{prose[i]}
@@ -261,7 +262,7 @@ export default function StoryScroll({
 				</div>
 			</div>
 
-			<Thesis thesis={thesis} phases={phases} onPick={(i) => goTo(i + 1)} />
+			<Thesis thesis={thesis} closing={closing} />
 		</MotionConfig>
 	);
 }
