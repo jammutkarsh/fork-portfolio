@@ -10,6 +10,16 @@ export interface PhaseMeta {
 	year?: number;
 	/** Framed on the wall of the desk; see sketches.tsx for the options. */
 	sketch: SketchId;
+	/** Tints the page while this phase is on screen. */
+	color: string;
+	/** What this version of me was after. */
+	drive: string;
+	/** What stood in the way. */
+	friction: string;
+	/** How the phase ties back to the story's thesis. */
+	thread: string;
+	/** Terminal lines that type out as the phase scrolls in. */
+	scenario: string[];
 }
 
 export interface Phase extends PhaseMeta {
@@ -21,6 +31,8 @@ export interface Story {
 	name: string;
 	avatar: string;
 	occupation: string;
+	/** The idea every phase leads back to; closes the home page. */
+	thesis: string;
 	phases: Phase[];
 }
 
@@ -53,6 +65,7 @@ export function getStory(): Story {
 		name: data.name,
 		avatar: data.avatar,
 		occupation: data.occupation,
+		thesis: data.thesis,
 		phases,
 	};
 }

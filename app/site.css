@@ -81,26 +81,6 @@ html.theme-switching::view-transition-new(root) {
 }
 
 /*
-  Home page (app/components/story/story-deck.tsx): the footer is pinned to
-  the bottom of the screen and fades in on the last slide of the story.
-*/
-html.story-deck footer {
-	position: fixed;
-	inset-inline: 0;
-	bottom: 0;
-	z-index: 10;
-	opacity: 0;
-	pointer-events: none;
-	background-color: var(--ds-bg-primary);
-	transition: opacity 400ms ease;
-}
-
-html.story-deck.story-end footer {
-	opacity: 1;
-	pointer-events: auto;
-}
-
-/*
   Code blocks carry colours for both themes (rehype-pretty-code, see
   app/blogs/utils.ts); show the set that matches the site theme.
 */
