@@ -3,9 +3,11 @@ import siteMetadata from '../../site-metadata';
 import { AtSignIcon } from './icons/at-sign-icon';
 import { GithubIcon } from './icons/github-icon';
 import { LinkedinIcon } from './icons/linkedin-icon';
+import { ResumeIcon } from './icons/resume-icon';
 import { XIcon } from './icons/x-icon';
 
 const socials = [
+	{ href: siteMetadata.resume, label: 'Resume', Icon: ResumeIcon },
 	{ href: siteMetadata.github, label: 'GitHub', Icon: GithubIcon },
 	{ href: siteMetadata.linkedin, label: 'LinkedIn', Icon: LinkedinIcon },
 	{ href: siteMetadata.twitter, label: 'X (Twitter)', Icon: XIcon },

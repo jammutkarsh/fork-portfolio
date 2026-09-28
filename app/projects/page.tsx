@@ -32,7 +32,7 @@ export default function Page() {
 	};
 
 	return (
-		<PageContainer>
+		<PageContainer accent='#2496ed'>
 			<JsonLd data={jsonLd} />
 			<Header title='Projects' />
 			<div className='space-y-2 md:space-y-5 '>

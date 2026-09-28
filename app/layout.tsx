@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 import { type ReactNode, ViewTransition } from 'react';
 import { getPosts } from './blogs/utils';
 import CommandMenu from './components/command-menu';
+import { AmbienceProvider } from './components/layouts/ambience';
 import { FrameProvider } from './components/layouts/frame';
 import SiteFooter from './components/layouts/site-footer';
 import SiteNav from './components/layouts/site-nav';
@@ -103,21 +104,23 @@ export default function RootLayout({ children }: RootLayoutProps) {
 				>
 					<LenisProvider>
 						<FrameProvider>
-							<div className='flex min-h-svh flex-col'>
-								<SiteNav />
-								{/* Page content crossfades on navigation; nav/footer stay put. */}
-								<ViewTransition default='page'>
-									<div className='flex flex-1 flex-col'>{children}</div>
-								</ViewTransition>
-								<SiteFooter />
-							</div>
-							<CommandMenu
-								posts={commandMenuPosts}
-								projects={getProjects().map(({ slug, name }) => ({
-									slug,
-									name,
-								}))}
-							/>
+							<AmbienceProvider>
+								<div className='flex min-h-svh flex-col'>
+									<SiteNav />
+									{/* Page content crossfades on navigation; nav/footer stay put. */}
+									<ViewTransition default='page'>
+										<div className='flex flex-1 flex-col'>{children}</div>
+									</ViewTransition>
+									<SiteFooter />
+								</div>
+								<CommandMenu
+									posts={commandMenuPosts}
+									projects={getProjects().map(({ slug, name }) => ({
+										slug,
+										name,
+									}))}
+								/>
+							</AmbienceProvider>
 						</FrameProvider>
 					</LenisProvider>
 					{process.env.NODE_ENV === 'production' && <Analytics />}

@@ -82,7 +82,8 @@ export default async function Image({
 	}
 
 	const architecture =
-		project.architecture && (await architecturePng(project.architecture));
+		project.architecture &&
+		(await architecturePng(project.architecture[0].source));
 	return renderOgImage({
 		path: `/projects/${slug}`,
 		title: project.name,

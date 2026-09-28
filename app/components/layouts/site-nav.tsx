@@ -4,8 +4,9 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Fragment, useEffect, useState, ViewTransition } from 'react';
+import siteMetadata from '../../site-metadata';
 import { openCommandMenu } from '../command-menu';
-import { terminalPath } from './terminal-path';
+import Breadcrumbs from './breadcrumbs';
 import ThemeSwitch from './theme-switch/theme-switch';
 
 export const navLinks = [
@@ -33,6 +34,37 @@ function SearchIcon({ className }: { className?: string }) {
 			<path d='m20 20-3.5-3.5' />
 		</svg>
 	);
+}
+
+/**
+ * Whether the nav should slide away: after scrolling down past the top, and
+ * until the page is scrolled back up (even slightly) or reaches the top.
+ */
+function useHiddenOnScroll(enabled: boolean) {
+	const [hidden, setHidden] = useState(false);
+	useEffect(() => {
+		setHidden(false);
+		if (!enabled) return;
+		let last = window.scrollY;
+		let frame = 0;
+		const onScroll = () => {
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(() => {
+				const y = window.scrollY;
+				const delta = y - last;
+				if (y < 64) setHidden(false);
+				else if (delta > 4) setHidden(true);
+				else if (delta < -4) setHidden(false);
+				if (y < 64 || Math.abs(delta) > 4) last = y;
+			});
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => {
+			cancelAnimationFrame(frame);
+			window.removeEventListener('scroll', onScroll);
+		};
+	}, [enabled]);
+	return hidden;
 }
 
 export default function SiteNav() {
@@ -63,23 +95,24 @@ export default function SiteNav() {
 		return () => window.removeEventListener('keydown', onKeyDown);
 	}, [open]);
 
+	// The home story pins its frame under the nav, so there it always stays.
+	const hidden = useHiddenOnScroll(pathname !== '/' && !open);
+
 	return (
-		<header className='sticky top-0 z-20 w-full border-b border-(--ds-border) bg-[color-mix(in_oklch,var(--ds-bg-secondary)_85%,transparent)] backdrop-blur-md'>
+		<header
+			className={classNames(
+				'sticky top-0 z-20 w-full border-b border-(--ds-border) bg-[color-mix(in_oklch,var(--ds-bg-secondary)_85%,transparent)] backdrop-blur-md motion-safe:transition-transform motion-safe:duration-300 has-[:focus-visible]:translate-y-0',
+				hidden && '-translate-y-full',
+			)}
+		>
 			{/*
 				The links are rendered once (the active indicator is a named view
 				transition and must be unique): inline on desktop, inside the
 				collapsible hamburger panel on mobile.
 			*/}
 			<nav className='mx-auto flex w-full max-w-5xl flex-wrap items-center border-x border-gray-200 px-5 dark:border-gray-300/20 sm:h-16 sm:flex-nowrap sm:px-8 md:px-18'>
-				{/* Terminal-style brand: the current path, e.g. ~/utc/blog */}
-				<Link
-					href='/'
-					aria-label='Home'
-					className='order-1 flex h-14 min-w-0 items-center font-mono text-sm font-semibold text-(--ds-text-primary) sm:h-auto'
-				>
-					<span className='text-primary-500'>~/</span>
-					<span className='truncate'>{terminalPath(pathname).slice(2)}</span>
-				</Link>
+				{/* Terminal-style brand: the current path as breadcrumbs, e.g. ~/utc / blogs */}
+				<Breadcrumbs />
 
 				{/* Mobile: hamburger toggle */}
 				<button
@@ -160,6 +193,20 @@ export default function SiteNav() {
 									</Fragment>
 								);
 							})}
+							<span
+								aria-hidden='true'
+								className='hidden px-1 font-mono font-normal text-(--ds-text-tertiary) select-none sm:inline'
+							>
+								|
+							</span>
+							<a
+								href={siteMetadata.resume}
+								target='_blank'
+								rel='noreferrer'
+								className='py-2 text-(--ds-text-primary) hover:text-primary-500 motion-safe:transition-colors motion-safe:duration-150 sm:px-2 sm:py-1'
+							>
+								Resume ↗
+							</a>
 
 							{/* Mobile-only: search and theme inside the menu */}
 							<div className='mt-2 flex w-full items-center justify-between border-t border-dashed border-(--ds-border-strong) pt-3 sm:hidden'>

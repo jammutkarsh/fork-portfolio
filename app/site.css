@@ -81,23 +81,20 @@ html.theme-switching::view-transition-new(root) {
 }
 
 /*
-  Home page (app/components/story/story-deck.tsx): the footer is pinned to
-  the bottom of the screen and fades in on the last slide of the story.
+  Home page (app/components/story/story-scroll.tsx): until JS knows the
+  screen, both layouts of the story are rendered; show the one that fits.
+  Keep these queries in step with PORTRAIT there.
 */
-html.story-deck footer {
-	position: fixed;
-	inset-inline: 0;
-	bottom: 0;
-	z-index: 10;
-	opacity: 0;
-	pointer-events: none;
-	background-color: var(--ds-bg-primary);
-	transition: opacity 400ms ease;
+@media (min-width: 768px), (max-height: 500px) {
+	.story-portrait {
+		display: none;
+	}
 }
 
-html.story-deck.story-end footer {
-	opacity: 1;
-	pointer-events: auto;
+@media (max-width: 767px) and (min-height: 501px) {
+	.story-wide {
+		display: none;
+	}
 }
 
 /*

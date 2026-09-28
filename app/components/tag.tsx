@@ -24,7 +24,7 @@ export function tagBadge(text: string) {
 }
 
 /**
- * A post tag. Links to the blog filtered by this tag, or — when `onSelect`
+ * A post tag, always shown in lower case. Links to the blog filtered by this tag, or — when `onSelect`
  * is given (on the blog page itself) — filters in place.
  */
 export default function Tag({
@@ -46,7 +46,7 @@ export default function Tag({
 				className={`${badge ?? tagBadge(text)} cursor-pointer`}
 				onClick={() => onSelect(slug)}
 			>
-				{text}
+				{text.toLowerCase()}
 			</button>
 		);
 	}
@@ -56,7 +56,7 @@ export default function Tag({
 			href={`/blogs?tag=${slug}`}
 			className={`${badge ?? tagBadge(text)} cursor-pointer`}
 		>
-			{text}
+			{text.toLowerCase()}
 		</Link>
 	);
 }

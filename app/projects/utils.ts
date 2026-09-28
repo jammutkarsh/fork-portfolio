@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import type { Project } from './types';
+import type { Diagram, Project } from './types';
 
 const PROJECTS_DIR = path.join(process.cwd(), 'content/projects');
 
@@ -47,8 +47,25 @@ function readProject(file: string): Project {
 		order: data.order,
 		demo: data.demo,
 		screenshots: data.screenshots,
-		architecture: data.architecture,
+		architecture: diagrams(data.architecture),
 	};
+}
+
+/**
+ * `architecture` is one Mermaid source, or a list of them, each either a
+ * source or `{ title, source }`.
+ */
+function diagrams(value: unknown): Diagram[] | undefined {
+	if (!value) return undefined;
+	const list = Array.isArray(value) ? value : [value];
+	const out: Diagram[] = list
+		.map((item) =>
+			typeof item === 'string'
+				? { source: item }
+				: { title: item?.title, source: item?.source ?? '' },
+		)
+		.filter((diagram) => diagram.source.trim());
+	return out.length ? out : undefined;
 }
 
 /** All projects, by `order` and then by name. */

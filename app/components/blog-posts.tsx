@@ -3,9 +3,23 @@
 import { format } from 'date-fns';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
+import type { PointerEvent } from 'react';
 import { kebabCase } from '../blogs/kebab-case';
 import type { PostSummary } from '../blogs/utils';
 import Tag from './tag';
+
+// Keep the hover halo centred on the pointer.
+function followPointer(event: PointerEvent<HTMLElement>) {
+	const box = event.currentTarget.getBoundingClientRect();
+	event.currentTarget.style.setProperty(
+		'--halo-x',
+		`${event.clientX - box.left}px`,
+	);
+	event.currentTarget.style.setProperty(
+		'--halo-y',
+		`${event.clientY - box.top}px`,
+	);
+}
 
 export function BlogPosts({
 	posts,
@@ -24,7 +38,8 @@ export function BlogPosts({
 			{posts.map((post, index) => (
 				<motion.li
 					key={post.slug}
-					className='group border-b border-dashed border-(--ds-border-strong)'
+					onPointerMove={followPointer}
+					className='group relative isolate border-b border-dashed border-(--ds-border-strong)'
 					initial={{
 						scale: prefersReducedMotion ? 1 : 0.8,
 						opacity: 0,
@@ -36,6 +51,11 @@ export function BlogPosts({
 						delay: prefersReducedMotion ? 0 : index / 10,
 					}}
 				>
+					{/* Halo: a soft glow that follows the pointer while hovering */}
+					<span
+						aria-hidden='true'
+						className='pointer-events-none absolute -inset-x-4 inset-y-0 -z-10 rounded-(--ds-radius-lg) bg-[radial-gradient(320px_circle_at_var(--halo-x,50%)_var(--halo-y,50%),color-mix(in_oklch,var(--ds-primary)_16%,transparent),transparent_70%)] opacity-0 motion-safe:transition-opacity motion-safe:duration-300 [@media(hover:hover)]:group-hover:opacity-100'
+					/>
 					<Link
 						href={`/blogs/${post.slug}`}
 						aria-label={`Read "${post.metadata.title}"`}

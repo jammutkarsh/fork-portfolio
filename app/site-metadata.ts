@@ -40,6 +40,7 @@ const siteMetadata = {
 	twitter: 'https://twitter.com/jammutkarsh',
 	twitterHandle: '@jammutkarsh',
 	linkedin: 'https://www.linkedin.com/in/jammutkarsh',
+	resume: 'https://short.utkarshchourasia.in/resume',
 	locale: 'en-US',
 	ogLocale: 'en_US',
 };

@@ -10,6 +10,8 @@ export interface PhaseMeta {
 	year?: number;
 	/** Framed on the wall of the desk; see sketches.tsx for the options. */
 	sketch: SketchId;
+	/** Tints the page while this phase is on screen. */
+	color: string;
 }
 
 export interface Phase extends PhaseMeta {
@@ -21,6 +23,10 @@ export interface Story {
 	name: string;
 	avatar: string;
 	occupation: string;
+	/** The idea every phase leads back to; closes the home page. */
+	thesis: string;
+	/** Follows the thesis, continuing its sentence. */
+	closing: string;
 	phases: Phase[];
 }
 
@@ -53,6 +59,8 @@ export function getStory(): Story {
 		name: data.name,
 		avatar: data.avatar,
 		occupation: data.occupation,
+		thesis: data.thesis,
+		closing: data.closing,
 		phases,
 	};
 }
