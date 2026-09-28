@@ -35,6 +35,37 @@ function SearchIcon({ className }: { className?: string }) {
 	);
 }
 
+/**
+ * Whether the nav should slide away: after scrolling down past the top, and
+ * until the page is scrolled back up (even slightly) or reaches the top.
+ */
+function useHiddenOnScroll(enabled: boolean) {
+	const [hidden, setHidden] = useState(false);
+	useEffect(() => {
+		setHidden(false);
+		if (!enabled) return;
+		let last = window.scrollY;
+		let frame = 0;
+		const onScroll = () => {
+			cancelAnimationFrame(frame);
+			frame = requestAnimationFrame(() => {
+				const y = window.scrollY;
+				const delta = y - last;
+				if (y < 64) setHidden(false);
+				else if (delta > 4) setHidden(true);
+				else if (delta < -4) setHidden(false);
+				if (y < 64 || Math.abs(delta) > 4) last = y;
+			});
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => {
+			cancelAnimationFrame(frame);
+			window.removeEventListener('scroll', onScroll);
+		};
+	}, [enabled]);
+	return hidden;
+}
+
 export default function SiteNav() {
 	const pathname = usePathname();
 	const [open, setOpen] = useState(false);
@@ -63,8 +94,16 @@ export default function SiteNav() {
 		return () => window.removeEventListener('keydown', onKeyDown);
 	}, [open]);
 
+	// The home story pins its frame under the nav, so there it always stays.
+	const hidden = useHiddenOnScroll(pathname !== '/' && !open);
+
 	return (
-		<header className='sticky top-0 z-20 w-full border-b border-(--ds-border) bg-[color-mix(in_oklch,var(--ds-bg-secondary)_85%,transparent)] backdrop-blur-md'>
+		<header
+			className={classNames(
+				'sticky top-0 z-20 w-full border-b border-(--ds-border) bg-[color-mix(in_oklch,var(--ds-bg-secondary)_85%,transparent)] backdrop-blur-md motion-safe:transition-transform motion-safe:duration-300 has-[:focus-visible]:translate-y-0',
+				hidden && '-translate-y-full',
+			)}
+		>
 			{/*
 				The links are rendered once (the active indicator is a named view
 				transition and must be unique): inline on desktop, inside the

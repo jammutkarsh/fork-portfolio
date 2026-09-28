@@ -63,6 +63,7 @@ export default function StoryScroll({
 	closing,
 	phases,
 	prose,
+	sentences,
 }: {
 	title: string;
 	bio: string;
@@ -71,6 +72,8 @@ export default function StoryScroll({
 	closing: string;
 	phases: PhaseMeta[];
 	prose: ReactNode[];
+	/** Each phase's prose, one sentence at a time. */
+	sentences: ReactNode[][];
 }) {
 	const reduceMotion = useReducedMotion();
 	const portrait = usePortrait();
@@ -78,8 +81,6 @@ export default function StoryScroll({
 	// Where the reader is: -1 on the intro, then 0 … phases - 1 as each
 	// chapter comes on, fractions in between. Set by the layout on screen.
 	const pos = useMotionValue(-1);
-	// 0 during the story, rising to 1 once it has scrolled past.
-	const outro = useMotionValue(0);
 
 	const settled = useTransform(pos, settle);
 	const smooth = useSpring(settled, { stiffness: 140, damping: 26, mass: 0.6 });
@@ -101,11 +102,11 @@ export default function StoryScroll({
 		};
 	}, [open, wide, reduceMotion]);
 
-	const story = { title, bio, avatar, phases, prose, pos, outro, scene };
+	const story = { title, bio, avatar, phases, prose, pos, scene };
 
 	return (
 		<MotionConfig reducedMotion='user'>
-			<WorldBackdrop p={scene} outro={outro} phases={phases} />
+			<WorldBackdrop p={scene} phases={phases} />
 
 			{portrait !== true && (
 				<div className={portrait === undefined ? 'story-wide' : undefined}>
@@ -114,7 +115,11 @@ export default function StoryScroll({
 			)}
 			{portrait !== false && (
 				<div className={portrait === undefined ? 'story-portrait' : undefined}>
-					<StoryPinned {...story} active={portrait === true} />
+					<StoryPinned
+						{...story}
+						sentences={sentences}
+						active={portrait === true}
+					/>
 				</div>
 			)}
 

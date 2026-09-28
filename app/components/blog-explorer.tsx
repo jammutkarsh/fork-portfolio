@@ -113,7 +113,7 @@ export function BlogExplorer({ posts, tags, tagNames, tagBadges }: Props) {
 					badge='badge badge-primary'
 					onClick={() => selectTag(null)}
 				>
-					All ({posts.length})
+					all ({posts.length})
 				</TagChip>
 				{sortedTags.map((tag) => (
 					<TagChip
@@ -122,7 +122,7 @@ export function BlogExplorer({ posts, tags, tagNames, tagBadges }: Props) {
 						badge={tagBadges[tag] ?? tagBadge(tag)}
 						onClick={() => selectTag(activeTag === tag ? null : tag)}
 					>
-						{tagNames[tag] ?? tag} ({tags[tag]})
+						{(tagNames[tag] ?? tag).toLowerCase()} ({tags[tag]})
 					</TagChip>
 				))}
 			</fieldset>

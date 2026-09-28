@@ -34,7 +34,6 @@ export default function Thesis({
 	return (
 		<section
 			ref={ref}
-			aria-labelledby='thesis'
 			className='relative mx-auto flex w-full max-w-4xl flex-col items-center px-5 pb-24 text-center sm:px-8 md:pb-36'
 		>
 			<motion.div
@@ -42,13 +41,7 @@ export default function Thesis({
 				style={{ scaleY: line }}
 				className='h-24 w-px origin-top bg-linear-to-b from-(--ds-border-strong) to-primary-500 md:h-32'
 			/>
-			<p
-				id='thesis'
-				className='mt-6 font-mono text-xs tracking-widest text-(--ds-text-secondary) uppercase'
-			>
-				The thread through every chapter
-			</p>
-			<blockquote className='mt-5 text-3xl leading-tight font-light tracking-[-0.03em] sm:text-4xl lg:text-5xl'>
+			<blockquote className='mt-8 text-3xl leading-tight font-light tracking-[-0.03em] sm:text-4xl lg:text-5xl'>
 				<span className='text-primary-500'>“</span>
 				{words.map((word, k) => (
 					<Word

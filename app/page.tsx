@@ -18,6 +18,14 @@ export default function Home() {
 				prose={phases.map((phase) => (
 					<PhaseProse key={phase.id} source={phase.body} />
 				))}
+				sentences={phases.map((phase) =>
+					// content/story.mdx has one sentence per line
+					phase.body
+						.split('\n')
+						.map((line) => line.trim())
+						.filter(Boolean)
+						.map((line) => <PhaseProse key={line} source={line} inline />),
+				)}
 			/>
 		</main>
 	);

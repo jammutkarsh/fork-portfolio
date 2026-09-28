@@ -5,8 +5,10 @@ import {
 	type MotionStyle,
 	type MotionValue,
 	motion,
-	motionValue,
+	useMotionValue,
+	useReducedMotion,
 	useScroll,
+	useSpring,
 	useTransform,
 } from 'motion/react';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
@@ -19,19 +21,73 @@ interface Stop {
 	at: number;
 	/** Scrolling spent moving into this stop from the previous one. */
 	enter: number;
-	/** Scrolling spent on this stop. */
-	hold: number;
-	/** How much taller the text is than its space (it scrolls by this). */
-	overflow: number;
+	/** The chapter this stop belongs to; -1 for the intro. */
+	chapter: number;
+}
+
+// A chapter's text as a paragraph, the same in the pages and the measurer.
+const paragraph = 'py-1.5 leading-relaxed text-(--ds-text-primary)';
+// Space the pages keep clear at the top and bottom of the text area (pt-5,
+// pb-8), where it fades out.
+const PAGE_PADDING = 20 + 32;
+
+/** The sentences `from` … `to` of a chapter, as one paragraph. */
+function Sentences({
+	sentences,
+	from = 0,
+	to = sentences.length,
+}: {
+	sentences: ReactNode[];
+	from?: number;
+	to?: number;
+}) {
+	return (
+		<p className={paragraph}>
+			{sentences.slice(from, to).map((sentence, j) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: sentences are fixed
+				<span key={from + j}>{sentence} </span>
+			))}
+		</p>
+	);
+}
+
+/**
+ * Splits each chapter's sentences into pages that fit `room` pixels, from
+ * the measurer's copy of the text: a page ends before the sentence that
+ * would run past it. One line is kept spare, as a sentence can wrap one line
+ * differently once it starts a page. Returns each page's first sentence.
+ */
+function paginate(measurer: HTMLElement, room: number) {
+	return [...measurer.querySelectorAll<HTMLElement>('[data-chapter]')].map(
+		(chapter) => {
+			const para = chapter.firstElementChild as HTMLElement;
+			const spans = [...para.children] as HTMLElement[];
+			const line = Number.parseFloat(getComputedStyle(para).lineHeight) || 26;
+			const limit = room - 12 - line;
+			const starts = [0];
+			let top = spans[0]?.getClientRects()[0]?.top ?? 0;
+			spans.forEach((span, j) => {
+				if (j === starts[starts.length - 1]) return;
+				const rects = span.getClientRects();
+				if (!rects.length) return;
+				if (rects[rects.length - 1].bottom - top > limit) {
+					starts.push(j);
+					top = rects[0].top;
+				}
+			});
+			return starts;
+		},
+	);
 }
 
 /**
  * The story on phones held upright: one frame fills the screen and stays
  * put, with the chapter title at the top, my photo (then the desk) under it
  * and the text below. Scrolling the page moves the story along; nothing
- * snaps. Between chapters the title, desk and text cross over; on a chapter
- * whose text is taller than its space, the page's scroll first scrolls the
- * text, so there is never a scroll box inside the page.
+ * snaps. Between chapters the title, desk and text cross over. A chapter
+ * whose text is longer than its space is split into pages that fit, which
+ * turn over as you scroll while the title and desk stay, so text never has
+ * to scroll on its own.
  */
 export default function StoryPinned({
 	title,
@@ -39,8 +95,8 @@ export default function StoryPinned({
 	avatar,
 	phases,
 	prose,
+	sentences,
 	pos,
-	outro,
 	scene,
 	active,
 }: {
@@ -49,8 +105,9 @@ export default function StoryPinned({
 	avatar: string;
 	phases: PhaseMeta[];
 	prose: ReactNode[];
+	/** Each phase's prose, one sentence at a time. */
+	sentences: ReactNode[][];
 	pos: MotionValue<number>;
-	outro: MotionValue<number>;
 	scene: MotionValue<number>;
 	/** Whether this layout is the one on screen, and so drives `pos`. */
 	active: boolean;
@@ -58,23 +115,29 @@ export default function StoryPinned({
 	const container = useRef<HTMLDivElement>(null);
 	const frame = useRef<HTMLDivElement>(null);
 	const area = useRef<HTMLDivElement>(null);
-	const texts = useRef<(HTMLDivElement | null)[]>([]);
-	// How far each chapter's text has scrolled up, in pixels.
-	const [shifts] = useState(() => phases.map(() => motionValue(0)));
+	const measurer = useRef<HTMLDivElement>(null);
 	const plan = useRef({ start: 0, stops: [] as Stop[] });
+	// Each chapter's pages, as the index of each page's first sentence.
+	const [pages, setPages] = useState(() => phases.map(() => [0]));
 	const [height, setHeight] = useState<number>();
+	const reduceMotion = useReducedMotion();
 	const lenis = useLenis();
 	const { scrollY } = useScroll();
 
-	const introOpacity = useTransform(scene, [-1, -0.55], [1, 0]);
-	const introY = useTransform(scene, [-1, -0.55], [0, -24]);
-	const introEvents = useTransform(scene, (v) => (v < -0.6 ? 'auto' : 'none'));
-	const progress = useTransform(pos, [-1, phases.length - 1], [0, 1]);
-	const progressColor = useTransform(
-		scene,
-		phases.map((_, i) => i),
-		phases.map((phase) => phase.color),
-	);
+	// Which text is on: 0 for the intro, then each page in turn (fractions
+	// in between). Like the scene, it holds while a page is on.
+	const textPos = useMotionValue(0);
+	const settled = useTransform(textPos, (v) => {
+		const base = Math.floor(v);
+		const t = Math.min(1, Math.max(0, (v - base - 0.2) / 0.6));
+		return base + t * t * (3 - 2 * t);
+	});
+	const smooth = useSpring(settled, { stiffness: 140, damping: 26, mass: 0.6 });
+	const text = reduceMotion ? settled : smooth;
+
+	const introOpacity = useTransform(text, [0, 0.45], [1, 0]);
+	const introY = useTransform(text, [0, 0.45], [0, -24]);
+	const introEvents = useTransform(text, (v) => (v < 0.4 ? 'auto' : 'none'));
 
 	useEffect(() => {
 		if (!active) return;
@@ -82,49 +145,44 @@ export default function StoryPinned({
 			const { start, stops } = plan.current;
 			if (!stops.length) return;
 			const s = y - start;
-			let p = -1;
-			for (let i = 1; i < stops.length; i++) {
-				const { at, enter } = stops[i];
-				if (s >= at) p = i - 1;
+			let t = 0;
+			for (let k = 1; k < stops.length; k++) {
+				const { at, enter } = stops[k];
+				if (s >= at) t = k;
 				else {
-					if (s > at - enter) p = i - 2 + (s - (at - enter)) / enter;
+					if (s > at - enter) t = k - 1 + (s - (at - enter)) / enter;
 					break;
 				}
 			}
-			pos.set(p);
-			// Text taller than its space scrolls 1:1 with the page, a little
-			// after its chapter has arrived.
-			for (let i = 1; i < stops.length; i++) {
-				const { at, hold, overflow } = stops[i];
-				const lead = (hold - overflow) / 2;
-				shifts[i - 1].set(-Math.min(overflow, Math.max(0, s - at - lead)));
-			}
-			const last = stops[stops.length - 1];
-			outro.set(
-				Math.min(
-					1,
-					Math.max(0, (s - last.at - last.hold) / (0.8 * window.innerHeight)),
-				),
-			);
+			const from = Math.floor(t);
+			const to = Math.min(stops.length - 1, from + 1);
+			const { chapter: a } = stops[from];
+			const { chapter: b } = stops[to];
+			textPos.set(t);
+			pos.set(a + (b - a) * (t - from));
 		};
 		const measure = () => {
 			const c = container.current;
 			const f = frame.current;
 			const a = area.current;
-			if (!c || !f || !a) return;
+			const m = measurer.current;
+			if (!c || !f || !a || !m) return;
+			const next = paginate(m, a.clientHeight - PAGE_PADDING);
+			setPages((prev) =>
+				JSON.stringify(prev) === JSON.stringify(next) ? prev : next,
+			);
 			const vh = window.innerHeight;
 			const nav = Number.parseFloat(getComputedStyle(f).top) || 0;
-			const enter = 0.5 * vh;
-			const base = 0.35 * vh;
-			const room = a.clientHeight;
-			const stops: Stop[] = [{ at: 0, enter: 0, hold: 0.25 * vh, overflow: 0 }];
-			let at = stops[0].hold;
-			for (const text of texts.current) {
-				const overflow = Math.max(0, (text?.offsetHeight ?? 0) - room);
-				at += enter;
-				stops.push({ at, enter, hold: base + overflow, overflow });
-				at += base + overflow;
-			}
+			const stops: Stop[] = [{ at: 0, enter: 0, chapter: -1 }];
+			let at = 0.25 * vh;
+			next.forEach((starts, chapter) => {
+				starts.forEach((_, page) => {
+					const enter = (page === 0 ? 0.5 : 0.4) * vh;
+					at += enter;
+					stops.push({ at, enter, chapter });
+					at += 0.3 * vh;
+				});
+			});
 			plan.current = {
 				start: c.getBoundingClientRect().top + window.scrollY - nav,
 				stops,
@@ -135,7 +193,7 @@ export default function StoryPinned({
 		measure();
 		const resize = new ResizeObserver(measure);
 		if (area.current) resize.observe(area.current);
-		for (const text of texts.current) if (text) resize.observe(text);
+		if (measurer.current) resize.observe(measurer.current);
 		window.addEventListener('resize', measure);
 		const unsubscribe = scrollY.on('change', update);
 		return () => {
@@ -143,7 +201,7 @@ export default function StoryPinned({
 			window.removeEventListener('resize', measure);
 			unsubscribe();
 		};
-	}, [active, scrollY, pos, outro, shifts]);
+	}, [active, scrollY, pos, textPos]);
 
 	const goTo = (index: number) => {
 		const { start, stops } = plan.current;
@@ -152,6 +210,15 @@ export default function StoryPinned({
 		if (lenis) lenis.scrollTo(target, { duration: 1.4 });
 		else window.scrollTo({ top: target, behavior: 'smooth' });
 	};
+
+	// Every page in reading order; page n is text stop n + 1.
+	const allPages = pages.flatMap((starts, chapter) =>
+		starts.map((from, page) => ({
+			chapter,
+			from,
+			to: starts[page + 1] ?? sentences[chapter].length,
+		})),
+	);
 
 	return (
 		<>
@@ -164,7 +231,7 @@ export default function StoryPinned({
 			>
 				<div
 					ref={frame}
-					className='sticky top-(--nav) flex h-[calc(100svh-var(--nav))] flex-col px-5 pt-6 pb-4 sm:px-8'
+					className='sticky top-(--nav) flex h-[calc(100svh-var(--nav))] flex-col px-5 pt-6 pb-2 sm:px-8'
 				>
 					{/* Chapter title, top left */}
 					<div aria-hidden='true' className='grid min-h-19 shrink-0 items-end'>
@@ -181,10 +248,10 @@ export default function StoryPinned({
 						className='mx-auto mt-4 w-full max-w-[calc(30svh*4/3)] shrink-0'
 					/>
 
-					{/* The intro, then each chapter's text, in the same space */}
+					{/* The intro, then each page of text, in the same space */}
 					<div
 						ref={area}
-						className='mt-3 grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_1.25rem,black_calc(100%-2rem),transparent)]'
+						className='relative mt-3 grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_1.25rem,black_calc(100%-2rem),transparent)]'
 					>
 						<motion.section
 							style={{
@@ -205,30 +272,26 @@ export default function StoryPinned({
 								My journey &darr;
 							</button>
 						</motion.section>
-						{phases.map((phase, i) => (
-							<Text
-								key={phase.id}
-								ref={(el) => {
-									texts.current[i] = el;
-								}}
-								i={i}
-								scene={scene}
-								shift={shifts[i]}
-							>
-								{prose[i]}
-							</Text>
-						))}
-					</div>
 
-					{/* How far through the story */}
-					<div
-						aria-hidden='true'
-						className='mt-2 h-px shrink-0 bg-(--ds-border)'
-					>
-						<motion.div
-							className='h-full origin-left'
-							style={{ scaleX: progress, backgroundColor: progressColor }}
-						/>
+						{allPages.map(({ chapter, from, to }, n) => (
+							<Page key={`${chapter}-${from}`} text={text} stop={n + 1}>
+								<Sentences sentences={sentences[chapter]} from={from} to={to} />
+							</Page>
+						))}
+
+						{/* An invisible copy of every chapter's text, to find page breaks */}
+						<div
+							ref={measurer}
+							aria-hidden='true'
+							className='invisible absolute inset-x-0 top-0 text-base'
+						>
+							{sentences.map((chapter, c) => (
+								// biome-ignore lint/suspicious/noArrayIndexKey: chapters are fixed
+								<div key={c} data-chapter={c}>
+									<Sentences sentences={chapter} />
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -246,10 +309,10 @@ export default function StoryPinned({
 	);
 }
 
-/** 1 while chapter `i` is on, fading out half a chapter away. */
-function useBump(scene: MotionValue<number>, i: number) {
+/** 1 while stop `i` is on, fading out half a stop away. */
+function useBump(value: MotionValue<number>, i: number) {
 	return useTransform(
-		scene,
+		value,
 		[i - 0.5, i - 0.2, i + 0.2, i + 0.5],
 		[0, 1, 1, 0],
 	);
@@ -281,31 +344,26 @@ function Title({
 	);
 }
 
-function Text({
-	ref,
-	i,
-	scene,
-	shift,
+/** A page of chapter text: on while the text position is at `stop`. */
+function Page({
+	text,
+	stop,
 	children,
 }: {
-	ref: (el: HTMLDivElement | null) => void;
-	i: number;
-	scene: MotionValue<number>;
-	shift: MotionValue<number>;
+	text: MotionValue<number>;
+	stop: number;
 	children: ReactNode;
 }) {
-	const opacity = useBump(scene, i);
-	const enter = useTransform(scene, [i - 0.5, i, i + 0.5], [14, 0, -8]);
-	const y = useTransform(() => shift.get() + enter.get());
+	const opacity = useBump(text, stop);
+	const y = useTransform(text, [stop - 0.5, stop, stop + 0.5], [14, 0, -8]);
 	const pointerEvents = useTransform(opacity, (o) =>
 		o > 0.5 ? 'auto' : 'none',
 	);
 	return (
 		<motion.div
-			ref={ref}
 			aria-hidden='true'
 			style={{ opacity, y, pointerEvents }}
-			className='[grid-area:1/1] self-start py-5 text-base'
+			className='[grid-area:1/1] self-start pt-5 pb-8 text-base'
 		>
 			{children}
 		</motion.div>

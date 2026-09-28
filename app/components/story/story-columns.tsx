@@ -26,7 +26,6 @@ export default function StoryColumns({
 	phases,
 	prose,
 	pos,
-	outro,
 	scene,
 	active,
 }: {
@@ -36,7 +35,6 @@ export default function StoryColumns({
 	phases: PhaseMeta[];
 	prose: ReactNode[];
 	pos: MotionValue<number>;
-	outro: MotionValue<number>;
 	scene: MotionValue<number>;
 	/** Whether this layout is the one on screen, and so drives `pos`. */
 	active: boolean;
@@ -68,12 +66,6 @@ export default function StoryColumns({
 			threadHeight.set(Math.max(0, at - listTop));
 			if (!centers.length || at <= centers[0]) return pos.set(-1);
 			const last = centers.length - 1;
-			outro.set(
-				Math.min(
-					1,
-					Math.max(0, (at - centers[last]) / (0.8 * window.innerHeight)),
-				),
-			);
 			if (at >= centers[last]) return pos.set(last - 1);
 			let k = 0;
 			while (at >= centers[k + 1]) k++;
@@ -104,7 +96,7 @@ export default function StoryColumns({
 			window.removeEventListener('resize', measure);
 			unsubscribe();
 		};
-	}, [active, scrollY, pos, threadHeight, outro]);
+	}, [active, scrollY, pos, threadHeight]);
 
 	// Scroll so that stop `index` (0 = intro, 1 = first chapter) is centred.
 	const goTo = (index: number) => {

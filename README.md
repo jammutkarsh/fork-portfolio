@@ -27,7 +27,7 @@ npm run dev
 ## Writing content
 
 - Blog posts: `content/blog/*.mdx` (frontmatter: `title`, `date`, `tags`, `draft`, `summary`)
-- Home page story: `content/story.mdx` (one `## Title` section per phase; each phase's year, sketch and colour, plus the closing thesis, live in the frontmatter)
+- Home page story: `content/story.mdx` (one `## Title` section per phase, one sentence per line, as phones split long chapters into pages between sentences; each phase's year, sketch and colour, plus the closing thesis, live in the frontmatter)
 - Uses page: `app/uses/content.mdx`
 - Projects: `content/projects/*.mdx`, one file per project (images go in `public/static/images/project/<name>/`)
 - Blog posts are served at `/blogs/<slug>`; old `/blog/...` links redirect there (`next.config.ts`)

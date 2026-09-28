@@ -141,7 +141,7 @@ export default async function ProjectPage(props: {
 				<ul className='flex flex-wrap gap-2'>
 					{project.stack.map((tech) => (
 						<li key={tech} className={tagBadge(tech)}>
-							{tech}
+							{tech.toLowerCase()}
 						</li>
 					))}
 				</ul>
