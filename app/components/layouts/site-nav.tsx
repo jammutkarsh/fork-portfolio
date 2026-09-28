@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Fragment, useEffect, useState, ViewTransition } from 'react';
 import { openCommandMenu } from '../command-menu';
-import { terminalPath } from './terminal-path';
+import Breadcrumbs from './breadcrumbs';
 import ThemeSwitch from './theme-switch/theme-switch';
 
 export const navLinks = [
@@ -71,15 +71,8 @@ export default function SiteNav() {
 				collapsible hamburger panel on mobile.
 			*/}
 			<nav className='mx-auto flex w-full max-w-5xl flex-wrap items-center border-x border-gray-200 px-5 dark:border-gray-300/20 sm:h-16 sm:flex-nowrap sm:px-8 md:px-18'>
-				{/* Terminal-style brand: the current path, e.g. ~/utc/blog */}
-				<Link
-					href='/'
-					aria-label='Home'
-					className='order-1 flex h-14 min-w-0 items-center font-mono text-sm font-semibold text-(--ds-text-primary) sm:h-auto'
-				>
-					<span className='text-primary-500'>~/</span>
-					<span className='truncate'>{terminalPath(pathname).slice(2)}</span>
-				</Link>
+				{/* Terminal-style brand: the current path as breadcrumbs, e.g. ~/utc / blogs */}
+				<Breadcrumbs />
 
 				{/* Mobile: hamburger toggle */}
 				<button
