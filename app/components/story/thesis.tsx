@@ -8,6 +8,7 @@ import {
 } from 'motion/react';
 import Link from 'next/link';
 import { useRef } from 'react';
+import siteMetadata from '../../site-metadata';
 
 /**
  * The end of the story: the thread that ran down the chapters arrives at
@@ -72,6 +73,14 @@ export default function Thesis({
 				<Link href='/projects' className='underline-magical'>
 					Projects &rarr;
 				</Link>
+				<a
+					href={siteMetadata.resume}
+					target='_blank'
+					rel='noreferrer'
+					className='underline-magical'
+				>
+					Resume ↗
+				</a>
 			</div>
 		</section>
 	);

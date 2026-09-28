@@ -1,7 +1,7 @@
 'use client';
 
 import type { MotionValue } from 'motion/react';
-import { Ambience, PRIMARY } from '../layouts/ambience';
+import { PRIMARY, useAmbience } from '../layouts/ambience';
 import type { PhaseMeta } from './get-story';
 
 /**
@@ -17,11 +17,10 @@ export default function WorldBackdrop({
 	p: MotionValue<number>;
 	phases: PhaseMeta[];
 }) {
-	return (
-		<Ambience
-			p={p}
-			stops={[-1, ...phases.map((_, i) => i)]}
-			colors={[PRIMARY, ...phases.map((phase) => phase.color)]}
-		/>
+	useAmbience(
+		p,
+		[-1, ...phases.map((_, i) => i)],
+		[PRIMARY, ...phases.map((phase) => phase.color)],
 	);
+	return null;
 }
