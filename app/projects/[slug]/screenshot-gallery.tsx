@@ -72,7 +72,7 @@ export default function ScreenshotGallery({
 				className='m-auto h-dvh max-h-none w-dvw max-w-none bg-transparent p-4 backdrop:bg-black/95 backdrop:backdrop-blur-sm md:p-10'
 			>
 				<div className='pointer-events-none flex h-full flex-col gap-4'>
-					<div className='pointer-events-auto flex items-center justify-between gap-4 text-sm text-gray-300'>
+					<div className='flex items-center justify-between gap-4 text-sm text-gray-300 *:pointer-events-auto'>
 						<span className='tabular-nums'>
 							{index + 1} / {count}
 							{current.caption && ` · ${current.caption}`}
@@ -103,10 +103,30 @@ export default function ScreenshotGallery({
 							fill
 							sizes='100vw'
 							className='pointer-events-auto object-contain'
+							// The image element fills this area but the picture is fitted
+							// inside it; a click beside the picture closes the preview.
+							onClick={(event) => {
+								const img = event.currentTarget;
+								const box = img.getBoundingClientRect();
+								const k = Math.min(
+									box.width / img.naturalWidth,
+									box.height / img.naturalHeight,
+								);
+								const width = img.naturalWidth * k;
+								const height = img.naturalHeight * k;
+								const left = box.left + (box.width - width) / 2;
+								const top = box.top + (box.height - height) / 2;
+								const inside =
+									event.clientX >= left &&
+									event.clientX <= left + width &&
+									event.clientY >= top &&
+									event.clientY <= top + height;
+								if (!inside) dialog.current?.close();
+							}}
 						/>
 					</div>
 					{count > 1 && (
-						<div className='pointer-events-auto flex justify-center gap-3'>
+						<div className='flex justify-center gap-3 *:pointer-events-auto'>
 							<button
 								type='button'
 								onClick={() => step(-1)}

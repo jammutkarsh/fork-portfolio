@@ -71,7 +71,7 @@ export default function Thesis({
 
 				<motion.p
 					style={{ opacity: closingOpacity, y: closingY }}
-					className='mt-8 max-w-2xl text-lg leading-relaxed text-(--ds-text-secondary) sm:text-xl'
+					className='mt-8 max-w-2xl text-lg leading-relaxed text-(--ds-text-primary) sm:text-xl'
 				>
 					{closing}
 				</motion.p>
@@ -161,6 +161,7 @@ function Connector({ color }: { color: string }) {
 			<div ref={ref} style={{ height }}>
 				{width > 0 && (
 					<svg
+						aria-hidden='true'
 						width={width}
 						height={height}
 						className='block overflow-visible'

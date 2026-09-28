@@ -20,13 +20,25 @@ screenshots:
     caption: The blog, with search and tag filters
   - src: /static/images/project/utkarshchourasia-in/post.webp
     caption: A blog post, with the frame opened up for code
-architecture: |
-  flowchart LR
-    content["content/*.mdx"] --> parse["gray-matter + next-mdx-remote"]
-    parse --> build["Next.js static build"]
-    build --> home["Home: story deck"]
-    build --> blog["Blog"]
-    build --> projects["Projects"]
+# architecture: one Mermaid diagram (any type), or a list of them, each a
+# source or `{ title, source }`.
+architecture:
+  - title: Build
+    source: |
+      flowchart LR
+        content["content/*.mdx"] --> parse["gray-matter + next-mdx-remote"]
+        parse --> build["Next.js static build"]
+        build --> home["Home: story"]
+        build --> blog["Blog"]
+        build --> projects["Projects"]
+  - title: Serving a page
+    source: |
+      sequenceDiagram
+        participant B as Browser
+        participant V as Vercel CDN
+        B->>V: GET /blogs/some-post
+        V-->>B: prerendered HTML
+        B->>B: hydrate, then animate on scroll
 ---
 
 My corner of the internet needed to do three things: tell my story, host my writing,

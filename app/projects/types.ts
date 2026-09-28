@@ -26,8 +26,14 @@ export interface Project {
 	/** A YouTube link or a video file path. */
 	demo?: string;
 	screenshots?: Screenshot[];
-	/** Mermaid source. */
-	architecture?: string;
+	/** Architecture diagrams, in order. */
+	architecture?: Diagram[];
+}
+
+/** A Mermaid diagram (any type Mermaid supports), with an optional title. */
+export interface Diagram {
+	title?: string;
+	source: string;
 }
 
 export interface ProjectModal {

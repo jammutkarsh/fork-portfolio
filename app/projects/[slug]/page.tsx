@@ -161,7 +161,19 @@ export default async function ProjectPage(props: {
 
 			{project.architecture && (
 				<Section label='Architecture'>
-					<MermaidDiagram source={project.architecture} />
+					<div className='space-y-8'>
+						{project.architecture.map((diagram, i) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: diagrams are fixed
+							<figure key={i} className='space-y-3'>
+								{diagram.title && (
+									<figcaption className='font-mono text-sm text-(--ds-text-primary)'>
+										{diagram.title}
+									</figcaption>
+								)}
+								<MermaidDiagram source={diagram.source} />
+							</figure>
+						))}
+					</div>
 				</Section>
 			)}
 		</article>
