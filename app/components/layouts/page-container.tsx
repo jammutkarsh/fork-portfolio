@@ -4,7 +4,7 @@ import { PageAmbience } from './ambience';
 export default function PageContainer({
 	children,
 	className,
-	accent = '#af00d7',
+	accent = '#7c6cf0',
 }: {
 	children: React.ReactNode;
 	className?: string;

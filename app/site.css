@@ -81,6 +81,23 @@ html.theme-switching::view-transition-new(root) {
 }
 
 /*
+  Home page (app/components/story/story-scroll.tsx): until JS knows the
+  screen, both layouts of the story are rendered; show the one that fits.
+  Keep these queries in step with PORTRAIT there.
+*/
+@media (min-width: 768px), (max-height: 500px) {
+	.story-portrait {
+		display: none;
+	}
+}
+
+@media (max-width: 767px) and (min-height: 501px) {
+	.story-wide {
+		display: none;
+	}
+}
+
+/*
   Code blocks carry colours for both themes (rehype-pretty-code, see
   app/blogs/utils.ts); show the set that matches the site theme.
 */
